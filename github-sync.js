@@ -1,13 +1,32 @@
 // =============================================
 // PEER CRM v5 · GitHub Sync + WhatsApp Module
+// Token נשמר ב-localStorage של הדפדפן (לא בקובץ ציבורי)
 // =============================================
+
+const TOKEN_KEY = 'peer_crm_github_token';
+
+// ========== TOKEN MANAGEMENT ==========
+function getStoredToken() {
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+function setStoredToken(token) {
+  localStorage.setItem(TOKEN_KEY, token);
+}
+
+function clearStoredToken() {
+  localStorage.removeItem(TOKEN_KEY);
+}
 
 // ========== GITHUB API CLIENT ==========
 async function ghApiCall(method, path, body = null) {
   const cfg = window.PEER_CONFIG;
+  const token = getStoredToken();
+  if (!token) throw new Error('NO_TOKEN');
+
   const url = `https://api.github.com/repos/${cfg.github_owner}/${cfg.github_repo}/${path}`;
   const headers = {
-    'Authorization': `Bearer ${cfg.github_token}`,
+    'Authorization': `Bearer ${token}`,
     'Accept': 'application/vnd.github+json',
     'X-GitHub-Api-Version': '2022-11-28'
   };
@@ -19,6 +38,10 @@ async function ghApiCall(method, path, body = null) {
   const res = await fetch(url, opts);
   if (!res.ok) {
     const err = await res.text();
+    if (res.status === 401) {
+      clearStoredToken();
+      throw new Error('TOKEN_INVALID');
+    }
     throw new Error(`GitHub API ${res.status}: ${err}`);
   }
   return res.json();
@@ -28,19 +51,88 @@ async function ghApiCall(method, path, body = null) {
 async function initGitHubSync() {
   const cfg = window.PEER_CONFIG;
   if (!cfg) throw new Error('config.js לא נטען');
-  if (cfg.github_token === 'YOUR_GITHUB_TOKEN_HERE') {
-    showSetupModal();
-    throw new Error('GitHub Token לא מוגדר');
+  if (!cfg.github_owner || cfg.github_owner === 'YOUR_GITHUB_USERNAME') {
+    throw new Error('CONFIG_INCOMPLETE');
   }
+
+  let token = getStoredToken();
+  if (!token) {
+    // אין Token - נבקש מהמשתמש פעם אחת
+    token = await promptForToken();
+    if (!token) throw new Error('NO_TOKEN');
+    setStoredToken(token);
+  }
+
   // בדיקת חיבור
   try {
     await ghApiCall('GET', '');
-    GH_CONFIG = cfg;
     console.log('✓ GitHub connection OK');
   } catch(err) {
-    console.error('GitHub connection failed:', err);
-    throw err;
+    if (err.message === 'TOKEN_INVALID') {
+      // Token לא תקין - בקש חדש
+      const newToken = await promptForToken('הטוקן הקודם פג תוקף. אנא הכניסי חדש:');
+      if (!newToken) throw err;
+      setStoredToken(newToken);
+      await ghApiCall('GET', '');
+    } else {
+      throw err;
+    }
   }
+}
+
+// ========== TOKEN PROMPT MODAL ==========
+function promptForToken(message = 'הכניסי את ה-Personal Access Token של GitHub:') {
+  return new Promise((resolve) => {
+    const modal = document.createElement('div');
+    modal.className = 'gh-setup-modal';
+    modal.innerHTML = `
+      <div class="gh-setup">
+        <h2>🔐 חיבור ל-GitHub</h2>
+        <p>${message}</p>
+        <p style="font-size:12px">צריכה Token? <a href="https://github.com/settings/tokens?type=beta" target="_blank" style="color:var(--gold);text-decoration:underline">לחצי כאן ליצירה</a> (פעם אחת בלבד)</p>
+
+        <label>Personal Access Token</label>
+        <input type="password" id="gh-token-input" placeholder="github_pat_..." autocomplete="off" />
+        <p style="font-size:11px;color:var(--ink-faint);margin-top:6px">הטוקן יישמר במכשיר הזה בלבד. לא יישלח לאף מקום אחר.</p>
+
+        <details style="margin-top:14px;font-size:12px">
+          <summary style="cursor:pointer;font-weight:600;color:var(--gold)">איך מקבלים Token?</summary>
+          <div class="step"><b>שלב 1:</b> לחצי <a href="https://github.com/settings/tokens?type=beta" target="_blank">כאן</a> ליצירת Token חדש</div>
+          <div class="step"><b>שלב 2:</b> Token name: "PEER CRM"</div>
+          <div class="step"><b>שלב 3:</b> Expiration: 90 days</div>
+          <div class="step"><b>שלב 4:</b> Repository access: Only select repos → בחרי <code>peer-crm</code></div>
+          <div class="step"><b>שלב 5:</b> Repository permissions → Contents: <b>Read and write</b></div>
+          <div class="step"><b>שלב 6:</b> Generate token → העתיקי והדביקי כאן</div>
+        </details>
+
+        <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end">
+          <button class="btn" id="gh-cancel">ביטול</button>
+          <button class="btn btn-pri" id="gh-save">חבר</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    const input = modal.querySelector('#gh-token-input');
+    input.focus();
+
+    modal.querySelector('#gh-save').onclick = () => {
+      const val = input.value.trim();
+      if (!val) {
+        input.style.borderColor = 'var(--danger)';
+        return;
+      }
+      modal.remove();
+      resolve(val);
+    };
+    modal.querySelector('#gh-cancel').onclick = () => {
+      modal.remove();
+      resolve(null);
+    };
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') modal.querySelector('#gh-save').click();
+    });
+  });
 }
 
 // ========== LOAD DATA ==========
@@ -183,25 +275,20 @@ function openWhatsAppForProperty(prop) {
   openWhatsAppEsti(text);
 }
 
-// ========== SETUP MODAL ==========
-function showSetupModal() {
-  const modal = document.createElement('div');
-  modal.className = 'gh-setup-modal';
-  modal.innerHTML = `
-    <div class="gh-setup">
-      <h2>🔐 הגדרת חיבור ל-GitHub</h2>
-      <p>כדי שהמערכת תשמור שינויים בענן, צריך להגדיר Personal Access Token פעם אחת.</p>
-      <div class="step"><b>שלב 1:</b> היכנסי ל-<a href="https://github.com/settings/tokens?type=beta" target="_blank">GitHub Tokens</a></div>
-      <div class="step"><b>שלב 2:</b> לחצי "Generate new token" → בחרי "Fine-grained" → תני שם "PEER CRM"</div>
-      <div class="step"><b>שלב 3:</b> הגדירי תפוגה (90 ימים מומלץ) → תחת "Repository access" בחרי את ה-repo</div>
-      <div class="step"><b>שלב 4:</b> תחת "Repository permissions" הפעילי <b>Contents: Read and write</b></div>
-      <div class="step"><b>שלב 5:</b> לחצי "Generate" והעתיקי את ה-Token (מתחיל ב-<code>github_pat_</code>)</div>
-      <p style="margin-top:14px"><b>הדרך הנכונה ביותר:</b> פתחי את הקובץ <code>config.js</code> במחשב, החליפי את <code>YOUR_GITHUB_TOKEN_HERE</code> ב-Token שלך, ושמרי את הקובץ.</p>
-      <p>למידע מלא ראי את הקובץ <code>SETUP.md</code> ב-Repository.</p>
-      <button class="btn btn-pri" onclick="this.closest('.gh-setup-modal').remove()">הבנתי, אסגור</button>
-    </div>
-  `;
-  document.body.appendChild(modal);
+// ========== TOKEN MANAGEMENT UI ==========
+async function changeGitHubToken() {
+  const newToken = await promptForToken('הכניסי Token חדש:');
+  if (newToken) {
+    setStoredToken(newToken);
+    location.reload();
+  }
+}
+
+function logoutGitHub() {
+  if (confirm('להתנתק? תצטרכי להזין שוב את ה-Token בכניסה הבאה.')) {
+    clearStoredToken();
+    location.reload();
+  }
 }
 
 // ========== EXPORT TO WINDOW ==========
@@ -214,3 +301,5 @@ window.showSyncStatus = showSyncStatus;
 window.openWhatsAppEsti = openWhatsAppEsti;
 window.openWhatsAppLead = openWhatsAppLead;
 window.openWhatsAppForProperty = openWhatsAppForProperty;
+window.changeGitHubToken = changeGitHubToken;
+window.logoutGitHub = logoutGitHub;

@@ -406,6 +406,7 @@ button{cursor:pointer;border:0;background:transparent;font:inherit;color:inherit
   <div class="right">
     <button class="iconbtn" onclick="navTo('whatsapp')" aria-label="וואטסאפ"><i data-lucide="message-circle"></i></button>
     <button class="iconbtn" onclick="navTo('pixel')" aria-label="פיקסל"><i data-lucide="sparkles" style="color:var(--ai)"></i></button>
+    <button class="iconbtn" onclick="navTo('settings')" aria-label="הגדרות"><i data-lucide="settings"></i></button>
   </div>
 </div>
 
@@ -472,6 +473,8 @@ button{cursor:pointer;border:0;background:transparent;font:inherit;color:inherit
     <section class="screen" id="screen-import"></section>
     <!-- DATABASE -->
     <section class="screen" id="screen-database"></section>
+    <!-- SETTINGS -->
+    <section class="screen" id="screen-settings"></section>
   </main>
 </div>
 
@@ -574,6 +577,9 @@ const NAV=[
     {id:'intake',label:'הוספת נכס',icon:'plus-square'},
     {id:'import',label:'מיזוג שבועי',icon:'upload-cloud'},
   ]},
+  {section:'מערכת',items:[
+    {id:'settings',label:'הגדרות',icon:'settings'},
+  ]},
 ];
 
 function renderNav(){
@@ -615,6 +621,7 @@ function renderScreen(id){
     'peer-commercial':()=>renderCatalog('peer-commercial'),'peer-land':()=>renderCatalog('peer-land'),
     neighborhood:renderNeighborhood,intake:renderIntake,leads:renderLeads,
     whatsapp:renderWhatsApp,pixel:renderPixel,import:renderImport,database:renderDatabase,
+    settings:renderSettings,
   };
   if(fns[id])fns[id]();
 }
@@ -638,6 +645,7 @@ function renderOverview(){
       <div class="topbar-act">
         <button class="btn" onclick="window.print()"><i data-lucide="printer"></i>הדפס</button>
         <button class="btn btn-ai" onclick="navTo('pixel')"><i data-lucide="sparkles"></i>שאלי את פיקסל</button>
+        <button class="btn" onclick="navTo('settings')" title="הגדרות"><i data-lucide="settings"></i></button>
       </div>
     </div>
 
@@ -991,7 +999,7 @@ function renderWhatsApp(){
         <h1 class="page-title">שיחות</h1>
         <div class="page-sub">מחובר כ-PEER נדל"ן · 050-540-0407 · 5 שיחות פעילות</div>
       </div>
-      <div class="topbar-act"><button class="btn"><i data-lucide="settings"></i>הגדרות</button></div>
+      <div class="topbar-act"><button class="btn" onclick="navTo('settings')"><i data-lucide="settings"></i>הגדרות</button></div>
     </div>
     <div class="wa-hub">
       <div class="wa-list">
@@ -1332,6 +1340,245 @@ async function init(){
   if(!localStorage.getItem('peer_v4_seen')){setTimeout(()=>$('#welcome').classList.add('show'),400)}
   if(window.lucide)lucide.createIcons();
 }
+/* ============== SETTINGS ============== */
+function renderSettings(){
+  const cfg = window.PEER_CONFIG || {};
+  const tokenStored = !!localStorage.getItem('peer_crm_github_token');
+  const lastUpdated = PEER_DATA?._meta?.lastUpdated;
+  const totalProps = PEER_DATA?._meta?.totalProperties || totalProperties();
+  const ghOwner = cfg.github_owner || '—';
+  const ghRepo = cfg.github_repo || '—';
+  const repoUrl = (ghOwner !== '—' && ghRepo !== '—') ? `https://github.com/${ghOwner}/${ghRepo}` : '#';
+  const pagesUrl = (ghOwner !== '—' && ghRepo !== '—') ? `https://${ghOwner}.github.io/${ghRepo}/` : '#';
+  
+  $('#screen-settings').innerHTML=`
+    <div class="topbar">
+      <div>
+        <div class="page-meta">מערכת</div>
+        <h1 class="page-title">הגדרות</h1>
+        <div class="page-sub">חיבור ל-GitHub, גיבויים, ניהול נתונים, ופרטי מערכת.</div>
+      </div>
+      <div class="topbar-act">
+        <button class="btn btn-pri" onclick="saveNow()"><i data-lucide="save"></i>שמור עכשיו</button>
+      </div>
+    </div>
+
+    <!-- חיבור GitHub -->
+    <div class="sec gold">
+      <div class="sec-h">
+        <div>
+          <div class="sec-eyebrow">סנכרון בענן</div>
+          <div class="sec-title">חיבור GitHub</div>
+        </div>
+        <span class="badge ${tokenStored?'b-active':'b-pending'}">${tokenStored?'מחובר':'לא מחובר'}</span>
+      </div>
+      
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:14px">
+        <div style="padding:12px 14px;border:1px solid var(--border);border-radius:4px;background:var(--paper)">
+          <div style="font-size:10.5px;color:var(--ink-faint);font-weight:600;letter-spacing:.5px">חשבון</div>
+          <div style="font-size:14px;color:var(--ink);font-weight:600;margin-top:3px">${ghOwner}</div>
+        </div>
+        <div style="padding:12px 14px;border:1px solid var(--border);border-radius:4px;background:var(--paper)">
+          <div style="font-size:10.5px;color:var(--ink-faint);font-weight:600;letter-spacing:.5px">Repository</div>
+          <div style="font-size:14px;color:var(--ink);font-weight:600;margin-top:3px">${ghRepo}</div>
+        </div>
+        <div style="padding:12px 14px;border:1px solid var(--border);border-radius:4px;background:var(--paper)">
+          <div style="font-size:10.5px;color:var(--ink-faint);font-weight:600;letter-spacing:.5px">Token</div>
+          <div style="font-size:14px;color:${tokenStored?'var(--success)':'var(--danger)'};font-weight:600;margin-top:3px">${tokenStored?'✓ נשמר במכשיר':'✗ חסר'}</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" onclick="changeGitHubToken()"><i data-lucide="key"></i>${tokenStored?'החלף Token':'הוסף Token'}</button>
+        ${tokenStored?`<button class="btn" onclick="logoutGitHub()"><i data-lucide="log-out"></i>התנתק</button>`:''}
+        <a class="btn" href="${repoUrl}" target="_blank"><i data-lucide="external-link"></i>פתח Repository ב-GitHub</a>
+        <a class="btn" href="${pagesUrl}" target="_blank"><i data-lucide="globe"></i>פתח את האפליקציה</a>
+        <a class="btn btn-ai" href="https://github.com/settings/tokens?type=beta" target="_blank"><i data-lucide="shield"></i>נהל Tokens ב-GitHub</a>
+      </div>
+
+      <div style="margin-top:14px;padding:12px;background:var(--gold-tint);border-right:3px solid var(--gold);border-radius:2px;font-size:12px;color:var(--ink-soft);line-height:1.6">
+        💡 <b>איך זה עובד:</b> ה-Token שלך נשמר רק במכשיר הזה (localStorage), לא בקובץ ולא בענן. כל שינוי שאת עושה במערכת נשמר אוטומטית ל-GitHub כל ${cfg.auto_save_seconds||30} שניות, או מיידית בלחיצה על "שמור עכשיו".
+      </div>
+    </div>
+
+    <!-- מצב נתונים -->
+    <div class="sec">
+      <div class="sec-h">
+        <div>
+          <div class="sec-eyebrow">מאגר נתונים</div>
+          <div class="sec-title">מצב הנתונים</div>
+        </div>
+      </div>
+      
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:14px">
+        <div class="merge-card"><div class="lbl" style="color:var(--gold)">סה"כ נכסים</div><div class="v">${totalProps}</div></div>
+        <div class="merge-card"><div class="lbl">לידים</div><div class="v">${PEER_DATA.leads?.length||0}</div></div>
+        <div class="merge-card"><div class="lbl">משימות פתוחות</div><div class="v">${PEER_DATA.tasks?.filter(t=>!t.done).length||0}</div></div>
+        <div class="merge-card"><div class="lbl" style="color:var(--success)">עודכן</div><div class="v" style="font-size:13px">${lastUpdated?new Date(lastUpdated).toLocaleString('he-IL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—'}</div></div>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" onclick="downloadDataJSON()"><i data-lucide="download"></i>הורד גיבוי (JSON)</button>
+        <button class="btn" onclick="navTo('import')"><i data-lucide="upload-cloud"></i>מיזוג שבועי</button>
+        <button class="btn" onclick="navTo('database')"><i data-lucide="database"></i>צפייה במאגר</button>
+        <button class="btn" onclick="reloadFromGitHub()"><i data-lucide="refresh-cw"></i>רענן מ-GitHub</button>
+      </div>
+    </div>
+
+    <!-- העדפות אישיות -->
+    <div class="sec">
+      <div class="sec-h">
+        <div>
+          <div class="sec-eyebrow">העדפות</div>
+          <div class="sec-title">פרטים אישיים ותקשורת</div>
+        </div>
+      </div>
+      
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px">
+        <div class="field">
+          <label style="display:block;font-size:11px;color:var(--ink-faint);font-weight:600;margin-bottom:5px">מספר WhatsApp עסקי</label>
+          <input id="set-phone" value="${cfg.esti_phone||'972552740050'}" style="width:100%;padding:10px;border:1px solid var(--border-strong);border-radius:4px;font:inherit" />
+          <div style="font-size:10.5px;color:var(--ink-faint);margin-top:4px">פורמט: 972 + מספר ללא 0</div>
+        </div>
+        <div class="field">
+          <label style="display:block;font-size:11px;color:var(--ink-faint);font-weight:600;margin-bottom:5px">שמירה אוטומטית כל</label>
+          <select id="set-autosave" style="width:100%;padding:10px;border:1px solid var(--border-strong);border-radius:4px;font:inherit">
+            <option value="10" ${cfg.auto_save_seconds==10?'selected':''}>10 שניות</option>
+            <option value="30" ${cfg.auto_save_seconds==30||!cfg.auto_save_seconds?'selected':''}>30 שניות (מומלץ)</option>
+            <option value="60" ${cfg.auto_save_seconds==60?'selected':''}>דקה</option>
+            <option value="300" ${cfg.auto_save_seconds==300?'selected':''}>5 דקות</option>
+            <option value="0" ${cfg.auto_save_seconds==0?'selected':''}>ידני בלבד</option>
+          </select>
+        </div>
+      </div>
+      
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+        <button class="btn btn-pri" onclick="savePreferences()"><i data-lucide="check"></i>שמור העדפות</button>
+        <button class="btn" onclick="testWhatsApp()"><i data-lucide="message-circle"></i>בדוק WhatsApp</button>
+      </div>
+    </div>
+
+    <!-- אבטחה -->
+    <div class="sec">
+      <div class="sec-h">
+        <div>
+          <div class="sec-eyebrow">אבטחה</div>
+          <div class="sec-title">פעולות רגישות</div>
+        </div>
+      </div>
+      
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="padding:12px 14px;background:var(--paper);border:1px solid var(--border);border-radius:4px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--ink)">מחק Token מהמכשיר</div>
+            <div style="font-size:11.5px;color:var(--ink-faint);margin-top:2px">מנקה את ה-Token של GitHub מהמכשיר. תצטרכי להזין שוב בכניסה הבאה.</div>
+          </div>
+          <button class="btn" onclick="logoutGitHub()" style="flex-shrink:0">התנתק</button>
+        </div>
+        
+        <div style="padding:12px 14px;background:var(--paper);border:1px solid var(--border);border-radius:4px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--ink)">מחק נתונים מקומיים</div>
+            <div style="font-size:11.5px;color:var(--ink-faint);margin-top:2px">מאפס את כל הנתונים השמורים בדפדפן. הנתונים ב-GitHub נשארים.</div>
+          </div>
+          <button class="btn" onclick="clearLocalData()" style="flex-shrink:0;color:var(--danger);border-color:rgba(160,72,72,.4)">נקה</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- מידע על המערכת -->
+    <div class="sec" style="background:var(--cream-soft)">
+      <div class="sec-h">
+        <div>
+          <div class="sec-eyebrow">אודות</div>
+          <div class="sec-title">PEER CRM v5.0</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--ink-soft);line-height:1.7">
+        מערכת ניהול נכסים ולידים עבור <b>אסתי הלר · PEER Luxury Real Estate · ירושלים</b>.<br>
+        בנוי על: GitHub Pages + GitHub API + Heebo + Lucide Icons + xlsx.js.<br>
+        סנכרון אוטומטי בין מכשירים, ללא Backend, ללא עלות חודשית.<br>
+        <a href="${repoUrl}/commits/main" target="_blank" style="color:var(--gold);text-decoration:underline">צפיי בהיסטוריית שינויים</a>
+      </div>
+    </div>
+  `;
+  if(window.lucide)lucide.createIcons();
+}
+
+// פונקציות עזר להגדרות
+async function reloadFromGitHub(){
+  if(pendingChanges){
+    if(!confirm('יש שינויים לא שמורים. לרענן בכל זאת? (השינויים יאבדו)'))return;
+  }
+  try{
+    showSyncStatus('טוען מחדש...','syncing');
+    await loadDataFromGitHub();
+    pendingChanges=false;
+    showSyncStatus('✓ עודכן','success');
+    renderNav();
+    renderSettings();
+    toast('✓ הנתונים רועננו מ-GitHub');
+  }catch(err){
+    showSyncStatus('✗ שגיאה','error');
+    toast('שגיאה בטעינה: '+err.message);
+  }
+}
+
+function downloadDataJSON(){
+  const json=JSON.stringify(PEER_DATA,null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`peer-crm-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('✓ גיבוי הורד');
+}
+
+function savePreferences(){
+  const phone=$('#set-phone').value.trim();
+  const autosave=parseInt($('#set-autosave').value);
+  // עדכון ב-config של ה-runtime
+  window.PEER_CONFIG.esti_phone=phone;
+  window.PEER_CONFIG.auto_save_seconds=autosave;
+  // שמירה ב-localStorage כעקיפה (כי config.js בקובץ)
+  localStorage.setItem('peer_prefs',JSON.stringify({esti_phone:phone,auto_save_seconds:autosave}));
+  toast('✓ ההעדפות נשמרו במכשיר');
+}
+
+function testWhatsApp(){
+  const phone=$('#set-phone').value.trim()||window.PEER_CONFIG?.esti_phone;
+  const url=`https://wa.me/${phone}?text=${encodeURIComponent('בדיקת PEER CRM ✓')}`;
+  window.open(url,'_blank');
+}
+
+function clearLocalData(){
+  if(!confirm('בטוחה? כל הנתונים המקומיים (כולל Token) ימחקו. הנתונים ב-GitHub יישארו.'))return;
+  if(!confirm('פעם אחרונה - לאשר מחיקה?'))return;
+  localStorage.clear();
+  // נקה גם את ה-IndexedDB אם קיים
+  if(typeof indexedDB!=='undefined'){
+    indexedDB.deleteDatabase('peer_v4');
+  }
+  alert('הנתונים נמחקו. המערכת תיטען מחדש.');
+  location.reload();
+}
+
+// טעינת preferences שמורים בעת init
+function loadStoredPrefs(){
+  try{
+    const stored=localStorage.getItem('peer_prefs');
+    if(stored){
+      const prefs=JSON.parse(stored);
+      if(window.PEER_CONFIG){
+        Object.assign(window.PEER_CONFIG,prefs);
+      }
+    }
+  }catch(e){}
+}
+loadStoredPrefs();
+
 window.addEventListener('DOMContentLoaded',init);
 </script>
 </body>
