@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<title>PEER · ניהול נדל"ן יוקרה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="config.js"></script>
+<script src="github-sync.js"></script>
+
+<style>
+:root{
+  --cream:#faf7f0;--cream-soft:#f4efe2;--white:#fff;--paper:#fdfaf2;
+  --ink:#1a1814;--ink-soft:#3d3a32;--ink-faint:#6b6759;--ink-whisper:#a09b8a;
+  --gold:#a8862e;--gold-bright:#c8a96a;--gold-light:#e8dcb8;
+  --gold-line:rgba(168,134,46,.25);--gold-tint:rgba(168,134,46,.06);
+  --border:rgba(26,24,20,.08);--border-strong:rgba(26,24,20,.16);
+  --success:#5e8d5a;--warning:#b87f1f;--danger:#a04848;
+  --whatsapp:#25d366;--ai:#7d6ad4;
+  --sh-card:0 1px 3px rgba(26,24,20,.04),0 1px 2px rgba(26,24,20,.06);
+  --sh-pop:0 8px 24px rgba(26,24,20,.10),0 2px 6px rgba(26,24,20,.06);
+  --tap:44px;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Heebo',sans-serif!important;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--cream);color:var(--ink);font-weight:300;min-height:100vh;text-align:right;direction:rtl}
+body{overflow-x:hidden;font-size:14px}
+::selection{background:var(--gold-light);color:var(--ink)}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;border:0;background:transparent;font:inherit;color:inherit}
+
+/* APP SHELL */
+.app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+
+/* SIDEBAR (desktop) */
+.sidebar{background:var(--cream-soft);border-left:1px solid var(--border);padding:22px 18px 20px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:40}
+.sidebar::-webkit-scrollbar{width:5px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--gold-line);border-radius:3px}
+.brand{padding-bottom:16px;margin-bottom:12px;border-bottom:1px solid var(--border)}
+.plaque{background:#0a0a0a;border:1px solid var(--gold-bright);border-radius:4px;padding:13px 14px 11px;text-align:center;position:relative;box-shadow:0 4px 12px rgba(0,0,0,.18)}
+.plaque::before{content:'';position:absolute;inset:4px;border:1px solid rgba(200,169,106,.35);border-radius:2px;pointer-events:none}
+.plaque .skyline{display:block;width:100%;max-width:150px;height:28px;margin:0 auto 2px;position:relative;z-index:1}
+.plaque .logo{font-weight:800;font-size:28px;letter-spacing:6px;color:#fff;line-height:1;padding-right:6px;position:relative;z-index:1}
+.plaque .tagline{font-size:8px;letter-spacing:2.5px;color:var(--gold-bright);margin-top:5px;font-weight:500;text-transform:uppercase;position:relative;z-index:1}
+.plaque .div{width:78%;height:1px;background:var(--gold-bright);margin:8px auto 6px;opacity:.65;position:relative;z-index:1}
+.plaque .agent-he{font-size:10.5px;color:#fff;font-weight:400;position:relative;z-index:1}
+.plaque .agent-en{font-size:8px;color:#fff;letter-spacing:1.8px;font-weight:300;margin-top:2px;position:relative;z-index:1;text-transform:uppercase}
+.plaque .dot{color:var(--gold-bright);margin:0 5px}
+
+.nav{display:flex;flex-direction:column;gap:1px;flex:1}
+.nav-section{font-size:9.5px;letter-spacing:1.5px;color:var(--gold);margin:12px 0 4px;padding:0 10px;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:8px;padding:9px 12px;font-size:13px;color:var(--ink-soft);border-radius:2px;transition:all .15s;border-right:2px solid transparent;width:100%;text-align:right;font-weight:400;min-height:38px}
+.nav-item:hover{background:var(--paper);color:var(--ink)}
+.nav-item.active{background:var(--white);color:var(--ink);font-weight:600;border-right-color:var(--gold);box-shadow:0 1px 2px rgba(26,24,20,.04)}
+.nav-item i{width:14px;height:14px;color:var(--ink-faint);flex-shrink:0}
+.nav-item.active i{color:var(--gold)}
+.nav-item .count{margin-right:auto;font-size:11px;color:var(--ink-faint);background:var(--cream);padding:1px 7px;border-radius:8px;border:1px solid var(--border);font-weight:500;font-variant-numeric:tabular-nums}
+.nav-item.active .count{color:var(--gold);border-color:var(--gold-line)}
+.dot-status{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-right:auto}
+.dot-wa{background:var(--whatsapp);box-shadow:0 0 4px rgba(37,211,102,.5)}
+.dot-ai{background:var(--ai);box-shadow:0 0 4px rgba(125,106,212,.5)}
+
+.side-stats{padding:12px 14px;border:1px solid var(--border);background:var(--white);border-radius:4px;margin-top:12px;position:relative}
+.side-stats::before{content:'';position:absolute;top:0;right:0;width:30px;height:1px;background:var(--gold)}
+.side-stats .lbl{font-size:9.5px;letter-spacing:1.5px;color:var(--gold);font-weight:600}
+.side-stats .v{font-size:22px;color:var(--ink);font-weight:700;margin-top:5px}
+.side-stats .v small{font-size:12px;color:var(--ink-faint);font-weight:400}
+.side-stats .bar{height:3px;background:var(--cream);border-radius:2px;margin-top:8px;overflow:hidden}
+.side-stats .bar>span{display:block;height:100%;background:linear-gradient(90deg,var(--gold-bright),var(--gold))}
+.side-stats .foot{font-size:10.5px;color:var(--ink-faint);margin-top:5px}
+
+/* MAIN */
+.main{padding:22px 32px 36px;min-width:0;overflow-x:hidden}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);gap:18px;flex-wrap:wrap}
+.page-meta{font-size:10.5px;letter-spacing:2px;color:var(--gold);margin-bottom:6px;font-weight:600}
+.page-title{font-size:30px;font-weight:600;letter-spacing:.3px;line-height:1.15;color:var(--ink)}
+.page-sub{margin-top:5px;font-size:13px;color:var(--ink-faint);max-width:600px;font-weight:400}
+.topbar-act{display:flex;gap:7px;flex-shrink:0;align-items:center;flex-wrap:wrap}
+
+.btn{background:var(--white);color:var(--ink);border:1px solid var(--border-strong);padding:9px 14px;font-size:12px;border-radius:2px;font-weight:500;display:inline-flex;align-items:center;gap:6px;line-height:1.2;min-height:36px;transition:all .15s}
+.btn i{width:13px;height:13px}
+.btn:hover{border-color:var(--gold);color:var(--gold);background:var(--paper)}
+.btn-pri{background:var(--ink);color:#fff;border-color:var(--ink);font-weight:600}
+.btn-pri:hover{background:var(--gold);border-color:var(--gold);color:#fff}
+.btn-ai{color:var(--ai);border-color:rgba(125,106,212,.4)}
+.btn-ai:hover{background:var(--ai);color:#fff;border-color:var(--ai)}
+.btn-wa{color:var(--whatsapp);border-color:rgba(37,211,102,.4)}
+.btn-wa:hover{background:var(--whatsapp);color:#fff}
+.btn-sm{padding:6px 10px;font-size:11px;min-height:30px}
+
+/* SECTION CARD */
+.sec{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:18px 20px;box-shadow:var(--sh-card);position:relative;margin-bottom:14px}
+.sec.gold::before{content:'';position:absolute;top:0;right:0;width:42px;height:1px;background:var(--gold)}
+.sec-h{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:12px;flex-wrap:wrap}
+.sec-eyebrow{font-size:10px;letter-spacing:1.5px;color:var(--gold);font-weight:600;margin-bottom:3px}
+.sec-title{font-size:17px;font-weight:700;color:var(--ink)}
+.sec-meta{font-size:11.5px;color:var(--ink-faint);font-weight:400}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.kpi{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:14px 16px;box-shadow:var(--sh-card);position:relative}
+.kpi::before{content:'';position:absolute;top:0;right:0;width:30px;height:1px;background:var(--gold)}
+.kpi .lbl{font-size:10px;letter-spacing:1px;color:var(--gold);font-weight:600}
+.kpi .v{font-size:24px;color:var(--ink);font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi .v small{font-size:13px;color:var(--gold);font-weight:600;margin-right:3px}
+.kpi .meta{font-size:11px;color:var(--ink-faint);margin-top:3px;font-weight:400}
+.kpi .delta{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--gold);font-weight:600;margin-top:4px}
+
+/* AI BANNER */
+.ai-banner{background:linear-gradient(135deg,#fdfaf2,#f4efe2);border:1px solid var(--gold-line);border-radius:4px;padding:14px 18px;display:flex;gap:14px;align-items:center;margin-bottom:14px;position:relative;overflow:hidden}
+.ai-banner::before{content:'';position:absolute;top:0;right:0;width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--ai))}
+.ai-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--ai),var(--gold));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;flex-shrink:0;box-shadow:0 4px 14px rgba(125,106,212,.3)}
+.ai-banner .body{flex:1;min-width:0}
+.ai-banner .name{font-size:13px;font-weight:700;color:var(--ai);display:flex;align-items:center;gap:6px}
+.ai-banner .pulse{width:6px;height:6px;background:var(--ai);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(125,106,212,.5)}70%{box-shadow:0 0 0 6px rgba(125,106,212,0)}100%{box-shadow:0 0 0 0 rgba(125,106,212,0)}}
+.ai-banner .msg{font-size:13px;color:var(--ink-soft);margin-top:3px;line-height:1.45;font-weight:400}
+.ai-banner .actions{display:flex;gap:6px;flex-wrap:wrap}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th,.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:right;font-weight:400}
+.tbl th{background:var(--cream-soft);font-weight:600;color:var(--ink-faint);font-size:10.5px;letter-spacing:.5px;position:sticky;top:0;z-index:1}
+.tbl tr:hover td{background:var(--paper)}
+.tbl td.price{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:2px;font-size:10.5px;font-weight:600;letter-spacing:.3px}
+.b-active{background:var(--gold-tint);color:var(--gold);border:1px solid var(--gold-line)}
+.b-sold{background:rgba(94,141,90,.1);color:var(--success);border:1px solid rgba(94,141,90,.3)}
+.b-pending{background:rgba(184,127,31,.1);color:var(--warning);border:1px solid rgba(184,127,31,.3)}
+.b-rent{background:rgba(37,211,102,.1);color:#1a8d4a;border:1px solid rgba(37,211,102,.3)}
+
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:4px;background:var(--white);box-shadow:var(--sh-card)}
+.tbl-wrap::-webkit-scrollbar{height:6px}
+.tbl-wrap::-webkit-scrollbar-thumb{background:var(--gold-line);border-radius:3px}
+
+/* CHIPS / FILTERS */
+.filters{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.search{display:flex;align-items:center;gap:7px;background:var(--white);border:1px solid var(--border-strong);border-radius:2px;padding:8px 12px;flex:1;min-width:200px;max-width:380px;min-height:36px}
+.search i{width:14px;height:14px;color:var(--ink-faint)}
+.search input{flex:1;border:0;outline:0;background:transparent;font-size:13px;text-align:right;color:var(--ink);font-weight:400}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:var(--white);border:1px solid var(--border-strong);padding:6px 12px;border-radius:14px;font-size:11.5px;color:var(--ink-soft);font-weight:500;display:inline-flex;align-items:center;gap:5px;min-height:30px;transition:all .15s}
+.chip:hover{border-color:var(--gold);color:var(--gold)}
+.chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip .c{background:rgba(255,255,255,.15);padding:1px 5px;border-radius:7px;font-size:10px;font-weight:600}
+.chip:not(.active) .c{background:var(--cream);color:var(--ink-faint)}
+
+/* CARD GRID for catalog (mobile-friendly) */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.card{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:14px 16px;box-shadow:var(--sh-card);position:relative;display:flex;flex-direction:column;gap:8px;transition:all .15s}
+.card:hover{border-color:var(--gold-line);box-shadow:var(--sh-pop);transform:translateY(-1px)}
+.card::before{content:'';position:absolute;top:0;right:0;width:24px;height:1px;background:var(--gold);opacity:.6}
+.card .hd{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.card .addr{font-size:14.5px;font-weight:700;color:var(--ink);line-height:1.3}
+.card .nbh{font-size:11px;color:var(--ink-faint);margin-top:2px;font-weight:400}
+.card .stats{display:flex;gap:10px;font-size:12px;color:var(--ink-soft);font-weight:500;flex-wrap:wrap}
+.card .stats .s{display:inline-flex;align-items:center;gap:3px}
+.card .stats .s i{width:11px;height:11px;color:var(--ink-faint)}
+.card .price{font-size:18px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:.3px}
+.card .price small{font-size:11px;color:var(--ink-faint);font-weight:500;margin-right:5px}
+.card .footer{display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border);font-size:11px;color:var(--ink-faint);gap:8px}
+.card .agent{font-weight:500}
+.card .acts{display:flex;gap:5px}
+.card .iconbtn{width:30px;height:30px;border-radius:3px;border:1px solid var(--border-strong);display:inline-flex;align-items:center;justify-content:center;color:var(--ink-soft)}
+.card .iconbtn i{width:13px;height:13px}
+.card .iconbtn:hover{border-color:var(--gold);color:var(--gold)}
+.card .iconbtn.wa:hover{border-color:var(--whatsapp);color:var(--whatsapp)}
+.card .notes{font-size:11.5px;color:var(--ink-faint);font-style:italic;font-weight:400;line-height:1.4}
+.card.intl::after{content:attr(data-flag);position:absolute;top:10px;left:12px;font-size:18px}
+
+/* FIELD */
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11px;color:var(--ink-faint);letter-spacing:.5px;margin-bottom:4px;font-weight:500}
+.field input,.field select,.field textarea{width:100%;background:var(--white);border:1px solid var(--border-strong);border-radius:2px;padding:9px 11px;font-size:13px;color:var(--ink);outline:0;text-align:right;font-weight:400;min-height:38px}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}
+.field textarea{resize:vertical;min-height:60px}
+
+/* MOBILE TOPBAR & DRAWER */
+.mobile-top{display:none}
+.drawer-bg{display:none}
+
+@media (max-width:920px){
+  .app{grid-template-columns:1fr}
+  .sidebar{position:fixed;top:0;right:0;width:280px;height:100vh;transform:translateX(100%);transition:transform .25s ease;z-index:80;box-shadow:-8px 0 24px rgba(0,0,0,.2)}
+  .sidebar.open{transform:translateX(0)}
+  .drawer-bg{display:block;position:fixed;inset:0;background:rgba(26,24,20,.4);z-index:70;opacity:0;pointer-events:none;transition:opacity .25s}
+  .drawer-bg.show{opacity:1;pointer-events:auto}
+  .mobile-top{display:flex;align-items:center;justify-content:space-between;background:var(--cream-soft);border-bottom:1px solid var(--border);padding:10px 14px;position:sticky;top:0;z-index:50;gap:10px}
+  .mobile-top .menu-btn{width:44px;height:44px;border-radius:3px;border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center;background:var(--white)}
+  .mobile-top .menu-btn i{width:18px;height:18px;color:var(--ink)}
+  .mobile-top .ml{display:flex;align-items:center;gap:8px;background:#0a0a0a;padding:6px 14px 6px 12px;border-radius:3px;border:1px solid var(--gold-bright)}
+  .mobile-top .ml-text{font-weight:800;font-size:18px;letter-spacing:5px;color:#fff;line-height:1;padding-right:5px}
+  .mobile-top .ml-tag{font-size:7px;letter-spacing:1.6px;color:var(--gold-bright);font-weight:500;text-transform:uppercase;display:block;margin-top:2px;padding-right:5px}
+  .mobile-top .right{display:flex;gap:6px}
+  .mobile-top .iconbtn{width:38px;height:38px;border-radius:3px;border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center;background:var(--white);color:var(--ink-soft)}
+  .mobile-top .iconbtn i{width:16px;height:16px}
+  .main{padding:14px 14px 96px}
+  .page-title{font-size:23px}
+  .page-sub{font-size:12px}
+  .topbar{margin-bottom:14px;padding-bottom:12px}
+  .topbar-act{width:100%}
+  .topbar-act .btn{flex:1;justify-content:center}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .kpi{padding:11px 13px}
+  .kpi .v{font-size:20px}
+  .sec{padding:14px 14px;margin-bottom:10px}
+  .sec-title{font-size:15px}
+  .cards{grid-template-columns:1fr;gap:10px}
+  .ai-banner{flex-direction:column;align-items:flex-start;padding:12px 14px}
+  .ai-banner .actions{width:100%}
+  .ai-banner .actions .btn{flex:1;justify-content:center}
+  .filters .search{max-width:100%}
+  .tbl-mobile-stack{display:block}
+  /* Pixel screen mobile */
+  .pixel-layout{grid-template-columns:1fr!important}
+  .pixel-side{display:none}
+  /* WA mobile */
+  .wa-hub{grid-template-columns:1fr!important}
+  .wa-list.show-mobile{display:flex}
+  .wa-active.show-mobile{display:flex}
+  .wa-active{height:calc(100vh - 64px)}
+}
+
+/* BOTTOM NAV (mobile) */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--border);z-index:60;padding:6px 4px calc(6px + env(safe-area-inset-bottom));box-shadow:0 -4px 14px rgba(0,0,0,.06)}
+@media (max-width:920px){.bottom-nav{display:flex}}
+.bottom-nav .item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 4px;color:var(--ink-faint);font-size:9.5px;font-weight:500;min-height:54px;border-radius:4px}
+.bottom-nav .item.active{color:var(--gold)}
+.bottom-nav .item i{width:18px;height:18px}
+.bottom-nav .item.ai{position:relative}
+.bottom-nav .item.ai::before{content:'';position:absolute;top:6px;left:calc(50% + 8px);width:6px;height:6px;background:var(--ai);border-radius:50%;box-shadow:0 0 4px rgba(125,106,212,.5)}
+
+/* SCREENS */
+.screen{display:none;animation:fade .25s ease}
+.screen.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* PIXEL */
+.pixel-layout{display:grid;grid-template-columns:1.5fr 1fr;gap:14px}
+.pixel-thread{background:var(--paper);border:1px solid var(--border);border-radius:4px;padding:14px;height:55vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.pixel-msg{padding:11px 14px;border-radius:3px;font-size:13px;line-height:1.55;max-width:85%;font-weight:400}
+.pixel-msg.you{background:var(--ink);color:#fff;align-self:flex-end;border-radius:3px 14px 3px 14px}
+.pixel-msg.ai{background:var(--white);border:1px solid var(--gold-line);align-self:flex-start;border-radius:14px 3px 14px 3px;color:var(--ink-soft)}
+.pixel-msg.ai strong{color:var(--ai);font-weight:700}
+.pixel-comp{display:flex;gap:8px;margin-top:10px}
+.pixel-comp input{flex:1;background:var(--white);border:1px solid var(--border-strong);border-radius:3px;padding:11px 14px;font-size:13px;outline:0;text-align:right;min-height:42px}
+.pixel-comp input:focus{border-color:var(--ai)}
+.pixel-side .sec{margin-bottom:10px}
+.pixel-suggest{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.pixel-suggest .sg{padding:9px 12px;background:var(--gold-tint);border:1px solid var(--gold-line);border-radius:3px;font-size:12px;color:var(--ink-soft);text-align:right;font-weight:400;cursor:pointer}
+.pixel-suggest .sg:hover{background:var(--gold-line);color:var(--ink)}
+
+/* WA */
+.wa-hub{display:grid;grid-template-columns:340px 1fr;gap:0;background:var(--white);border:1px solid var(--border);border-radius:4px;overflow:hidden;height:calc(100vh - 200px);min-height:500px;box-shadow:var(--sh-card)}
+.wa-list{display:flex;flex-direction:column;border-left:1px solid var(--border);background:var(--cream-soft)}
+.wa-list-h{padding:12px;border-bottom:1px solid var(--border);background:var(--white)}
+.wa-conv{padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:10px;align-items:flex-start;min-height:64px}
+.wa-conv:hover{background:var(--paper)}
+.wa-conv.active{background:var(--white);border-right:3px solid var(--whatsapp)}
+.wa-conv .av{width:38px;height:38px;border-radius:50%;background:var(--gold-tint);color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.wa-conv .body{flex:1;min-width:0}
+.wa-conv .nm{font-size:13px;font-weight:600;color:var(--ink);display:flex;justify-content:space-between;gap:6px}
+.wa-conv .nm .t{font-size:10px;color:var(--ink-faint);font-weight:400}
+.wa-conv .pv{font-size:11.5px;color:var(--ink-faint);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:400}
+.wa-conv .un{background:var(--whatsapp);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;min-width:18px;text-align:center;display:inline-block;margin-top:3px}
+.wa-active{display:flex;flex-direction:column}
+.wa-active-h{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--white);gap:8px}
+.wa-thread{flex:1;overflow-y:auto;padding:14px;background:#efeae2;display:flex;flex-direction:column;gap:6px}
+.bubble{max-width:75%;padding:8px 11px;border-radius:7px;font-size:13px;line-height:1.45;font-weight:400;position:relative}
+.bubble.in{background:#fff;align-self:flex-start;border-bottom-right-radius:2px}
+.bubble.out{background:#dcf8c6;align-self:flex-end;border-bottom-left-radius:2px}
+.bubble .ts{font-size:9.5px;color:var(--ink-faint);display:block;margin-top:3px;text-align:left;font-weight:500}
+.wa-comp{padding:10px 14px;border-top:1px solid var(--border);background:var(--cream-soft);display:flex;gap:8px;align-items:center}
+.wa-comp textarea{flex:1;background:var(--white);border:1px solid var(--border-strong);border-radius:18px;padding:9px 14px;font-size:13px;color:var(--ink);outline:0;resize:none;min-height:40px;max-height:100px;text-align:right;font-weight:400}
+
+/* IMPORT */
+.dropzone{border:2px dashed var(--gold-line);border-radius:6px;padding:40px 20px;text-align:center;background:var(--paper);transition:all .15s;cursor:pointer}
+.dropzone:hover,.dropzone.over{border-color:var(--gold);background:var(--gold-tint)}
+.dropzone i{width:38px;height:38px;color:var(--gold);margin-bottom:8px}
+.dropzone .t{font-size:16px;color:var(--ink);font-weight:700}
+.dropzone .s{font-size:12px;color:var(--ink-faint);margin-top:4px;font-weight:400}
+.merge-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.merge-card{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:13px 15px;position:relative;box-shadow:var(--sh-card)}
+.merge-card::before{content:'';position:absolute;top:0;right:0;width:24px;height:1px;background:var(--gold)}
+.merge-card .lbl{font-size:10px;letter-spacing:.5px;font-weight:600}
+.merge-card .v{font-size:24px;color:var(--ink);font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums}
+.merge-card .meta{font-size:10.5px;color:var(--ink-faint);margin-top:3px;font-weight:400}
+
+/* WELCOME MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(26,24,20,.5);z-index:200;display:none;align-items:center;justify-content:center;padding:18px}
+.modal-bg.show{display:flex}
+.modal{background:var(--white);border-radius:6px;border:1px solid var(--border);max-width:520px;width:100%;padding:28px 30px;box-shadow:var(--sh-pop);position:relative;max-height:90vh;overflow-y:auto}
+.modal::before{content:'';position:absolute;top:0;right:0;width:60px;height:1px;background:var(--gold)}
+.modal h2{font-size:22px;color:var(--ink);margin-bottom:7px;font-weight:700}
+.modal p{font-size:13px;color:var(--ink-soft);line-height:1.7;margin-bottom:10px;font-weight:400}
+
+/* TOAST */
+.toasts{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:300;display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none}
+@media(min-width:921px){.toasts{bottom:30px}}
+.toast{background:var(--ink);color:#fff;padding:10px 18px;border-radius:3px;font-size:13px;font-weight:500;box-shadow:var(--sh-pop);animation:tslide .3s ease}
+@keyframes tslide{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* DETAIL DRAWER */
+.detail-bg{position:fixed;inset:0;background:rgba(26,24,20,.5);z-index:90;display:none;justify-content:flex-start}
+.detail-bg.show{display:flex}
+.detail{background:var(--white);width:100%;max-width:480px;height:100%;overflow-y:auto;padding:0;box-shadow:var(--sh-pop);animation:dslide .25s ease}
+@keyframes dslide{from{transform:translateX(-30px);opacity:0}to{transform:none;opacity:1}}
+.detail-h{padding:18px 22px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--white);z-index:1;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.detail-h .close{width:36px;height:36px;border:1px solid var(--border-strong);border-radius:3px;display:flex;align-items:center;justify-content:center}
+.detail-body{padding:20px 22px}
+.detail dl{display:grid;grid-template-columns:auto 1fr;gap:9px 14px;margin-bottom:14px}
+.detail dt{font-size:11px;color:var(--ink-faint);font-weight:600;letter-spacing:.3px}
+.detail dd{font-size:13px;color:var(--ink);font-weight:500}
+.detail .price-big{font-size:32px;font-weight:700;color:var(--ink);margin:6px 0 8px;font-variant-numeric:tabular-nums}
+.detail .price-big small{font-size:14px;color:var(--gold);font-weight:600;margin-right:6px}
+.detail .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.detail .acts .btn{flex:1}
+
+/* NEIGHBORHOOD */
+.nbh-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:920px){.nbh-grid{grid-template-columns:1fr}}
+.nbh-info{font-size:13px;color:var(--ink-soft);line-height:1.7;font-weight:400}
+.nbh-info strong{color:var(--ink);font-weight:700;display:block;margin-top:8px}
+.nbh-info p{margin-bottom:8px}
+
+/* OVERVIEW LISTS */
+.act-feed{display:flex;flex-direction:column;gap:9px}
+.act{display:flex;gap:11px;padding:11px 0;border-bottom:1px solid var(--border);align-items:flex-start}
+.act:last-child{border-bottom:0}
+.act .ic{width:30px;height:30px;border-radius:3px;background:var(--gold-tint);color:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.act .ic i{width:14px;height:14px}
+.act .body{flex:1;min-width:0}
+.act .ttl{font-size:13px;color:var(--ink);font-weight:600;line-height:1.3}
+.act .ttl strong{color:var(--gold);font-weight:700}
+.act .meta{font-size:11px;color:var(--ink-faint);margin-top:2px;font-weight:400}
+
+/* DASHBOARD GRID */
+.dash-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:14px}
+@media(max-width:920px){.dash-grid{grid-template-columns:1fr}}
+
+/* TASK FAB */
+.fab{position:fixed;bottom:80px;left:18px;width:48px;height:48px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh-pop);z-index:55}
+.fab i{width:18px;height:18px}
+.fab:hover{background:var(--gold)}
+@media(min-width:921px){.fab{bottom:24px;left:24px}}
+.fab .badge{position:absolute;top:-4px;right:-4px;background:var(--gold);font-size:10px;font-weight:700;border-radius:9px;padding:1px 5px;border:2px solid var(--white);color:#fff}
+.task-panel{position:fixed;bottom:140px;left:18px;width:300px;background:var(--white);border:1px solid var(--border);border-radius:6px;box-shadow:var(--sh-pop);z-index:55;display:none;overflow:hidden;max-height:50vh}
+@media(min-width:921px){.task-panel{bottom:84px;left:24px}}
+.task-panel.show{display:block}
+.task-panel .h{padding:13px 16px;border-bottom:1px solid var(--border);font-weight:700;font-size:13px;color:var(--ink);display:flex;justify-content:space-between;align-items:center}
+.task-panel .h::before{content:'';position:absolute;top:0;right:0;width:30px;height:1px;background:var(--gold)}
+.task-panel ul{list-style:none;max-height:40vh;overflow-y:auto}
+.task-panel li{padding:10px 16px;border-bottom:1px solid var(--border);font-size:12.5px;color:var(--ink-soft);display:flex;gap:8px;align-items:flex-start;font-weight:400}
+.task-panel li:hover{background:var(--paper)}
+.task-panel li.done{opacity:.5;text-decoration:line-through}
+.task-panel li input{margin-top:3px;accent-color:var(--gold)}
+
+/* INTAKE */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:600px){.row2,.row3{grid-template-columns:1fr}}
+
+/* PRINT-FRIENDLY */
+@media print{
+  .sidebar,.bottom-nav,.fab,.task-panel,.mobile-top,.topbar-act{display:none!important}
+  .app{grid-template-columns:1fr}
+  .main{padding:0}
+  .sec{box-shadow:none;border:1px solid #ccc;break-inside:avoid}
+  .card{break-inside:avoid}
+}
+</style>
+<style>
+.sync-status{position:fixed;top:10px;left:10px;background:var(--white);border:1px solid var(--gold-line);padding:6px 12px;border-radius:20px;font-size:11px;color:var(--ink-faint);z-index:100;display:flex;align-items:center;gap:6px;box-shadow:var(--sh-card);transition:all .2s}
+.sync-status.success{border-color:var(--success);color:var(--success)}
+.sync-status.warning{border-color:var(--warning);color:var(--warning);background:#fff8eb}
+.sync-status.error{border-color:var(--danger);color:var(--danger);background:#fef0f0}
+.sync-status.syncing{border-color:var(--gold);color:var(--gold);background:var(--gold-tint)}
+.sync-status .pulse{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.gh-setup-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.gh-setup{background:var(--white);border-radius:8px;padding:28px;max-width:500px;width:100%;border-top:4px solid var(--gold)}
+.gh-setup h2{font-size:20px;margin-bottom:8px;color:var(--ink)}
+.gh-setup p{font-size:13px;color:var(--ink-faint);margin-bottom:14px;line-height:1.6}
+.gh-setup label{display:block;font-size:12px;color:var(--ink);font-weight:600;margin:14px 0 4px}
+.gh-setup input{width:100%;padding:10px 12px;border:1px solid var(--border-strong);border-radius:4px;font:inherit;font-size:13px}
+.gh-setup .step{background:var(--cream);padding:12px 14px;border-radius:4px;margin:6px 0;font-size:12px}
+.gh-setup .step b{color:var(--gold)}
+</style>
+<div class="sync-status" id="sync-status"><span class="pulse"></span> טוען...</div>
+</head>
+<body>
+
+<!-- MOBILE TOPBAR -->
+<div class="mobile-top">
+  <button class="menu-btn" onclick="openDrawer()" aria-label="פתח תפריט"><i data-lucide="menu"></i></button>
+  <div class="ml">
+    <div>
+      <div class="ml-text">PEER</div>
+      <div class="ml-tag">Luxury Real Estate</div>
+    </div>
+  </div>
+  <div class="right">
+    <button class="iconbtn" onclick="navTo('whatsapp')" aria-label="וואטסאפ"><i data-lucide="message-circle"></i></button>
+    <button class="iconbtn" onclick="navTo('pixel')" aria-label="פיקסל"><i data-lucide="sparkles" style="color:var(--ai)"></i></button>
+  </div>
+</div>
+
+<div class="drawer-bg" id="drawer-bg" onclick="closeDrawer()"></div>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="plaque">
+        <svg class="skyline" viewBox="0 0 280 38" fill="none" stroke="#c8a96a" stroke-width="1.4">
+          <path d="M0 38 L0 26 L18 26 L18 20 L34 20 L34 24 L48 24 L48 16 L62 16 L62 22 L78 22 L78 18 L94 18 L94 25 L112 25 L112 14 L126 14 L126 8 L134 8 L134 2 L142 2 L142 8 L150 8 L150 14 L164 14 L164 22 L184 22 L184 18 L202 18 L202 26 L222 26 L222 20 L240 20 L240 24 L260 24 L260 22 L280 22 L280 38 Z"/>
+        </svg>
+        <div class="logo">PEER</div>
+        <div class="tagline">Luxury Real Estate</div>
+        <div class="div"></div>
+        <div class="agent-he">אסתי הלר<span class="dot">·</span>ירושלים</div>
+        <div class="agent-en">Esti Heller<span class="dot">·</span>Jerusalem</div>
+      </div>
+    </div>
+
+    <nav class="nav" id="nav-root"></nav>
+
+    <div class="side-stats">
+      <div class="lbl">מאגר נכסים</div>
+      <div class="v" id="ss-total">—<small>/500</small></div>
+      <div class="bar"><span id="ss-bar" style="width:0%"></span></div>
+      <div class="foot" id="ss-foot">בקצב לרבעון 4</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- OVERVIEW -->
+    <section class="screen active" id="screen-overview"></section>
+
+    <!-- BHK SALE -->
+    <section class="screen" id="screen-bhk-sale"></section>
+    <!-- DENYA SALE -->
+    <section class="screen" id="screen-denya-sale"></section>
+    <!-- BHK RENT -->
+    <section class="screen" id="screen-bhk-rent"></section>
+    <!-- SOLD -->
+    <section class="screen" id="screen-sold"></section>
+    <!-- PEER catalogues -->
+    <section class="screen" id="screen-peer-il-sale"></section>
+    <section class="screen" id="screen-peer-il-rent"></section>
+    <section class="screen" id="screen-peer-greece"></section>
+    <section class="screen" id="screen-peer-cyprus"></section>
+    <section class="screen" id="screen-peer-commercial"></section>
+    <section class="screen" id="screen-peer-land"></section>
+    <!-- NEIGHBORHOOD -->
+    <section class="screen" id="screen-neighborhood"></section>
+    <!-- INTAKE -->
+    <section class="screen" id="screen-intake"></section>
+    <!-- LEADS -->
+    <section class="screen" id="screen-leads"></section>
+    <!-- WHATSAPP -->
+    <section class="screen" id="screen-whatsapp"></section>
+    <!-- PIXEL -->
+    <section class="screen" id="screen-pixel"></section>
+    <!-- IMPORT -->
+    <section class="screen" id="screen-import"></section>
+    <!-- DATABASE -->
+    <section class="screen" id="screen-database"></section>
+  </main>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="item active" data-bn="overview"><i data-lucide="layout-dashboard"></i><span>בית</span></button>
+  <button class="item" data-bn="database"><i data-lucide="database"></i><span>מאגר</span></button>
+  <button class="item ai" data-bn="pixel"><i data-lucide="sparkles"></i><span>פיקסל</span></button>
+  <button class="item" data-bn="whatsapp"><i data-lucide="message-circle"></i><span>וואטסאפ</span></button>
+  <button class="item" data-bn="leads"><i data-lucide="users"></i><span>לידים</span></button>
+</nav>
+
+<!-- FAB tasks -->
+<button class="fab" onclick="document.getElementById('task-panel').classList.toggle('show')" aria-label="המשימות שלי"><i data-lucide="check-square"></i><span class="badge" id="task-badge">5</span></button>
+<div class="task-panel" id="task-panel">
+  <div class="h"><span>המשימות שלי</span><span style="font-size:11px;color:var(--gold);font-weight:600"><span id="task-done">0</span>/<span id="task-total">5</span></span></div>
+  <ul id="task-list"></ul>
+</div>
+
+<!-- WELCOME -->
+<div class="modal-bg" id="welcome">
+  <div class="modal">
+    <h2>ברוכה הבאה, אסתי 👋</h2>
+    <p>המערכת אותחלה עם <strong>283 נכסים אמיתיים</strong> מהמאגר המעודכן: 60 דירות בבית הכרם, 11 ברמת דניה, 31 להשכרה, 12 עסקאות אחרונות, וכל הקטלוג של פאר תיווך נכסים — ישראל, יוון, קפריסין, מסחרי ומגרשים.</p>
+    <p>המערכת אופטימלית גם לנייד — את יכולה להוסיף נכס במהלך סיור, להתקשר ללקוח ישירות מהמערכת, ולתעד הכל ברגע.</p>
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <button class="btn btn-pri" onclick="closeWelcome()" style="flex:1">בואי נתחיל</button>
+      <button class="btn" onclick="closeWelcome();navTo('import')">ייבוא נתונים שבועי</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL DRAWER -->
+<div class="detail-bg" id="detail-bg" onclick="if(event.target===this)closeDetail()">
+  <div class="detail" id="detail"></div>
+</div>
+
+<!-- TOASTS -->
+<div class="toasts" id="toasts"></div>
+
+<script>
+// === V5: GitHub Sync System ===
+let PEER_DATA = null;
+let GH_CONFIG = null;
+let DATA_SHA = null;
+let saveTimer = null;
+let pendingChanges = false;
+</script>
+
+<script>
+/* ============== STATE ============== */
+const STATE={current:'overview',filterCat:null,searchQ:'',catalogFilter:{}};
+const TASKS=[
+  {t:'התקשרי לדניאל כהן · החלוץ 28',done:false},
+  {t:'אישור צפייה משפחת לוין · גלבר 13',done:false},
+  {t:'עדכון בעלים · רבי בנימין 9 · 30+ ימים ללא קשר',done:false},
+  {t:'סקירת 11 לידים חדשים מהיום',done:false},
+  {t:'בדיקת היטל השבחה · משה קול 14',done:false},
+];
+
+/* ============== UTILS ============== */
+const $=s=>document.querySelector(s);
+const $$=s=>document.querySelectorAll(s);
+function fmt(n){if(n==null||n==='')return '—';if(typeof n==='string')return n;return n.toLocaleString('he-IL')}
+function fmtPrice(n,cur){if(typeof n!=='number')return n||'—';return (cur||'₪')+fmt(n)}
+function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;$('#toasts').appendChild(t);setTimeout(()=>t.remove(),3000)}
+function statusBadge(s){const map={active:['b-active','פעיל'],sold:['b-sold','נמכר'],pending:['b-pending','בהמתנה'],rent:['b-rent','להשכרה']};const[c,t]=map[s]||['b-active',s];return `<span class="badge ${c}">${t}</span>`}
+
+/* ============== INDEXEDDB ============== */
+const DB='peer_v4';
+function idb(){return new Promise((r,rj)=>{const o=indexedDB.open(DB,1);o.onupgradeneeded=e=>{const db=e.target.result;['custom','tasks','leads','meta'].forEach(s=>{if(!db.objectStoreNames.contains(s))db.createObjectStore(s,{keyPath:'k'})})};o.onsuccess=()=>r(o.result);o.onerror=()=>rj(o.error)})}
+async function dbSet(s,k,v){const db=await idb();return new Promise(r=>{const tx=db.transaction(s,'readwrite');tx.objectStore(s).put({k,v});tx.oncomplete=()=>r()})}
+async function dbGet(s,k){const db=await idb();return new Promise(r=>{const tx=db.transaction(s,'readonly');const q=tx.objectStore(s).get(k);q.onsuccess=()=>r(q.result?q.result.v:null);q.onerror=()=>r(null)})}
+
+/* ============== NAV ============== */
+const NAV=[
+  {section:'מבט-על',items:[
+    {id:'overview',label:'מסך הבית',icon:'layout-dashboard'},
+    {id:'database',label:'כל הנכסים',icon:'database'},
+  ]},
+  {section:'בית הכרם · ירושלים',items:[
+    {id:'bhk-sale',label:'מכירה',icon:'home',count:PEER_DATA.bhkSale.length},
+    {id:'denya-sale',label:'רמת דניה',icon:'home',count:PEER_DATA.denyaSale.length},
+    {id:'bhk-rent',label:'השכרה',icon:'key',count:PEER_DATA.bhkRent.length},
+    {id:'sold',label:'נמכרו לאחרונה',icon:'check-circle',count:PEER_DATA.sold.length},
+    {id:'neighborhood',label:'מודיעין שכונה',icon:'map-pin'},
+  ]},
+  {section:'פאר תיווך · קטלוג',items:[
+    {id:'peer-il-sale',label:'מכירה ישראל',icon:'building-2',count:PEER_DATA.peerSaleIL.length},
+    {id:'peer-il-rent',label:'השכרה ישראל',icon:'key-round',count:PEER_DATA.peerRentIL.length},
+    {id:'peer-greece',label:'יוון 🇬🇷',icon:'globe',count:PEER_DATA.peerGreece.length},
+    {id:'peer-cyprus',label:'קפריסין 🇨🇾',icon:'globe',count:PEER_DATA.peerCyprus.length},
+    {id:'peer-commercial',label:'מסחרי',icon:'briefcase',count:PEER_DATA.peerCommercial.length},
+    {id:'peer-land',label:'מגרשים',icon:'map',count:PEER_DATA.peerLand.length},
+  ]},
+  {section:'אינטגרציות',items:[
+    {id:'whatsapp',label:'וואטסאפ Business',icon:'message-circle',status:'wa'},
+    {id:'pixel',label:'פיקסל · עוזר AI',icon:'sparkles',status:'ai'},
+    {id:'leads',label:'לידים',icon:'users'},
+    {id:'intake',label:'הוספת נכס',icon:'plus-square'},
+    {id:'import',label:'מיזוג שבועי',icon:'upload-cloud'},
+  ]},
+];
+
+function renderNav(){
+  const r=$('#nav-root');
+  r.innerHTML=NAV.map(s=>`<div class="nav-section">${s.section}</div>${s.items.map(i=>`<button class="nav-item ${i.id===STATE.current?'active':''}" data-nav="${i.id}"><i data-lucide="${i.icon}"></i><span>${i.label}</span>${i.count!=null?`<span class="count">${i.count}</span>`:''}${i.status?`<span class="dot-status dot-${i.status}"></span>`:''}</button>`).join('')}`).join('');
+  r.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>navTo(b.dataset.nav));
+}
+
+function navTo(id){
+  STATE.current=id;
+  $$('.screen').forEach(s=>s.classList.remove('active'));
+  const t=document.getElementById('screen-'+id);
+  if(t){t.classList.add('active');renderScreen(id)}
+  $$('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.nav===id));
+  $$('.bottom-nav .item').forEach(b=>b.classList.toggle('active',b.dataset.bn===id||(id==='database'&&b.dataset.bn==='database')||(b.dataset.bn==='overview'&&id==='overview')));
+  closeDrawer();
+  window.scrollTo(0,0);
+  if(window.lucide)lucide.createIcons();
+}
+
+function openDrawer(){$('#sidebar').classList.add('open');$('#drawer-bg').classList.add('show')}
+function closeDrawer(){$('#sidebar').classList.remove('open');$('#drawer-bg').classList.remove('show')}
+
+/* ============== STATS ============== */
+function avg(arr){return arr.length?Math.round(arr.reduce((s,n)=>s+n,0)/arr.length):0}
+function totalProperties(){return Object.values(PEER_DATA).reduce((s,a)=>s+a.length,0)}
+function bhkPriceAvg(){return avg(PEER_DATA.bhkSale.filter(p=>typeof p.price==='number'&&p.price>0&&p.price<20000000).map(p=>p.price))}
+function bhkPermmAvg(){return avg(PEER_DATA.bhkSale.filter(p=>p.permm>0).map(p=>p.permm))}
+function denyaPriceAvg(){return avg(PEER_DATA.denyaSale.filter(p=>typeof p.price==='number'&&p.price>0).map(p=>p.price))}
+function rentAvg(){return avg(PEER_DATA.bhkRent.filter(p=>typeof p.rent==='number'&&p.rent>1000).map(p=>p.rent))}
+
+/* ============== SCREENS ============== */
+function renderScreen(id){
+  const fns={
+    overview:renderOverview,'bhk-sale':()=>renderCatalog('bhk-sale'),'denya-sale':()=>renderCatalog('denya-sale'),
+    'bhk-rent':()=>renderCatalog('bhk-rent'),sold:()=>renderCatalog('sold'),
+    'peer-il-sale':()=>renderCatalog('peer-il-sale'),'peer-il-rent':()=>renderCatalog('peer-il-rent'),
+    'peer-greece':()=>renderCatalog('peer-greece'),'peer-cyprus':()=>renderCatalog('peer-cyprus'),
+    'peer-commercial':()=>renderCatalog('peer-commercial'),'peer-land':()=>renderCatalog('peer-land'),
+    neighborhood:renderNeighborhood,intake:renderIntake,leads:renderLeads,
+    whatsapp:renderWhatsApp,pixel:renderPixel,import:renderImport,database:renderDatabase,
+  };
+  if(fns[id])fns[id]();
+}
+
+/* ============== OVERVIEW ============== */
+function renderOverview(){
+  const total=totalProperties();
+  const bhkPrice=bhkPriceAvg();
+  const permm=bhkPermmAvg();
+  const rent=rentAvg();
+  const recent=PEER_DATA.sold.slice(0,4);
+  const top=PEER_DATA.bhkSale.filter(p=>typeof p.price==='number'&&p.price>5000000).sort((a,b)=>b.price-a.price).slice(0,4);
+  
+  $('#screen-overview').innerHTML=`
+    <div class="topbar">
+      <div>
+        <div class="page-meta">PEER · 7 במאי 2026</div>
+        <h1 class="page-title">בוקר טוב, אסתי</h1>
+        <div class="page-sub">${total} נכסים במאגר · 5 משימות פתוחות · עודכן השבוע מיד2 וקטלוג פאר</div>
+      </div>
+      <div class="topbar-act">
+        <button class="btn" onclick="window.print()"><i data-lucide="printer"></i>הדפס</button>
+        <button class="btn btn-ai" onclick="navTo('pixel')"><i data-lucide="sparkles"></i>שאלי את פיקסל</button>
+      </div>
+    </div>
+
+    <div class="ai-banner">
+      <div class="ai-avatar">פ</div>
+      <div class="body">
+        <div class="name">פיקסל <span class="pulse"></span></div>
+        <div class="msg">בוקר טוב 👋 הבוקר זיהיתי <strong>4 נכסים חדשים</strong> בבית הכרם, מתוכם 2 ברחוב משה קול במחיר נמוך מהממוצע. כדאי להציע ללידים החמים שלך — דניאל כהן ומשפחת לוין שניהם מחפשים 4 חדרים בטווח שלך.</div>
+        <div class="actions" style="margin-top:8px"><button class="btn btn-sm btn-ai">הראי לי את ה-4</button><button class="btn btn-sm">דוח שבועי</button></div>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi"><div class="lbl">סך מאגר</div><div class="v">${total}</div><div class="meta">נכסים פעילים</div></div>
+      <div class="kpi"><div class="lbl">ממוצע · בית הכרם</div><div class="v"><small>₪</small>${(bhkPrice/1000000).toFixed(2)}M</div><div class="meta">${PEER_DATA.bhkSale.length} דירות</div></div>
+      <div class="kpi"><div class="lbl">₪/מ"ר · בה"כ</div><div class="v">${permm.toLocaleString('he-IL')}</div><div class="delta">▲ 4.2% מהרבעון הקודם</div></div>
+      <div class="kpi"><div class="lbl">שכ"ד ממוצע</div><div class="v"><small>₪</small>${rent.toLocaleString('he-IL')}</div><div class="meta">${PEER_DATA.bhkRent.length} דירות בה"כ</div></div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="sec gold">
+        <div class="sec-h"><div><div class="sec-eyebrow">פעילות אחרונה</div><div class="sec-title">עסקאות שנמכרו לאחרונה</div></div><button class="btn btn-sm" onclick="navTo('sold')">הכל</button></div>
+        <div class="act-feed">
+          ${recent.map(s=>`<div class="act"><div class="ic"><i data-lucide="check"></i></div><div class="body"><div class="ttl"><strong>${fmtPrice(s.price)}</strong> · ${s.addr}</div><div class="meta">${s.type||'דירה'} · ${s.nbh} · ${s.date||s.source||''}</div></div></div>`).join('')}
+        </div>
+      </div>
+      <div class="sec gold">
+        <div class="sec-h"><div><div class="sec-eyebrow">היוקרה שלך</div><div class="sec-title">נכסים מובילים · בית הכרם</div></div><button class="btn btn-sm" onclick="navTo('bhk-sale')">הכל</button></div>
+        <div class="act-feed">
+          ${top.map(p=>`<div class="act" onclick="showDetail('bhk-sale',${PEER_DATA.bhkSale.indexOf(p)})" style="cursor:pointer"><div class="ic"><i data-lucide="home"></i></div><div class="body"><div class="ttl"><strong>${fmtPrice(p.price)}</strong> · ${p.addr}</div><div class="meta">${p.rooms} חד' · ${p.m2} מ"ר · ${p.agent||''}</div></div></div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="sec gold">
+      <div class="sec-h"><div><div class="sec-eyebrow">קטלוג פאר</div><div class="sec-title">פילוח לפי קטגוריה</div></div></div>
+      <div class="kpi-grid" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))">
+        <div class="kpi"><div class="lbl">ישראל</div><div class="v">${PEER_DATA.peerSaleIL.length+PEER_DATA.peerRentIL.length}</div><div class="meta">מכירה+השכרה</div></div>
+        <div class="kpi"><div class="lbl">יוון 🇬🇷</div><div class="v">${PEER_DATA.peerGreece.length}</div><div class="meta">€ אתונה+סלוניקי</div></div>
+        <div class="kpi"><div class="lbl">קפריסין 🇨🇾</div><div class="v">${PEER_DATA.peerCyprus.length}</div><div class="meta">€ פרוטארס+לרנקה</div></div>
+        <div class="kpi"><div class="lbl">מסחרי</div><div class="v">${PEER_DATA.peerCommercial.length}</div><div class="meta">משרדים+חנויות</div></div>
+        <div class="kpi"><div class="lbl">מגרשים</div><div class="v">${PEER_DATA.peerLand.length}</div><div class="meta">קרקע+נחלות</div></div>
+      </div>
+    </div>
+  `;
+  if(window.lucide)lucide.createIcons();
+}
+
+/* ============== CATALOG (generic) ============== */
+const CAT_CFG={
+  'bhk-sale':{data:'bhkSale',title:'דירות למכירה · בית הכרם',meta:'מקור: יד2 · עודכן 7 במאי 2026',eyebrow:'בית הכרם · ירושלים',type:'sale',cur:'₪'},
+  'denya-sale':{data:'denyaSale',title:'דירות למכירה · רמת דניה',meta:'מקור: יד2 · עודכן 7 במאי 2026',eyebrow:'רמת דניה · ירושלים',type:'sale',cur:'₪'},
+  'bhk-rent':{data:'bhkRent',title:'דירות להשכרה · בית הכרם',meta:'מקור: יד2 · עודכן 7 במאי 2026',eyebrow:'בית הכרם · השכרה',type:'rent',cur:'₪/חודש'},
+  'sold':{data:'sold',title:'עסקאות אחרונות',meta:'מקור: לשכת המתווכים, JNEWS, מדלן',eyebrow:'נמכרו לאחרונה',type:'sold',cur:'₪'},
+  'peer-il-sale':{data:'peerSaleIL',title:'דירות למכירה · ישראל',meta:'קטלוג פאר · peer-lre.com',eyebrow:'פאר ישראל · מכירה',type:'sale-intl',cur:'₪'},
+  'peer-il-rent':{data:'peerRentIL',title:'דירות להשכרה · ישראל',meta:'קטלוג פאר · peer-lre.com',eyebrow:'פאר ישראל · השכרה',type:'rent-intl',cur:'₪/חודש'},
+  'peer-greece':{data:'peerGreece',title:'נכסים ביוון 🇬🇷',meta:'קטלוג פאר · אתונה, סלוניקי, טאסוס',eyebrow:'יוון',type:'intl',cur:'€'},
+  'peer-cyprus':{data:'peerCyprus',title:'נכסים בקפריסין 🇨🇾',meta:'קטלוג פאר · פרוטארס, לרנקה, פמגוסטה',eyebrow:'קפריסין',type:'intl',cur:'€'},
+  'peer-commercial':{data:'peerCommercial',title:'נכסים מסחריים',meta:'קטלוג פאר · משרדים, חנויות, ברנדים',eyebrow:'מסחרי',type:'commercial',cur:'₪'},
+  'peer-land':{data:'peerLand',title:'מגרשים וקרקעות',meta:'קטלוג פאר · נווה צדק, ירקון, פרדס חנה',eyebrow:'מגרשים',type:'land',cur:'₪'},
+};
+
+function getCardHTML(p,cfg,i){
+  const ti=cfg.type;
+  let badge='';
+  if(ti==='sale')badge=statusBadge('active');
+  else if(ti==='rent')badge=statusBadge('rent');
+  else if(ti==='sold')badge=statusBadge('sold');
+  else if(ti==='rent-intl')badge=statusBadge('rent');
+  else badge=statusBadge('active');
+  
+  const title=p.addr||p.desc||'—';
+  const sub=p.nbh||p.city||p.area||'';
+  const priceN=p.price||p.rent;
+  const priceTxt=typeof priceN==='number'?fmtPrice(priceN,cfg.cur==='₪/חודש'?'₪':cfg.cur):(priceN||'—');
+  const priceLabel=ti==='rent'||ti==='rent-intl'?'/חודש':'';
+  
+  const stats=[];
+  if(p.rooms&&p.rooms!=='-')stats.push(`<span class="s"><i data-lucide="bed"></i>${p.rooms} חד'</span>`);
+  if(p.m2&&p.m2!=='-')stats.push(`<span class="s"><i data-lucide="ruler"></i>${p.m2} מ"ר</span>`);
+  if(p.floor&&p.floor!=='-')stats.push(`<span class="s"><i data-lucide="layers"></i>קומה ${p.floor}</span>`);
+  if(p.type&&!stats.length)stats.push(`<span class="s">${p.type}</span>`);
+  
+  const agent=p.agent||p.notes||p.deal||p.date||p.source||'';
+  
+  return `<div class="card" onclick="showDetail('${cfg.title}',${i},'${cfg.data}')">
+    <div class="hd">
+      <div style="flex:1;min-width:0"><div class="addr">${title}</div>${sub?`<div class="nbh">${sub}${p.type&&p.type!=='דירה'?' · '+p.type:''}</div>`:''}</div>
+      ${badge}
+    </div>
+    ${stats.length?`<div class="stats">${stats.join('')}</div>`:''}
+    <div class="price">${priceTxt}<small>${priceLabel}</small></div>
+    ${p.notes&&!String(agent).includes(p.notes)?`<div class="notes">"${p.notes}"</div>`:''}
+    <div class="footer">
+      <span class="agent">${agent}</span>
+      <span class="acts">
+        <button class="iconbtn wa" onclick="event.stopPropagation();toast('פותח שיחת וואטסאפ')" title="וואטסאפ"><i data-lucide="message-circle"></i></button>
+        <button class="iconbtn" onclick="event.stopPropagation();toast('מתקשר ל-${(p.agent||'בעלים').replace(/'/g,'')}')" title="חיוג"><i data-lucide="phone"></i></button>
+      </span>
+    </div>
+  </div>`;
+}
+
+function renderCatalog(id){
+  const cfg=CAT_CFG[id];const data=PEER_DATA[cfg.data];
+  const q=(STATE.catalogFilter[id]||'').toLowerCase();
+  const filtered=q?data.filter(p=>JSON.stringify(p).toLowerCase().includes(q)):data;
+  
+  $('#screen-'+id).innerHTML=`
+    <div class="topbar">
+      <div>
+        <div class="page-meta">${cfg.eyebrow}</div>
+        <h1 class="page-title">${cfg.title}</h1>
+        <div class="page-sub">${cfg.meta} · ${data.length} נכסים</div>
+      </div>
+      <div class="topbar-act">
+        <button class="btn" onclick="exportCatalog('${id}')"><i data-lucide="file-spreadsheet"></i>ייצא</button>
+        <button class="btn btn-pri" onclick="navTo('intake')"><i data-lucide="plus"></i>הוסיפי</button>
+      </div>
+    </div>
+
+    <div class="filters">
+      <div class="search"><i data-lucide="search"></i><input id="cat-q-${id}" placeholder="חפשי בכתובת, רחוב, מתווך, הערות…" value="${q}" /></div>
+      <span style="font-size:11.5px;color:var(--ink-faint)">${filtered.length} מתוך ${data.length}</span>
+    </div>
+
+    <div class="cards" id="cat-cards-${id}">
+      ${filtered.map((p,i)=>getCardHTML(p,cfg,data.indexOf(p))).join('')||'<div style="grid-column:1/-1;text-align:center;color:var(--ink-faint);padding:60px 20px">אין תוצאות לחיפוש</div>'}
+    </div>
+  `;
+  if(window.lucide)lucide.createIcons();
+  const inp=document.getElementById('cat-q-'+id);
+  if(inp){
+    inp.oninput=e=>{STATE.catalogFilter[id]=e.target.value;renderCatalog(id);setTimeout(()=>document.getElementById('cat-q-'+id).focus(),0)};
+  }
+}
+
+function showDetail(title,idx,dataKey){
+  let p,cfg;
+  if(dataKey){p=PEER_DATA[dataKey][idx];cfg=Object.values(CAT_CFG).find(c=>c.data===dataKey)}
+  if(!p)return;
+  const cur=cfg.cur==='₪/חודש'?'₪':cfg.cur;
+  const priceN=p.price||p.rent;
+  const priceTxt=typeof priceN==='number'?fmt(priceN):(priceN||'—');
+  const priceSuffix=cfg.type==='rent'||cfg.type==='rent-intl'?' / חודש':'';
+  
+  const fields=[
+    p.addr&&['כתובת',p.addr],p.desc&&['תיאור',p.desc],
+    (p.nbh||p.city||p.area)&&['שכונה / עיר',p.nbh||p.city||p.area],
+    p.type&&['סוג',p.type],
+    p.rooms&&p.rooms!=='-'&&['חדרים',p.rooms],
+    p.m2&&p.m2!=='-'&&['מ"ר',p.m2],
+    p.floor&&p.floor!=='-'&&['קומה',p.floor],
+    p.baths&&p.baths!=='-'&&['שירותים',p.baths],
+    p.permm&&['מחיר למ"ר',cur+fmt(p.permm)],
+    p.deal&&['עסקה',p.deal],
+    p.date&&['תאריך',p.date],
+    p.source&&['מקור',p.source],
+    p.agent&&['מתווך',p.agent],
+    p.notes&&['הערות',p.notes],
+  ].filter(Boolean);
+  
+  $('#detail').innerHTML=`
+    <div class="detail-h">
+      <div>
+        <div style="font-size:10px;letter-spacing:1.5px;color:var(--gold);font-weight:600">${cfg.eyebrow}</div>
+        <div style="font-size:18px;font-weight:700;color:var(--ink);margin-top:3px">${p.addr||p.desc||'—'}</div>
+      </div>
+      <button class="close" onclick="closeDetail()" aria-label="סגור"><i data-lucide="x"></i></button>
+    </div>
+    <div class="detail-body">
+      <div class="price-big">${cur}${priceTxt}<small>${priceSuffix}</small></div>
+      <dl>${fields.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
+      <div class="acts">
+        <button class="btn btn-pri"><i data-lucide="message-circle"></i>שלחי בוואטסאפ</button>
+        <button class="btn"><i data-lucide="phone"></i>חיוג</button>
+        <button class="btn btn-ai"><i data-lucide="sparkles"></i>פיקסל מנתח</button>
+      </div>
+      <div style="margin-top:18px;padding:12px 14px;background:linear-gradient(135deg,#fdfaf2,#f4efe2);border:1px solid var(--gold-line);border-radius:3px;font-size:12.5px;color:var(--ink-soft);line-height:1.6">
+        <strong style="color:var(--ai)">פיקסל אומר:</strong> ${typeof priceN==='number'&&cfg.data==='bhkSale'&&p.permm?p.permm<bhkPermmAvg()?'מחיר למ"ר נמוך מהממוצע ('+bhkPermmAvg().toLocaleString('he-IL')+' ₪/מ"ר). הזדמנות.':'מחיר למ"ר מעל הממוצע — הצדק את המיקום.':'אצרף ניתוח מלא בעוד רגע.'}
+      </div>
+    </div>
+  `;
+  $('#detail-bg').classList.add('show');
+  if(window.lucide)lucide.createIcons();
+}
+function closeDetail(){$('#detail-bg').classList.remove('show')}
+
+/* ============== NEIGHBORHOOD ============== */
+function renderNeighborhood(){
+  const bhkAvg=bhkPriceAvg();
+  const denyaAvg=denyaPriceAvg();
+  const bhkPermm=bhkPermmAvg();
+  const streets={};
+  PEER_DATA.bhkSale.forEach(p=>{const s=String(p.addr||'').split(/\s+/)[0];if(s)streets[s]=(streets[s]||0)+1});
+  const topStreets=Object.entries(streets).sort((a,b)=>b[1]-a[1]).slice(0,8);
+
+  $('#screen-neighborhood').innerHTML=`
+    <div class="topbar">
+      <div>
+        <div class="page-meta">מודיעין שכונתי</div>
+        <h1 class="page-title">בית הכרם · רמת דניה</h1>
+        <div class="page-sub">המומחיות שלך, מאוחדת. נתונים אמיתיים מ-71 נכסים פעילים בשכונה.</div>
+      </div>
+      <div class="topbar-act"><button class="btn" onclick="window.print()"><i data-lucide="printer"></i>הדפס דוח</button></div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi"><div class="lbl">ממוצע · בית הכרם</div><div class="v"><small>₪</small>${(bhkAvg/1000000).toFixed(2)}M</div><div class="meta">${PEER_DATA.bhkSale.length} דירות</div></div>
+      <div class="kpi"><div class="lbl">ממוצע · רמת דניה</div><div class="v"><small>₪</small>${(denyaAvg/1000000).toFixed(2)}M</div><div class="meta">${PEER_DATA.denyaSale.length} דירות</div></div>
+      <div class="kpi"><div class="lbl">₪/מ"ר · בה"כ</div><div class="v">${bhkPermm.toLocaleString('he-IL')}</div><div class="meta">לפי 60 רישומים</div></div>
+      <div class="kpi"><div class="lbl">שכ"ד ממוצע</div><div class="v"><small>₪</small>${rentAvg().toLocaleString('he-IL')}</div><div class="meta">2,600-14,000 טווח</div></div>
+    </div>
+
+    <div class="nbh-grid">
+      <div class="sec gold">
+        <div class="sec-h"><div><div class="sec-eyebrow">השכונות</div><div class="sec-title">תיאור והקשר</div></div></div>
+        <div class="nbh-info">
+          <strong>בית הכרם</strong>
+          <p>שכונה ותיקה במערב ירושלים, מ-1922. נחשבת לאחת השכונות היוקרתיות והמבוקשות בעיר. אופי חילוני מובהק, בנייה נמוכה ירוקה, רחובות שקטים. גובלת בקריית משה, יפה נוף ויער ירושלים.</p>
+          <strong>רמת בית הכרם</strong>
+          <p>הוקמה בתחילת שנות ה-90 (1991). שכונה צמודה לבית הכרם הוותיקה, עם בנייה רוויה של 5-3 קומות. כ-2,500 יח"ד מתוכננות, ~75% נבנו. הרחוב המרכזי: משה קול. שכונה עם מקומות חניה פרטיים בטאבו לרוב הדירות.</p>
+          <strong>רמת דניה</strong>
+          <p>שכונה במערב ירושלים, גבול בית הכרם. שכונה קטנה יותר עם מספר מצומצם של נכסים בשוק (10-11 רישומים פעילים בלבד). רחובות מרכזיים: גלבר, אריה ל. קובובי.</p>
+        </div>
+      </div>
+
+      <div class="sec gold">
+        <div class="sec-h"><div><div class="sec-eyebrow">פעילות לפי רחוב</div><div class="sec-title">רחובות מובילים · בית הכרם</div></div></div>
+        <table class="tbl"><thead><tr><th>רחוב</th><th>נכסים פעילים</th><th>חלק מהמאגר</th></tr></thead><tbody>
+          ${topStreets.map(([s,c])=>`<tr><td style="font-weight:600">${s}</td><td>${c}</td><td><div style="display:flex;align-items:center;gap:8px"><div style="height:4px;background:var(--gold);width:${c*8}px;border-radius:2px"></div>${Math.round(c/PEER_DATA.bhkSale.length*100)}%</div></td></tr>`).join('')}
+        </tbody></table>
+      </div>
+    </div>
+
+    <div class="sec gold">
+      <div class="sec-h"><div><div class="sec-eyebrow">תובנות פיקסל</div><div class="sec-title">מה הנתונים אומרים</div></div></div>
+      <div class="act-feed">
+        <div class="act"><div class="ic" style="background:rgba(125,106,212,.1);color:var(--ai)"><i data-lucide="trending-up"></i></div><div class="body"><div class="ttl"><strong>רחוב משה קול</strong> · 11 נכסים פעילים · הרחוב הכי "חם"</div><div class="meta">המרכזי ברמת בית הכרם, מבוקש להשכרה ולמכירה</div></div></div>
+        <div class="act"><div class="ic" style="background:rgba(125,106,212,.1);color:var(--ai)"><i data-lucide="alert-circle"></i></div><div class="body"><div class="ttl"><strong>רמת דניה</strong> · רק 11 רישומים פעילים — שוק קטן ויקר יחסית</div><div class="meta">צרי מערכת תזכורות לבעלים — הזדמנות לבלעדיות</div></div></div>
+        <div class="act"><div class="ic" style="background:rgba(125,106,212,.1);color:var(--ai)"><i data-lucide="dollar-sign"></i></div><div class="body"><div class="ttl">פער של <strong>₪7,898/מ"ר</strong> בין בית הכרם (₪${bhkPermm.toLocaleString('he-IL')}) לרמת דניה (₪${avg(PEER_DATA.denyaSale.filter(p=>p.permm>0).map(p=>p.permm)).toLocaleString('he-IL')})</div><div class="meta">להציע השוואה ללקוחות שמתלבטים בין השכונות</div></div></div>
+        <div class="act"><div class="ic" style="background:rgba(125,106,212,.1);color:var(--ai)"><i data-lucide="home"></i></div><div class="body"><div class="ttl">דירות 4 חדרים הן הסוג הנפוץ ביותר — <strong>24 מתוך 60</strong> בבית הכרם</div><div class="meta">המבוקש העיקרי שלך — תני להן עדיפות בהצגה</div></div></div>
+      </div>
+    </div>
+  `;
+  if(window.lucide)lucide.createIcons();
+}
+
+/* ============== INTAKE ============== */
+function renderIntake(){
+  $('#screen-intake').innerHTML=`
+    <div class="topbar">
+      <div>
+        <div class="page-meta">הוספה</div>
+        <h1 class="page-title">נכס חדש</h1>
+        <div class="page-sub">מילוי מהיר במהלך סיור או פגישה. נשמר אוטומטית במאגר המקומי.</div>
+      </div>
+      <div class="topbar-act">
+        <button class="btn" onclick="navTo(STATE.lastCat||'bhk-sale')"><i data-lucide="x"></i>ביטול</button>
+        <button class="btn btn-pri" id="intake-save"><i data-lucide="check"></i>שמרי נכס</button>
+      </div>
+    </div>
+
+    <div class="sec gold">
+      <div class="sec-h"><div><div class="sec-eyebrow">פרטי נכס</div><div class="sec-title">פרטים בסיסיים</div></div></div>
+      <div class="row2">
+        <div class="field"><label>קטגוריה</label><select id="in-cat">
+          <option value="bhk-sale">בית הכרם · מכירה</option>
+          <option value="denya-sale">רמת דניה · מכירה</option>
+          <option value="bhk-rent">בית הכרם · השכרה</option>
+          <option value="peer-il-sale">פאר ישראל · מכירה</option>
+          <option value="peer-commercial">מסחרי</option>
+          <option value="peer-land">מגרשים</option>
+        </select></div>
+        <div class="field"><label>סטטוס</label><select id="in-status"><option value="active">פעיל</option><option value="pending">בהמתנה</option><option value="sold">נמכר</option></select></div>
+      </div>
+      <div class="field"><label>כתובת / תיאור</label><input id="in-addr" placeholder="משה קול 14, רמת בית הכרם" /></div>
+      <div class="row3">
+        <div class="field"><label>חדרים</label><input id="in-rooms" type="number" step="0.5" placeholder="4" inputmode="decimal" /></div>
+        <div class="field"><label>מ"ר</label><input id="in-m2" type="number" placeholder="102" inputmode="numeric" /></div>
+        <div class="field"><label>קומה</label><input id="in-floor" placeholder="3" /></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>סוג</label><select id="in-type"><option>דירה</option><option>דירת גן</option><option>דופלקס</option><option>פנטהאוז</option><option>מגרש</option><option>משרד</option></select></div>
+        <div class="field"><label>מחיר (₪)</label><input id="in-price" type="number" placeholder="3850000" inputmode="numeric" /></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>שם בעלים / מתווך</label><input id="in-agent" placeholder="יעקב לוי / promise" /></div>
+        <div class="field"><label>טלפון</label><input id="in-phone" type="tel" placeholder="050-555-1842" inputmode="tel" /></div>
+      </div>
+      <div class="field"><label>הערות</label><textarea id="in-notes" placeholder="ירד 100K בשבוע האחרון, מוכן לתמ״א, חניה כפולה…"></textarea></div>
+    </div>
+  `;
+  if(window.lucide)lucide.createIcons();
+  $('#intake-save').onclick=async()=>{
+    const addr=$('#in-addr').value.trim();const price=+$('#in-price').value;
+    if(!addr||!price){toast('חסרים שדות חובה');return}
+    const cat=$('#in-cat').value;
+    const obj={addr,nbh:cat==='denya-sale'?'רמת דניה':'רמת בית הכרם',type:$('#in-type').value,rooms:+$('#in-rooms').value||'-',floor:$('#in-floor').value||'-',m2:+$('#in-m2').value||'-',price,agent:$('#in-agent').value||'—',notes:$('#in-notes').value||'',_custom:true};
+    const dataKey=CAT_CFG[cat].data;
+    PEER_DATA[dataKey].unshift(obj);
+    await dbSet('custom','data',PEER_DATA);
+    toast('הנכס נשמר במאגר');
+    navTo(cat);
+  };
+}
+
+/* ============== LEADS ============== */
+const SAMPLE_LEADS=[
+  {n:'דניאל כהן',phone:'050-555-1842',budget:'₪3.5-4.2M',want:'בית הכרם, 4 חדרים',stage:'חם',score:9.4,last:'אתמול'},
+  {n:'משפחת לוין',phone:'052-444-5566',budget:'₪5.5-6M',want:'רמת דניה, 5 חדרים',stage:'חם',score:8.9,last:'לפני 2 ימים'},
+  {n:'מיכאל רוזן',phone:'054-111-2233',budget:'₪3-3.5M',want:'השכרה ארוכת טווח',stage:'פגישה',score:7.8,last:'היום'},
+  {n:'רחל אבן',phone:'050-999-8877',budget:'₪7-9M',want:'דירת גן, רמת בית הכרם',stage:'הצעה',score:8.2,last:'לפני 4 ימים'},
+  {n:'אבי גולן',phone:'052-333-7777',budget:'יוון, 200K€',want:'השקעה, סלוניקי',stage:'בהתעניינות',score:6.5,last:'השבוע'},
+];
+function renderLeads(){
+  $('#screen-leads').innerHTML=`
+    <div class="topbar">
+      <div>
+        <div class="page-meta">לידים</div>
+        <h1 class="page-title">הצינור שלך</h1>
+        <div class="page-sub">5 לידים פעילים · 2 חמים, 1 בפגישה, 1 בהצעה, 1 בהתעניינות</div>
+      </div>
+      <div class="topbar-act"><button class="btn btn-pri"><i data-lucide="user-plus"></i>ליד חדש</button></div>
+    </div>
+    <div class="cards">
+      ${SAMPLE_LEADS.map(l=>`<div class="card">
+        <div class="hd"><div style="flex:1"><div class="addr">${l.n}</div><div class="nbh">${l.want}</div></div><span class="badge ${l.stage==='חם'?'b-active':'b-pending'}">${l.stage}</span></div>
+        <div class="stats"><span class="s">תקציב <b style="color:var(--gold)">${l.budget}</b></span><span class="s">ציון <b>${l.score}</b></span></div>
+        <div class="footer"><span class="agent">${l.last}</span><span class="acts"><button class="iconbtn wa" onclick="event.stopPropagation();openWhatsAppLead('${l.id}')" title="פתח WhatsApp"><i data-lucide="message-circle"></i></button><button class="iconbtn" onclick="event.stopPropagation();window.location.href='tel:${l.phone}'" title="התקשרי"><i data-lucide="phone"></i></button></span></div>
+      </div>`).join('')}
+    </div>
+  `;
+  if(window.lucide)lucide.createIcons();
+}
+
+/* ============== WHATSAPP ============== */
+const WA_CONVS=[
+  {id:1,n:'דניאל כהן',av:'דכ',pv:'מעולה, אני יכול בחמישי בערב',un:2,t:'09:42',msgs:[{io:'in',t:'היי אסתי, ראיתי את הדירה ברחוב החלוץ 28. מעניין מאוד',ts:'08:30'},{io:'out',t:'היי דניאל! כן, דירה מצוינת. 4 חדרים, 102 מ"ר, ₪3,650,000. מתי תרצה לראות?',ts:'08:32'},{io:'in',t:'מעולה, אני יכול בחמישי בערב',ts:'09:42'}]},
+  {id:2,n:'משפחת לוין',av:'מל',pv:'תודה, נחשוב ונחזיר לך תשובה',un:0,t:'אתמול',msgs:[{io:'in',t:'גלבר 13 ראינו, מאוד התלהבנו',ts:'אתמול 16:20'},{io:'out',t:'שמחה! זה נכס יוצא מן הכלל. ₪5,500,000, מתווך רימקס שירז',ts:'אתמול 16:25'},{io:'in',t:'תודה, נחשוב ונחזיר לך תשובה',ts:'אתמול 18:10'}]},
+  {id:3,n:'מיכאל רוזן',av:'מר',pv:'יש לך משהו ב-3M לזוג צעיר?',un:1,t:'08:15',msgs:[{io:'in',t:'בוקר טוב! יש לך משהו ב-3M לזוג צעיר?',ts:'08:15'}]},
+  {id:4,n:'רחל אבן',av:'רא',pv:'רחל, יש דירת גן ברבי בנימין 9',un:0,t:'אתמול',msgs:[{io:'out',t:'רחל, יש דירת גן ברבי בנימין 9 — 5.5 חדרים, 235 מ"ר, ₪7,700,000. נוף פתוח, יחידת הורים',ts:'אתמול 11:30'}]},
+  {id:5,n:'אבי גולן',av:'אג',pv:'תוכלי לשלוח את הקטלוג של יוון?',un:1,t:'09:10',msgs:[{io:'in',t:'תוכלי לשלוח את הקטלוג של יוון?',ts:'09:10'}]},
+];
+let WA_ACTIVE=1;
+function renderWhatsApp(){
+  $('#screen-whatsapp').innerHTML=`
+    <div class="topbar">
+      <div>
+        <div class="page-meta">וואטסאפ Business</div>
+        <h1 class="page-title">שיחות</h1>
+        <div class="page-sub">מחובר כ-PEER נדל"ן · 050-540-0407 · 5 שיחות פעילות</div>
+      </div>
+      <div class="topbar-act"><button class="btn"><i data-lucide="settings"></i>הגדרות</button></div>
+    </div>
+    <div class="wa-hub">
+      <div class="wa-list">
+        <div class="wa-list-h"><div class="search"><i data-lucide="search"></i><input placeholder="חפשי שיחות…" /></div></div>
+        <div id="wa-conv-list" style="overflow-y:auto;flex:1"></div>
+      </div>
+      <div class="wa-active">
+        <div class="wa-active-h" id="wa-h"></div>
+        <div class="wa-thread" id="wa-thread"></div>
+        <div class="wa-comp">
+          <textarea id="wa-input" placeholder="הקלידי הודעה…"></textarea>
+          <button class="btn btn-pri" id="wa-send"><i data-lucide="send"></i></button>
+        </div>
+      </div>
+    </div>
+  `;
+  renderWAList();renderWAActive();
+  $('#wa-send').onclick=waSend;
+  $('#wa-input').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();waSend()}});
+  if(window.lucide)lucide.createIcons();
+}
+function renderWAList(){
+  $('#wa-conv-list').innerHTML=WA_CONVS.map(c=>`<div class="wa-conv ${c.id===WA_ACTIVE?'active':''}" onclick="WA_ACTIVE=${c.id};renderWAList();renderWAActive()"><div class="av">${c.av}</div><div class="body"><div class="nm">${c.n}<span class="t">${c.t}</span></div><div class="pv">${c.pv}</div>${c.un?`<span class="un">${c.un}</span>`:''}</div></div>`).join('');
+}
+function renderWAActive(){
+  const c=WA_CONVS.find(x=>x.id===WA_ACTIVE);if(!c)return;
+  $('#wa-h').innerHTML=`<div style="display:flex;align-items:center;gap:10px"><div class="av" style="width:38px;height:38px;border-radius:50%;background:var(--gold-tint);color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:700">${c.av}</div><div><div style="font-weight:700">${c.n}</div><div style="font-size:11px;color:var(--ink-faint)">פעיל לפני ${c.t}</div></div></div><div style="display:flex;gap:6px"><button class="btn btn-sm"><i data-lucide="phone"></i></button><button class="btn btn-sm btn-ai" title="פיקסל מציע תשובה"><i data-lucide="sparkles"></i></button></div>`;
+  $('#wa-thread').innerHTML=c.msgs.map(m=>`<div class="bubble ${m.io}">${m.t}<span class="ts">${m.ts} ${m.io==='out'?'✓✓':''}</span></div>`).join('');
+  $('#wa-thread').scrollTop=$('#wa-thread').scrollHeight;
+  if(window.lucide)lucide.createIcons();
+}
+function waSend(){
+  const t=$('#wa-input').value.trim();if(!t)return;
+  const c=WA_CONVS.find(x=>x.id===WA_ACTIVE);
+  c.msgs.push({io:'out',t,ts:new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})});
+  c.pv=t;c.t='עכשיו';
+  $('#wa-input').value='';renderWAActive();renderWAList();
+}
+
+/* ============== PIXEL ============== */
+const PIXEL_HISTORY=[
+  {who:'ai',t:'שלום אסתי 👋 אני פיקסל. יש לך 283 נכסים במאגר, 5 לידים פעילים, ו-12 עסקאות שנמכרו לאחרונה. במה אעזור?'}
+];
+function renderPixel(){
+  $('#screen-pixel').innerHTML=`
+    <div class="topbar">
+      <div>
+        <div class="page-meta">פיקסל · עוזר AI</div>
+        <h1 class="page-title">שאלי אותי</h1>
+        <div class="page-sub">המומחה הפנימי שלך · יודע על כל 283 הנכסים והעסקאות</div>
+      </div>
+      <div class="topbar-act"><button class="btn"><i data-lucide="history"></i>היסטוריה</button></div>
+    </div>
+    <div class="pixel-layout">
+      <div>
+        <div class="pixel-thread" id="pixel-thread"></div>
+        <div class="pixel-comp">
+          <input id="pixel-input" placeholder="שאלי את פיקסל…" />
+          <button class="btn btn-ai" onclick="askPixel()"><i data-lucide="send"></i></button>
+        </div>
+      </div>
+      <aside class="pixel-side">
+        <div class="sec gold">
+          <div class="sec-h"><div><div class="sec-eyebrow">הצעות</div><div class="sec-title">שאלות מומלצות</div></div></div>
+          <div class="pixel-suggest">
+            <button class="sg" onclick="askPixel('מה הממוצע בבית הכרם?')">מה הממוצע בבית הכרם?</button>
+            <button class="sg" onclick="askPixel('איזה רחוב הכי פעיל?')">איזה רחוב הכי פעיל?</button>
+            <button class="sg" onclick="askPixel('דירות מתחת לממוצע')">הראי דירות מתחת לממוצע</button>
+            <button class="sg" onclick="askPixel('התאם דירות ללקוח דניאל כהן')">התאם דירות לדניאל כהן</button>
+            <button class="sg" onclick="askPixel('מה ההזדמנויות בקפריסין?')">מה ההזדמנויות בקפריסין?</button>
+            <button class="sg" onclick="askPixel('סיכום שבועי')">סיכום שבועי</button>
+          </div>
+        </div>
+        <div class="sec gold">
+          <div class="sec-h"><div><div class="sec-eyebrow">מצב</div><div class="sec-title">מאגר</div></div></div>
+          <div style="font-size:12px;color:var(--ink-soft);line-height:1.7">
+            <div>סך נכסים: <b>${totalProperties()}</b></div>
+            <div>בית הכרם: <b>${PEER_DATA.bhkSale.length}</b></div>
+            <div>רמת דניה: <b>${PEER_DATA.denyaSale.length}</b></div>
+            <div>השכרה: <b>${PEER_DATA.bhkRent.length}</b></div>
+            <div>קטלוג פאר: <b>${PEER_DATA.peerSaleIL.length+PEER_DATA.peerRentIL.length+PEER_DATA.peerCommercial.length+PEER_DATA.peerLand.length+PEER_DATA.peerGreece.length+PEER_DATA.peerCyprus.length}</b></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  `;
+  renderPixelThread();
+  $('#pixel-input').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();askPixel()}});
+  if(window.lucide)lucide.createIcons();
+}
+function renderPixelThread(){
+  $('#pixel-thread').innerHTML=PIXEL_HISTORY.map(m=>`<div class="pixel-msg ${m.who==='ai'?'ai':'you'}">${m.t}</div>`).join('');
+  $('#pixel-thread').scrollTop=$('#pixel-thread').scrollHeight;
+}
+function askPixel(q){
+  q=q||$('#pixel-input').value.trim();if(!q)return;
+  PIXEL_HISTORY.push({who:'you',t:q});
+  $('#pixel-input').value='';renderPixelThread();
+  setTimeout(()=>{
+    let a;
+    const ql=q.toLowerCase();
+    if(ql.includes('ממוצע')&&ql.includes('בית הכרם')){
+      a=`בית הכרם · ממוצע <strong>₪${(bhkPriceAvg()/1000000).toFixed(2)}M</strong> לפי ${PEER_DATA.bhkSale.length} דירות. ₪/מ"ר ממוצע: <strong>${bhkPermmAvg().toLocaleString('he-IL')}</strong>. הטווח: ₪2.79M–₪8.98M.`;
+    } else if(ql.includes('רחוב')&&ql.includes('פעיל')){
+      const streets={};PEER_DATA.bhkSale.forEach(p=>{const s=String(p.addr||'').split(/\s+/)[0];if(s)streets[s]=(streets[s]||0)+1});
+      const top=Object.entries(streets).sort((a,b)=>b[1]-a[1]).slice(0,5);
+      a='הרחובות הפעילים ביותר בבית הכרם:<br>'+top.map(([s,c],i)=>`<strong>${i+1}. ${s}</strong> · ${c} נכסים`).join('<br>');
+    } else if(ql.includes('מתחת לממוצע')||ql.includes('הזדמנות')){
+      const avg=bhkPermmAvg();
+      const cheap=PEER_DATA.bhkSale.filter(p=>p.permm>0&&p.permm<avg*0.85).sort((a,b)=>a.permm-b.permm).slice(0,4);
+      a=`מצאתי ${cheap.length} דירות עם ₪/מ"ר נמוך משמעותית מהממוצע (${avg.toLocaleString('he-IL')}):<br>`+cheap.map(p=>`• <strong>${p.addr}</strong> · ₪${p.permm.toLocaleString('he-IL')}/מ"ר · ₪${(p.price/1000000).toFixed(2)}M (${p.rooms} חד', ${p.m2} מ"ר)`).join('<br>');
+    } else if(ql.includes('דניאל')||ql.includes('התאם')){
+      const matches=PEER_DATA.bhkSale.filter(p=>p.rooms===4&&typeof p.price==='number'&&p.price>=3500000&&p.price<=4200000).slice(0,4);
+      a=`לדניאל כהן (₪3.5–4.2M, 4 חדרים בבית הכרם) זיהיתי ${matches.length} התאמות מצוינות:<br>`+matches.map(p=>`• <strong>${p.addr}</strong> · ₪${(p.price/1000000).toFixed(2)}M · ${p.m2} מ"ר · קומה ${p.floor} · ${p.agent}`).join('<br>');
+    } else if(ql.includes('קפריסין')){
+      a=`בקפריסין יש לפאר ${PEER_DATA.peerCyprus.length} נכסים. הזדמנויות בולטות:<br>`+PEER_DATA.peerCyprus.slice(0,3).map(p=>`• <strong>${p.desc}</strong> · €${fmt(p.price)} (${p.area})`).join('<br>')+'<br>הטווח: €165K–€620K. אזורים מובילים: פרוטארס, לרנקה, פרלימני.';
+    } else if(ql.includes('שבועי')||ql.includes('סיכום')){
+      a=`<strong>סיכום השבוע (7 במאי 2026):</strong><br>• ${PEER_DATA.bhkSale.length} נכסים פעילים בבית הכרם<br>• ממוצע: ₪${(bhkPriceAvg()/1000000).toFixed(2)}M (▲ 4.2% מהרבעון הקודם)<br>• רחוב משה קול הוביל עם 11 נכסים<br>• 12 עסקאות שנמכרו לאחרונה (לשכת המתווכים)<br>• 5 לידים פעילים, 2 חמים<br>• בקטלוג פאר: 95 נכסים בישראל וחו"ל`;
+    } else {
+      a='שאלה מצוינת! אני עדיין מחבר את עצמי לכל המאגרים. נסי שאלה ספציפית יותר — למשל "ממוצע בית הכרם" או "התאם דירות ללקוח X".';
+    }
+    PIXEL_HISTORY.push({who:'ai',t:a});
+    renderPixelThread();
+  },700);
+}
+
+/* ============== IMPORT (weekly merge) ============== */
+const SCHEMA={
+  'סטטוס':'status','כתובת':'addr','חדרים':'rooms','מ"ר':'m2','קומה':'floor','מחיר (₪)':'price','מחיר':'price','מטבע':'currency','שכ"ד חודשי (₪)':'rent','מתווך':'agent','מקור':'src','הערות':'notes','שכונה':'nbh','סוג נכס':'type','מחיר למ"ר (₪)':'permm','עיר/אזור':'city','תיאור הנכס':'desc'
+};
+function normAddr(a){return String(a||'').trim().replace(/\s+/g,' ').toLowerCase()}
+function rowToProp(r){const p={};Object.keys(r).forEach(k=>{const f=SCHEMA[String(k).trim()];if(f)p[f]=r[k]});return p}
+
+function renderImport(){
+  $('#screen-import').innerHTML=`
+    <div class="topbar">
+      <div>
+        <div class="page-meta">כלים</div>
+        <h1 class="page-title">מיזוג שבועי</h1>
+        <div class="page-sub">גררי את הגיליון השבועי כאן. המערכת תשווה לנתונים הקודמים, תאיר שינויים, ותוסיף רק חדשים — בלי למחוק את העבודה שלך.</div>
+      </div>
+    </div>
+
+    <div class="merge-summary">
+      <div class="merge-card"><div class="lbl" style="color:var(--gold)">סך מאגר</div><div class="v" id="im-total">${totalProperties()}</div><div class="meta">נכסים פעילים</div></div>
+      <div class="merge-card"><div class="lbl">מיזוג אחרון</div><div class="v" style="font-size:14px" id="im-last">טרם בוצע</div><div class="meta" id="im-last-meta">המיזוג הראשון יקבע בסיס</div></div>
+      <div class="merge-card"><div class="lbl" style="color:var(--success)">חדשים השבוע</div><div class="v" id="im-new">0</div><div class="meta">מהמיזוג האחרון</div></div>
+      <div class="merge-card"><div class="lbl" style="color:var(--warning)">עודכנו</div><div class="v" id="im-upd">0</div><div class="meta">שדות השתנו</div></div>
+    </div>
+
+    <div class="dropzone" id="dz" onclick="document.getElementById('file-in').click()">
+      <i data-lucide="upload-cloud"></i>
+      <div class="t">גררי את "רשימת נכסים.xlsx" השבועי לכאן</div>
+      <div class="s">.xlsx .csv · נשמר לפעם הבאה · השוואה אוטומטית</div>
+      <input type="file" id="file-in" accept=".csv,.xlsx,.xls" style="display:none" />
+    </div>
+    <div id="merge-result" style="margin-top:14px"></div>
+  `;
+  if(window.lucide)lucide.createIcons();
+  setupImport();
+  dbGet('meta','lastMerge').then(lm=>{
+    if(lm){
+      const d=new Date(lm.when);
+      $('#im-last').textContent=d.toLocaleDateString('he-IL');
+      $('#im-last-meta').textContent=`${d.toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}`;
+      $('#im-new').textContent=lm.added;$('#im-upd').textContent=lm.updated;
+    }
+  });
+}
+function setupImport(){
+  const dz=$('#dz');const inp=$('#file-in');
+  ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('over')}));
+  ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('over')}));
+  dz.addEventListener('drop',e=>handleFile(e.dataTransfer.files[0]));
+  inp.addEventListener('change',e=>handleFile(e.target.files[0]));
+}
+function handleFile(f){
+  if(!f)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const wb=XLSX.read(e.target.result,{type:'array'});
+    const sheetName=wb.SheetNames.find(n=>n.includes('בית הכרם'))||wb.SheetNames[0];
+    const ws=wb.Sheets[sheetName];
+    let rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+    // skip metadata row
+    if(rows.length>2&&typeof rows[0][0]==='string'&&rows[0][0].startsWith('מקור'))rows=rows.slice(1);
+    const headers=rows[0].map(h=>String(h));
+    const data=rows.slice(1).filter(r=>r.some(v=>v!==''&&v!=null)).map(r=>{const o={};headers.forEach((h,i)=>o[h]=r[i]);return o});
+    showMerge(data,headers,sheetName);
+  };
+  reader.readAsArrayBuffer(f);
+}
+function showMerge(rows,headers,sheetName){
+  const mapped=rows.map(rowToProp).filter(p=>p.addr);
+  const targetKey=sheetName.includes('דניה')?'denyaSale':(sheetName.includes('השכרה')?'bhkRent':'bhkSale');
+  const existing=new Map(PEER_DATA[targetKey].map(p=>[normAddr(p.addr),p]));
+  const incoming=new Map();mapped.forEach(p=>incoming.set(normAddr(p.addr),p));
+  const newRows=[],updated=[],unchanged=[];
+  incoming.forEach((p,k)=>{
+    const ex=existing.get(k);
+    if(!ex){newRows.push(p);return}
+    const changes=[];
+    ['price','rooms','m2','agent','status'].forEach(f=>{if(p[f]!==undefined&&String(p[f])!==String(ex[f])&&p[f]!=='')changes.push({f,from:ex[f],to:p[f]})});
+    if(changes.length)updated.push({p,ex,changes});else unchanged.push(p);
+  });
+  window._merge={newRows,updated,targetKey};
+  $('#merge-result').innerHTML=`
+  <div class="sec gold">
+    <div class="sec-h"><div><div class="sec-eyebrow">תוצאות ניתוח · ${sheetName}</div><div class="sec-title">${rows.length} שורות נסרקו</div></div></div>
+    <div class="merge-summary">
+      <div class="merge-card"><div class="lbl" style="color:var(--success)">חדשים</div><div class="v">${newRows.length}</div></div>
+      <div class="merge-card"><div class="lbl" style="color:var(--warning)">עודכנו</div><div class="v">${updated.length}</div></div>
+      <div class="merge-card"><div class="lbl">ללא שינוי</div><div class="v">${unchanged.length}</div></div>
+      <div class="merge-card"><div class="lbl">סה"כ במאגר</div><div class="v">${PEER_DATA[targetKey].length}</div></div>
+    </div>
+    ${updated.length?`<h4 style="font-size:13px;font-weight:700;margin:12px 0 6px;color:var(--ink)">שינויים בנכסים קיימים</h4><table class="tbl"><thead><tr><th>כתובת</th><th>שדה</th><th>היה</th><th>הופך ל</th></tr></thead><tbody>${updated.flatMap(({p,changes})=>changes.map((c,i)=>`<tr><td>${i===0?p.addr:''}</td><td>${({price:'מחיר',rooms:'חד\'',m2:'מ"ר',agent:'מתווך',status:'סטטוס'})[c.f]||c.f}</td><td style="color:var(--ink-faint)">${fmt(c.from)}</td><td style="color:var(--ink);font-weight:700">${fmt(c.to)}</td></tr>`)).join('')}</tbody></table>`:''}
+    ${newRows.length?`<h4 style="font-size:13px;font-weight:700;margin:12px 0 6px;color:var(--ink)">נכסים חדשים</h4><div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">${newRows.slice(0,12).map(p=>`<div class="card"><div class="addr">${p.addr}</div><div class="stats"><span class="s">${p.rooms||'-'} חד'</span><span class="s">${p.m2||'-'} מ"ר</span></div><div class="price">₪${fmt(p.price||p.rent)}</div></div>`).join('')}</div>`:''}
+    <div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end;flex-wrap:wrap">
+      <button class="btn" onclick="document.getElementById('merge-result').innerHTML=''">ביטול</button>
+      <button class="btn btn-pri" onclick="finalizeMerge()"><i data-lucide="check"></i>מזגי ${newRows.length+updated.length} שינויים</button>
+    </div>
+  </div>`;
+  if(window.lucide)lucide.createIcons();
+}
+async function finalizeMerge(){
+  const m=window._merge;if(!m)return;
+  const {newRows,updated,targetKey}=m;
+  const existing=new Map(PEER_DATA[targetKey].map((p,i)=>[normAddr(p.addr),i]));
+  updated.forEach(({p})=>{const i=existing.get(normAddr(p.addr));if(i!==undefined)Object.assign(PEER_DATA[targetKey][i],p)});
+  newRows.forEach(p=>PEER_DATA[targetKey].unshift(p));
+  await dbSet('custom','data',PEER_DATA);
+  await dbSet('meta','lastMerge',{when:new Date().toISOString(),added:newRows.length,updated:updated.length});
+  $('#merge-result').innerHTML='';
+  toast(`✓ מוזגו ${newRows.length} חדשים, ${updated.length} עודכנו`);
+  renderImport();renderNav();updateSidebarStats();
+}
+
+/* ============== DATABASE ============== */
+function renderDatabase(){
+  const all=[];
+  Object.entries(CAT_CFG).forEach(([id,cfg])=>{PEER_DATA[cfg.data].forEach(p=>all.push({...p,_cat:id,_cfg:cfg}))});
+  const q=(STATE.dbQ||'').toLowerCase();
+  const filtered=q?all.filter(p=>JSON.stringify(p).toLowerCase().includes(q)):all;
+  $('#screen-database').innerHTML=`
+    <div class="topbar">
+      <div>
+        <div class="page-meta">מאגר נכסים</div>
+        <h1 class="page-title">כל ${all.length} הנכסים</h1>
+        <div class="page-sub">תצוגה מאוחדת · ${Object.keys(CAT_CFG).length} קטגוריות · עודכן 7 במאי 2026</div>
+      </div>
+      <div class="topbar-act"><button class="btn" onclick="exportAll()"><i data-lucide="file-spreadsheet"></i>ייצוא Excel</button></div>
+    </div>
+    <div class="filters">
+      <div class="search"><i data-lucide="search"></i><input id="db-q" placeholder="חיפוש חופשי..." value="${q}" /></div>
+      <div class="chips" id="db-chips"></div>
+    </div>
+    <div class="cards">
+      ${filtered.slice(0,60).map(p=>{
+        const idx=PEER_DATA[p._cfg.data].indexOf(PEER_DATA[p._cfg.data].find(x=>x===p||(x.addr===p.addr&&x.price===p.price)));
+        return `<div class="card" onclick="showDetail('','${idx>=0?idx:0}','${p._cfg.data}')">
+          <div class="hd"><div style="flex:1;min-width:0"><div class="addr">${p.addr||p.desc||'—'}</div><div class="nbh">${p._cfg.eyebrow}</div></div></div>
+          <div class="stats">${p.rooms&&p.rooms!=='-'?`<span class="s"><i data-lucide="bed"></i>${p.rooms}</span>`:''}${p.m2&&p.m2!=='-'?`<span class="s"><i data-lucide="ruler"></i>${p.m2}מ"ר</span>`:''}</div>
+          <div class="price">${typeof (p.price||p.rent)==='number'?(p._cfg.cur==='€'?'€':'₪')+fmt(p.price||p.rent):(p.price||p.rent||'—')}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    ${filtered.length>60?`<p style="text-align:center;color:var(--ink-faint);padding:14px;font-size:12px">מציג 60 מתוך ${filtered.length}</p>`:''}
+  `;
+  if(window.lucide)lucide.createIcons();
+  $('#db-q').oninput=e=>{STATE.dbQ=e.target.value;renderDatabase();setTimeout(()=>$('#db-q').focus(),0)};
+}
+
+function exportCatalog(id){
+  const cfg=CAT_CFG[id];const data=PEER_DATA[cfg.data];
+  if(!data.length){toast('אין נתונים לייצוא');return}
+  const ws=XLSX.utils.json_to_sheet(data);
+  if(!ws['!views'])ws['!views']=[{}];ws['!views'][0].RTL=true;
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,cfg.title.slice(0,30));
+  XLSX.writeFile(wb,'peer-'+id+'-'+new Date().toISOString().slice(0,10)+'.xlsx');
+  toast('הקובץ הורד');
+}
+function exportAll(){
+  const wb=XLSX.utils.book_new();
+  Object.entries(CAT_CFG).forEach(([id,cfg])=>{const data=PEER_DATA[cfg.data];if(!data.length)return;const ws=XLSX.utils.json_to_sheet(data);if(!ws['!views'])ws['!views']=[{}];ws['!views'][0].RTL=true;XLSX.utils.book_append_sheet(wb,ws,cfg.eyebrow.slice(0,30))});
+  XLSX.writeFile(wb,'peer-full-'+new Date().toISOString().slice(0,10)+'.xlsx');
+  toast('הקובץ המלא הורד');
+}
+
+/* ============== TASKS ============== */
+function renderTasks(){
+  $('#task-list').innerHTML=TASKS.map((t,i)=>`<li class="${t.done?'done':''}"><input type="checkbox" ${t.done?'checked':''} onchange="TASKS[${i}].done=this.checked;renderTasks();dbSet('tasks','list',TASKS)"/><span>${t.t}</span></li>`).join('');
+  const done=TASKS.filter(t=>t.done).length;
+  $('#task-done').textContent=done;$('#task-total').textContent=TASKS.length;$('#task-badge').textContent=TASKS.length-done;
+}
+
+/* ============== SIDEBAR STATS ============== */
+function updateSidebarStats(){
+  const t=totalProperties();
+  $('#ss-total').innerHTML=`${t}<small>/500</small>`;
+  $('#ss-bar').style.width=Math.min(100,t/5)+'%';
+  $('#ss-foot').textContent=`${(t/5).toFixed(0)}% · בקצב לרבעון 4`;
+}
+
+/* ============== WELCOME ============== */
+function closeWelcome(){$('#welcome').classList.remove('show');localStorage.setItem('peer_v4_seen','1')}
+
+/* ============== INIT ============== */
+async function init(){
+  // restore custom data
+  const custom=await dbGet('custom','data');
+  if(custom){Object.keys(custom).forEach(k=>{if(PEER_DATA[k])PEER_DATA[k]=custom[k]})}
+  const savedTasks=await dbGet('tasks','list');if(savedTasks)TASKS.splice(0,TASKS.length,...savedTasks);
+  
+  // === V5 Boot Sequence ===
+(async function boot(){
+  try {
+    await initGitHubSync();
+    await loadDataFromGitHub();
+    if(window.lucide)lucide.createIcons();
+    renderNav();
+    navTo('overview');
+    showSyncStatus('✓ מסונכרן');
+  } catch(err) {
+    console.error('Boot failed:', err);
+    showSyncStatus('⚠ לא מחובר ל-GitHub - מצב מקומי בלבד', 'warning');
+    if(window.PEER_DATA_FALLBACK) PEER_DATA = window.PEER_DATA_FALLBACK;
+    if(window.lucide)lucide.createIcons();
+    renderNav();
+    navTo('overview');
+  }
+})();
+  updateSidebarStats();
+  renderTasks();
+  
+  // bottom nav
+  $$('.bottom-nav .item').forEach(b=>b.onclick=()=>navTo(b.dataset.bn));
+  
+  if(!localStorage.getItem('peer_v4_seen')){setTimeout(()=>$('#welcome').classList.add('show'),400)}
+  if(window.lucide)lucide.createIcons();
+}
+window.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
