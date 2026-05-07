@@ -55,28 +55,20 @@ async function initGitHubSync() {
     throw new Error('CONFIG_INCOMPLETE');
   }
 
+  // אין צורך ב-Token לטעינה - רק לשמירה
+  // אם יש Token שמור, נבדוק שהוא תקף
   let token = getStoredToken();
-  if (!token) {
-    // אין Token - נבקש מהמשתמש פעם אחת
-    token = await promptForToken();
-    if (!token) throw new Error('NO_TOKEN');
-    setStoredToken(token);
-  }
-
-  // בדיקת חיבור
-  try {
-    await ghApiCall('GET', '');
-    console.log('✓ GitHub connection OK');
-  } catch(err) {
-    if (err.message === 'TOKEN_INVALID') {
-      // Token לא תקין - בקש חדש
-      const newToken = await promptForToken('הטוקן הקודם פג תוקף. אנא הכניסי חדש:');
-      if (!newToken) throw err;
-      setStoredToken(newToken);
+  if (token) {
+    try {
       await ghApiCall('GET', '');
-    } else {
-      throw err;
+      console.log('✓ GitHub Token תקף - שמירה זמינה');
+    } catch(err) {
+      if (err.message === 'TOKEN_INVALID') {
+        console.warn('Token פג תוקף - תידרשי להזין חדש לפני שמירה');
+      }
     }
+  } else {
+    console.log('אין Token - מצב קריאה בלבד. הזיני Token דרך ההגדרות לאפשר שמירה.');
   }
 }
 
@@ -136,24 +128,76 @@ function promptForToken(message = 'הכניסי את ה-Personal Access Token ש
 }
 
 // ========== LOAD DATA ==========
+// אסטרטגיה: קודם לנסות לטעון כקובץ סטטי (חינם, מהיר, בלי Token)
+// אם זה נכשל - לנסות דרך ה-API (דורש Token, עובד גם ל-Repos פרטיים)
 async function loadDataFromGitHub() {
-  showSyncStatus('טוען נתונים מ-GitHub...', 'syncing');
+  showSyncStatus('טוען נתונים...', 'syncing');
   const cfg = window.PEER_CONFIG;
+
+  // ניסיון 1: טעינה כקובץ סטטי (העדפה - אין צורך ב-Token)
+  try {
+    // הוסף timestamp כדי לעקוף cache
+    const staticUrl = `${cfg.data_file}?t=${Date.now()}`;
+    const res = await fetch(staticUrl);
+    if (res.ok) {
+      PEER_DATA = await res.json();
+      window.PEER_DATA = PEER_DATA;
+      console.log(`✓ נטענו ${PEER_DATA._meta?.totalProperties || 0} נכסים (קובץ סטטי)`);
+
+      // נטען את ה-SHA ברקע אם יש Token (לכתיבה עתידית)
+      if (getStoredToken()) {
+        try {
+          const apiResult = await ghApiCall('GET', `contents/${cfg.data_file}`);
+          DATA_SHA = apiResult.sha;
+        } catch(e) {
+          console.warn('Could not fetch SHA - saves disabled until login');
+        }
+      }
+      return PEER_DATA;
+    }
+  } catch(e) {
+    console.warn('Static load failed, trying API:', e.message);
+  }
+
+  // ניסיון 2: טעינה דרך ה-API (דורש Token)
+  if (!getStoredToken()) {
+    throw new Error('לא ניתן לטעון את data.json. ודא שהקובץ קיים ב-Repository.');
+  }
   const result = await ghApiCall('GET', `contents/${cfg.data_file}`);
   DATA_SHA = result.sha;
-
-  // GitHub מחזיר Base64 - יש לפענח ולתמוך ב-UTF-8 (עברית)
   const decoded = decodeURIComponent(escape(atob(result.content.replace(/\n/g, ''))));
   PEER_DATA = JSON.parse(decoded);
-  window.PEER_DATA = PEER_DATA; // חשיפה לקוד הישן
-
-  console.log(`✓ נטענו ${PEER_DATA._meta?.totalProperties || 0} נכסים מ-GitHub`);
+  window.PEER_DATA = PEER_DATA;
+  console.log(`✓ נטענו ${PEER_DATA._meta?.totalProperties || 0} נכסים (API)`);
   return PEER_DATA;
 }
 
 // ========== SAVE DATA ==========
 async function saveDataToGitHub(commitMessage = 'Update from CRM') {
   if (!PEER_DATA) return;
+
+  // וודא שיש Token לפני שמירה
+  let token = getStoredToken();
+  if (!token) {
+    token = await promptForToken('כדי לשמור שינויים ב-GitHub, צריך להזין Token פעם אחת:');
+    if (!token) {
+      showSyncStatus('שמירה בוטלה', 'warning');
+      return false;
+    }
+    setStoredToken(token);
+    // צריך לטעון את ה-SHA אם זה הפעם הראשונה
+    if (!DATA_SHA) {
+      const cfg = window.PEER_CONFIG;
+      try {
+        const apiResult = await ghApiCall('GET', `contents/${cfg.data_file}`);
+        DATA_SHA = apiResult.sha;
+      } catch(e) {
+        showSyncStatus('שגיאה: ' + e.message, 'error');
+        return false;
+      }
+    }
+  }
+
   showSyncStatus('שומר ל-GitHub...', 'syncing');
 
   const cfg = window.PEER_CONFIG;

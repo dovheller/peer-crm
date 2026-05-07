@@ -1324,14 +1324,18 @@ async function init(){
     if(window.lucide)lucide.createIcons();
     renderNav();
     navTo('overview');
-    showSyncStatus('✓ מסונכרן');
+    const hasToken = !!localStorage.getItem('peer_crm_github_token');
+    showSyncStatus(hasToken ? '✓ מסונכרן' : 'מצב קריאה - הזיני Token לשמירה', hasToken ? 'success' : 'warning');
   } catch(err) {
     console.error('Boot failed:', err);
-    showSyncStatus('⚠ לא מחובר ל-GitHub - מצב מקומי בלבד', 'warning');
-    if(window.PEER_DATA_FALLBACK) PEER_DATA = window.PEER_DATA_FALLBACK;
+    showSyncStatus('⚠ שגיאה: ' + err.message, 'error');
+    // אם בכל זאת נכשל - תן למשתמש לראות הגדרות
     if(window.lucide)lucide.createIcons();
-    renderNav();
-    navTo('overview');
+    if(PEER_DATA){renderNav();navTo('overview');}
+    else{
+      // אין נתונים בכלל - הצג רק הגדרות
+      document.querySelector('.app').innerHTML = '<div style="padding:40px;text-align:center"><h1 style="color:var(--ink);margin-bottom:14px">לא ניתן לטעון נתונים</h1><p style="color:var(--ink-faint);margin-bottom:20px">' + err.message + '</p><p style="color:var(--ink-faint);font-size:13px">בדקי שהקובץ <code>data.json</code> קיים ב-Repository ושהוא ציבורי.</p></div>';
+    }
   }
 })();
   updateSidebarStats();
