@@ -8,7 +8,7 @@
 
 window.PEER_CONFIG = {
   // שם המשתמש שלך ב-GitHub (לדוגמה: "esti-heller")
-  github_owner: "YOUR_GITHUB_USERNAME",
+  github_owner: "dovheller",
 
   // שם ה-Repository (לדוגמה: "peer-crm")
   github_repo: "peer-crm",
