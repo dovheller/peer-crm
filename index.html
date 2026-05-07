@@ -550,41 +550,44 @@ async function dbSet(s,k,v){const db=await idb();return new Promise(r=>{const tx
 async function dbGet(s,k){const db=await idb();return new Promise(r=>{const tx=db.transaction(s,'readonly');const q=tx.objectStore(s).get(k);q.onsuccess=()=>r(q.result?q.result.v:null);q.onerror=()=>r(null)})}
 
 /* ============== NAV ============== */
-const NAV=[
-  {section:'מבט-על',items:[
-    {id:'overview',label:'מסך הבית',icon:'layout-dashboard'},
-    {id:'database',label:'כל הנכסים',icon:'database'},
-  ]},
-  {section:'בית הכרם · ירושלים',items:[
-    {id:'bhk-sale',label:'מכירה',icon:'home',count:PEER_DATA.bhkSale.length},
-    {id:'denya-sale',label:'רמת דניה',icon:'home',count:PEER_DATA.denyaSale.length},
-    {id:'bhk-rent',label:'השכרה',icon:'key',count:PEER_DATA.bhkRent.length},
-    {id:'sold',label:'נמכרו לאחרונה',icon:'check-circle',count:PEER_DATA.sold.length},
-    {id:'neighborhood',label:'מודיעין שכונה',icon:'map-pin'},
-  ]},
-  {section:'פאר תיווך · קטלוג',items:[
-    {id:'peer-il-sale',label:'מכירה ישראל',icon:'building-2',count:PEER_DATA.peerSaleIL.length},
-    {id:'peer-il-rent',label:'השכרה ישראל',icon:'key-round',count:PEER_DATA.peerRentIL.length},
-    {id:'peer-greece',label:'יוון 🇬🇷',icon:'globe',count:PEER_DATA.peerGreece.length},
-    {id:'peer-cyprus',label:'קפריסין 🇨🇾',icon:'globe',count:PEER_DATA.peerCyprus.length},
-    {id:'peer-commercial',label:'מסחרי',icon:'briefcase',count:PEER_DATA.peerCommercial.length},
-    {id:'peer-land',label:'מגרשים',icon:'map',count:PEER_DATA.peerLand.length},
-  ]},
-  {section:'אינטגרציות',items:[
-    {id:'whatsapp',label:'וואטסאפ Business',icon:'message-circle',status:'wa'},
-    {id:'pixel',label:'פיקסל · עוזר AI',icon:'sparkles',status:'ai'},
-    {id:'leads',label:'לידים',icon:'users'},
-    {id:'intake',label:'הוספת נכס',icon:'plus-square'},
-    {id:'import',label:'מיזוג שבועי',icon:'upload-cloud'},
-  ]},
-  {section:'מערכת',items:[
-    {id:'settings',label:'הגדרות',icon:'settings'},
-  ]},
-];
+function buildNav(){
+  const D = PEER_DATA || {};
+  return [
+    {section:'מבט-על',items:[
+      {id:'overview',label:'מסך הבית',icon:'layout-dashboard'},
+      {id:'database',label:'כל הנכסים',icon:'database'},
+    ]},
+    {section:'בית הכרם · ירושלים',items:[
+      {id:'bhk-sale',label:'מכירה',icon:'home',count:D.bhkSale?.length||0},
+      {id:'denya-sale',label:'רמת דניה',icon:'home',count:D.denyaSale?.length||0},
+      {id:'bhk-rent',label:'השכרה',icon:'key',count:D.bhkRent?.length||0},
+      {id:'sold',label:'נמכרו לאחרונה',icon:'check-circle',count:D.sold?.length||0},
+      {id:'neighborhood',label:'מודיעין שכונה',icon:'map-pin'},
+    ]},
+    {section:'פאר תיווך · קטלוג',items:[
+      {id:'peer-il-sale',label:'מכירה ישראל',icon:'building-2',count:D.peerSaleIL?.length||0},
+      {id:'peer-il-rent',label:'השכרה ישראל',icon:'key-round',count:D.peerRentIL?.length||0},
+      {id:'peer-greece',label:'יוון 🇬🇷',icon:'globe',count:D.peerGreece?.length||0},
+      {id:'peer-cyprus',label:'קפריסין 🇨🇾',icon:'globe',count:D.peerCyprus?.length||0},
+      {id:'peer-commercial',label:'מסחרי',icon:'briefcase',count:D.peerCommercial?.length||0},
+      {id:'peer-land',label:'מגרשים',icon:'map',count:D.peerLand?.length||0},
+    ]},
+    {section:'אינטגרציות',items:[
+      {id:'whatsapp',label:'וואטסאפ Business',icon:'message-circle',status:'wa'},
+      {id:'pixel',label:'פיקסל · עוזר AI',icon:'sparkles',status:'ai'},
+      {id:'leads',label:'לידים',icon:'users'},
+      {id:'intake',label:'הוספת נכס',icon:'plus-square'},
+      {id:'import',label:'מיזוג שבועי',icon:'upload-cloud'},
+    ]},
+    {section:'מערכת',items:[
+      {id:'settings',label:'הגדרות',icon:'settings'},
+    ]},
+  ];
+}
 
 function renderNav(){
   const r=$('#nav-root');
-  r.innerHTML=NAV.map(s=>`<div class="nav-section">${s.section}</div>${s.items.map(i=>`<button class="nav-item ${i.id===STATE.current?'active':''}" data-nav="${i.id}"><i data-lucide="${i.icon}"></i><span>${i.label}</span>${i.count!=null?`<span class="count">${i.count}</span>`:''}${i.status?`<span class="dot-status dot-${i.status}"></span>`:''}</button>`).join('')}`).join('');
+  r.innerHTML=buildNav().map(s=>`<div class="nav-section">${s.section}</div>${s.items.map(i=>`<button class="nav-item ${i.id===STATE.current?'active':''}" data-nav="${i.id}"><i data-lucide="${i.icon}"></i><span>${i.label}</span>${i.count!=null?`<span class="count">${i.count}</span>`:''}${i.status?`<span class="dot-status dot-${i.status}"></span>`:''}</button>`).join('')}`).join('');
   r.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>navTo(b.dataset.nav));
 }
 
