@@ -2,1391 +2,36 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PEER · מערכת ניהול נדל"ן יוקרה</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<title>PEER · ניהול נדל"ן יוקרה</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
 :root{
-  --cream:#faf7f0; --cream-soft:#f4efe2; --white-pure:#ffffff; --paper:#fdfaf2;
-  --ink:#1a1814; --ink-soft:#3d3a32; --ink-faint:#6b6759; --ink-whisper:#a09b8a;
-  --gold:#a8862e; --gold-bright:#c8a96a; --gold-light:#e8dcb8;
-  --gold-line:rgba(168,134,46,0.25); --gold-tint:rgba(168,134,46,0.06);
-  --border:rgba(26,24,20,0.08); --border-strong:rgba(26,24,20,0.16); --border-gold:rgba(168,134,46,0.4);
-  --success:#5e8d5a; --warning:#b87f1f; --danger:#a04848;
-  --whatsapp:#25d366; --ai-glow:#7d6ad4;
-  --shadow-card:0 1px 3px rgba(26,24,20,0.04), 0 1px 2px rgba(26,24,20,0.06);
-  --shadow-pop:0 8px 24px rgba(26,24,20,0.10), 0 2px 6px rgba(26,24,20,0.06);
+  --cream:#faf7f0;--cream-soft:#f4efe2;--white:#fff;--paper:#fdfaf2;
+  --ink:#1a1814;--ink-soft:#3d3a32;--ink-faint:#6b6759;--ink-whisper:#a09b8a;
+  --gold:#a8862e;--gold-bright:#c8a96a;--gold-light:#e8dcb8;
+  --gold-line:rgba(168,134,46,.25);--gold-tint:rgba(168,134,46,.06);
+  --border:rgba(26,24,20,.08);--border-strong:rgba(26,24,20,.16);
+  --success:#5e8d5a;--warning:#b87f1f;--danger:#a04848;
+  --whatsapp:#25d366;--ai:#7d6ad4;
+  --sh-card:0 1px 3px rgba(26,24,20,.04),0 1px 2px rgba(26,24,20,.06);
+  --sh-pop:0 8px 24px rgba(26,24,20,.10),0 2px 6px rgba(26,24,20,.06);
+  --tap:44px;
 }
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Heebo',sans-serif !important}
-html,body{background:var(--cream);color:var(--ink);font-weight:300;min-height:100vh;text-align:right}
-body{overflow-x:hidden}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Heebo',sans-serif!important;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--cream);color:var(--ink);font-weight:300;min-height:100vh;text-align:right;direction:rtl}
+body{overflow-x:hidden;font-size:14px}
 ::selection{background:var(--gold-light);color:var(--ink)}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;border:0;background:transparent;font:inherit;color:inherit}
 
+/* APP SHELL */
 .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
-
-/* SIDEBAR */
-.sidebar{background:var(--cream-soft);border-left:1px solid var(--border);padding:24px 20px 20px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
-.sidebar::-webkit-scrollbar{width:6px}
-.sidebar::-webkit-scrollbar-thumb{background:var(--gold-line);border-radius:3px}
-.brand{padding:0 0 18px;margin-bottom:14px;border-bottom:1px solid var(--border)}
-.brand-plaque{background:#0a0a0a;border:1px solid var(--gold-bright);border-radius:4px;padding:14px 16px 12px;text-align:center;position:relative;box-shadow:0 4px 12px rgba(0,0,0,0.18)}
-.brand-plaque::before{content:'';position:absolute;inset:4px;border:1px solid rgba(200,169,106,0.35);border-radius:2px;pointer-events:none}
-.brand-skyline{display:block;width:100%;max-width:160px;height:30px;margin:0 auto 2px;position:relative;z-index:1}
-.brand-logo{font-weight:800;font-size:30px;letter-spacing:7px;color:#fff;line-height:1;padding-right:7px;position:relative;z-index:1}
-.brand-tagline{font-size:8.5px;letter-spacing:2.6px;color:var(--gold-bright);margin-top:5px;font-weight:500;text-transform:uppercase;position:relative;z-index:1}
-.brand-plaque-divider{width:78%;height:1px;background:var(--gold-bright);margin:9px auto 7px;opacity:0.65;position:relative;z-index:1}
-.brand-agent-he{font-size:11px;color:#fff;letter-spacing:0.5px;font-weight:400;position:relative;z-index:1}
-.brand-agent-en{font-size:8.5px;color:#fff;letter-spacing:2px;font-weight:300;margin-top:2px;position:relative;z-index:1;text-transform:uppercase}
-.brand-agent-he .dot,.brand-agent-en .dot{color:var(--gold-bright);margin:0 5px}
-
-.nav{display:flex;flex-direction:column;gap:1px;flex:1}
-.nav-section{font-size:10px;letter-spacing:1.5px;color:var(--gold);margin:14px 0 4px;padding:0 10px;font-weight:600;display:flex;align-items:center;gap:8px}
-.nav-section.shared::before{content:'';width:3px;height:11px;background:var(--gold);border-radius:1px}
-.nav-section .src{margin-right:auto;color:var(--ink-whisper);font-weight:400;letter-spacing:0.3px;font-size:10px;font-style:italic}
-.nav-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;font-size:13px;color:var(--ink-soft);cursor:pointer;border-radius:2px;transition:all .15s ease;border-right:2px solid transparent;background:transparent;border-top:0;border-bottom:0;border-left:0;width:100%;text-align:right;font-weight:400}
-.nav-item:hover{background:var(--paper);color:var(--ink)}
-.nav-item.active{background:var(--white-pure);color:var(--ink);font-weight:600;border-right-color:var(--gold);box-shadow:0 1px 2px rgba(26,24,20,0.04)}
-.nav-item .label{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
-.nav-item .count{font-size:11px;color:var(--ink-faint);font-variant-numeric:tabular-nums;background:var(--cream);padding:2px 7px;border-radius:8px;border:1px solid var(--border);font-weight:500}
-.nav-item.active .count{color:var(--gold);border-color:var(--gold-line)}
-.nav-item .flag{font-size:13px;line-height:1}
-.nav-item i{width:14px;height:14px;color:var(--ink-faint);flex-shrink:0}
-.nav-item.active i{color:var(--gold)}
-.pulse-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;box-shadow:0 0 0 0 rgba(168,134,46,0.6);animation:pulse 2s infinite;flex-shrink:0}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(168,134,46,0.5)}70%{box-shadow:0 0 0 6px rgba(168,134,46,0)}100%{box-shadow:0 0 0 0 rgba(168,134,46,0)}}
-.status-dot{width:6px;height:6px;border-radius:50%;display:inline-block;flex-shrink:0}
-.status-green{background:var(--whatsapp);box-shadow:0 0 4px rgba(37,211,102,.5)}
-.status-purple{background:var(--ai-glow);box-shadow:0 0 4px rgba(125,106,212,.5)}
-
-.sidebar-stats{padding:14px 14px;border:1px solid var(--border);background:var(--white-pure);border-radius:4px;margin-top:14px;position:relative}
-.sidebar-stats::before{content:'';position:absolute;top:0;right:0;width:30px;height:1px;background:var(--gold)}
-.stats-label{font-size:10px;letter-spacing:1.5px;color:var(--gold);margin-bottom:8px;font-weight:600}
-.stats-num{font-size:24px;color:var(--ink);font-weight:700}
-.stats-num small{font-size:13px;color:var(--ink-faint);font-weight:400}
-.stats-bar{height:4px;background:var(--cream);border-radius:2px;margin-top:8px;overflow:hidden}
-.stats-bar > span{display:block;height:100%;background:linear-gradient(90deg,var(--gold-bright),var(--gold));width:49.4%}
-.stats-foot{font-size:11px;color:var(--ink-faint);margin-top:6px;letter-spacing:0.3px}
-
-/* MAIN */
-.main{padding:26px 36px 36px;max-width:100%;overflow-x:hidden;min-width:0}
-.topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--border);gap:24px}
-.page-meta{font-size:11px;letter-spacing:2px;color:var(--gold);margin-bottom:7px;font-weight:600}
-.page-title{font-size:34px;font-weight:600;letter-spacing:.3px;line-height:1.15;color:var(--ink)}
-.page-subtitle{margin-top:6px;font-size:13px;color:var(--ink-faint);max-width:600px;font-weight:400}
-.topbar-actions{display:flex;gap:8px;flex-shrink:0;align-items:center}
-
-.btn{background:var(--white-pure);color:var(--ink);border:1px solid var(--border-strong);padding:9px 16px;font-size:12px;letter-spacing:.3px;cursor:pointer;transition:all .2s ease;border-radius:2px;font-weight:500;display:inline-flex;align-items:center;gap:6px;line-height:1.2}
-.btn i{width:13px;height:13px}
-.btn:hover{border-color:var(--gold);color:var(--gold);background:var(--paper)}
-.btn-primary{background:var(--ink);color:var(--white-pure);border-color:var(--ink);font-weight:600}
-.btn-primary:hover{background:var(--gold);border-color:var(--gold);color:var(--white-pure)}
-.btn-ghost{background:transparent;border-color:transparent;color:var(--ink-soft)}
-.btn-ghost:hover{background:var(--paper);color:var(--gold);border-color:transparent}
-.btn-ai{color:var(--ai-glow);border-color:rgba(125,106,212,0.4)}
-.btn-ai:hover{background:var(--ai-glow);color:var(--white-pure);border-color:var(--ai-glow)}
-.btn-wa{color:var(--whatsapp);border-color:rgba(37,211,102,0.4)}
-.btn-wa:hover{background:var(--whatsapp);color:#fff;border-color:var(--whatsapp)}
-.btn-sm{padding:6px 11px;font-size:11px}
-.btn-icon{padding:8px;width:34px;height:34px;justify-content:center}
-.btn-icon i{width:14px;height:14px}
-
-/* AI banner */
-.ai-banner{background:linear-gradient(135deg,var(--gold-tint) 0%,rgba(125,106,212,0.05) 100%);border:1px solid var(--gold-line);border-radius:4px;padding:16px 22px;margin-bottom:22px;display:flex;align-items:center;gap:16px;position:relative}
-.ai-banner::before{content:'';position:absolute;top:0;right:0;width:40px;height:1px;background:var(--gold)}
-.ai-avatar{width:42px;height:42px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#bda4f0 0%,var(--gold-bright) 60%,var(--gold) 100%);display:flex;align-items:center;justify-content:center;color:var(--white-pure);font-size:20px;font-weight:700;flex-shrink:0;box-shadow:0 2px 8px rgba(125,106,212,0.18)}
-.ai-content{flex:1;font-size:13px;color:var(--ink-soft);line-height:1.6;font-weight:400}
-.ai-content strong{color:var(--ai-glow);font-weight:600}
-.ai-content .ai-name{font-weight:700;color:var(--ai-glow)}
-.ai-actions{display:flex;gap:8px;flex-shrink:0}
-
-/* SECTIONS / CARDS */
-.section{background:var(--white-pure);border:1px solid var(--border);padding:22px 24px;position:relative;border-radius:4px;box-shadow:var(--shadow-card)}
-.section.gold-corner::before{content:'';position:absolute;top:0;right:0;width:40px;height:1px;background:var(--gold)}
-.section-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;padding-bottom:11px;border-bottom:1px solid var(--border);gap:12px}
-.section-title{font-size:20px;font-weight:600;color:var(--ink);letter-spacing:.2px}
-.section-eyebrow{font-size:10px;color:var(--gold);letter-spacing:1.5px;margin-bottom:4px;font-weight:600}
-.section-meta{font-size:11px;color:var(--ink-faint)}
-
-/* KPI strip */
-.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
-.kpi{background:var(--white-pure);border:1px solid var(--border);border-radius:4px;padding:18px 20px;position:relative;box-shadow:var(--shadow-card)}
-.kpi::before{content:'';position:absolute;top:0;right:0;width:32px;height:1px;background:var(--gold)}
-.kpi-label{font-size:11px;letter-spacing:.3px;color:var(--ink-faint);font-weight:500}
-.kpi-value{font-size:36px;font-weight:700;color:var(--ink);margin-top:6px;line-height:1.1;font-variant-numeric:tabular-nums}
-.kpi-value small{font-size:18px;color:var(--ink-faint);margin-right:2px;font-weight:400}
-.kpi-trend{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;color:var(--gold);font-weight:500}
-.kpi-trend .arrow{font-size:9px}
-
-/* Two-column body */
-.two-col{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;margin-bottom:18px}
-
-/* Activity timeline */
-.timeline{display:flex;flex-direction:column;gap:14px}
-.timeline-item{display:flex;gap:14px;padding-bottom:14px;border-bottom:1px solid var(--border)}
-.timeline-item:last-child{border-bottom:0;padding-bottom:0}
-.tl-time{flex-shrink:0;font-size:10px;color:var(--ink-faint);letter-spacing:.5px;width:60px;padding-top:2px;font-weight:500}
-.tl-icon{width:28px;height:28px;border-radius:50%;background:var(--cream-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--border)}
-.tl-icon i{width:13px;height:13px;color:var(--gold)}
-.tl-icon.wa{background:rgba(37,211,102,0.08);border-color:rgba(37,211,102,0.2)}
-.tl-icon.wa i{color:var(--whatsapp)}
-.tl-icon.ai{background:rgba(125,106,212,0.08);border-color:rgba(125,106,212,0.2)}
-.tl-icon.ai i{color:var(--ai-glow)}
-.tl-body{flex:1;font-size:13px;color:var(--ink-soft);line-height:1.55;font-weight:400}
-.tl-body strong{color:var(--ink);font-weight:600}
-.tl-meta{font-size:11px;color:var(--ink-faint);margin-top:3px}
-
-/* Goal */
-.goal-card{display:flex;flex-direction:column;gap:14px}
-.goal-num{font-size:48px;color:var(--ink);font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
-.goal-num small{font-size:22px;color:var(--ink-faint);font-weight:400}
-.goal-label{font-size:11px;color:var(--ink-faint);letter-spacing:1px;font-weight:500}
-.goal-bar{height:6px;background:var(--cream-soft);border-radius:3px;overflow:hidden;position:relative}
-.goal-bar > span{display:block;height:100%;background:linear-gradient(90deg,var(--gold-bright),var(--gold))}
-.goal-tics{display:flex;justify-content:space-between;font-size:10px;color:var(--ink-whisper);letter-spacing:.5px;margin-top:4px}
-.goal-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:6px;padding-top:14px;border-top:1px solid var(--border)}
-.goal-stat{text-align:center}
-.goal-stat .v{font-size:22px;color:var(--gold);font-weight:700;line-height:1}
-.goal-stat .l{font-size:10px;color:var(--ink-faint);letter-spacing:.5px;margin-top:4px;font-weight:500}
-
-/* International + hot leads */
-.bottom-row{display:grid;grid-template-columns:1.6fr 1fr;gap:18px}
-.carousel{display:flex;gap:12px;overflow-x:auto;padding:6px;scrollbar-width:thin}
-.carousel::-webkit-scrollbar{height:6px}
-.carousel::-webkit-scrollbar-thumb{background:var(--gold-line);border-radius:3px}
-.intl-card{flex:0 0 240px;background:var(--white-pure);border:1px solid var(--border);border-radius:4px;overflow:hidden;cursor:pointer;transition:all .2s;box-shadow:var(--shadow-card)}
-.intl-card:hover{border-color:var(--border-gold);transform:translateY(-1px)}
-.intl-photo{height:130px;background:repeating-linear-gradient(135deg,var(--cream-soft),var(--cream-soft) 8px,var(--paper) 8px,var(--paper) 16px);position:relative;display:flex;align-items:flex-end;padding:10px;border-bottom:1px solid var(--border)}
-.intl-photo .flag-pill{position:absolute;top:10px;left:10px;background:var(--white-pure);border:1px solid var(--border);font-size:11px;padding:4px 9px;border-radius:14px;letter-spacing:.3px;display:flex;align-items:center;gap:5px;font-weight:500}
-.intl-photo .placeholder-text{font-size:9px;color:var(--ink-whisper);letter-spacing:1.5px;font-weight:500}
-.intl-body{padding:12px 14px}
-.intl-addr{font-size:13px;color:var(--ink);font-weight:600;margin-bottom:4px}
-.intl-price{font-size:20px;color:var(--gold);font-weight:700;font-variant-numeric:tabular-nums}
-.intl-meta{display:flex;gap:10px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;color:var(--ink-faint);font-weight:500}
-.intl-meta span{display:flex;align-items:center;gap:3px}
-.intl-meta i{width:12px;height:12px}
-.intl-foot{font-size:10px;color:var(--ink-whisper);margin-top:6px;letter-spacing:.3px;font-style:italic;font-weight:400}
-
-.hot-leads{display:flex;flex-direction:column;gap:10px}
-.hot-lead{background:var(--white-pure);border:1px solid var(--border);border-radius:4px;padding:12px 14px;display:flex;gap:12px;align-items:center;box-shadow:var(--shadow-card)}
-.lead-avatar{width:36px;height:36px;border-radius:50%;background:var(--gold-light);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;border:1px solid var(--border-gold)}
-.hl-info{flex:1;min-width:0}
-.hl-name{font-size:13px;color:var(--ink);font-weight:600}
-.hl-meta{font-size:11px;color:var(--ink-faint);margin-top:2px;display:flex;gap:6px;align-items:center;font-weight:400}
-.hl-meta .sep{color:var(--ink-whisper)}
-.hl-actions{display:flex;gap:4px}
-.icon-btn{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--white-pure);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;color:var(--ink-soft);padding:0}
-.icon-btn i{width:13px;height:13px}
-.icon-btn:hover{border-color:var(--gold);color:var(--gold)}
-.icon-btn.wa{color:var(--whatsapp);border-color:rgba(37,211,102,.3)}
-.icon-btn.wa:hover{background:var(--whatsapp);color:#fff}
-.icon-btn.ai{color:var(--ai-glow);border-color:rgba(125,106,212,.3)}
-.icon-btn.ai:hover{background:var(--ai-glow);color:#fff}
-
-/* Filters */
-.filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;background:var(--white-pure);border:1px solid var(--border);border-radius:4px;padding:12px 16px;box-shadow:var(--shadow-card)}
-.search{flex:1;min-width:200px;position:relative}
-.search input{width:100%;background:transparent;border:0;border-bottom:1px solid var(--border);padding:8px 28px 8px 8px;font-size:13px;color:var(--ink);outline:0;transition:border .2s;text-align:right;font-weight:400}
-.search input:focus{border-bottom-color:var(--gold)}
-.search input::placeholder{color:var(--ink-whisper)}
-.search i{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--ink-faint);pointer-events:none}
-.chips{display:flex;gap:6px;flex-wrap:wrap}
-.chip{padding:6px 12px;border:1px solid var(--border-strong);font-size:11px;color:var(--ink-soft);cursor:pointer;border-radius:2px;transition:all .15s;background:var(--white-pure);display:inline-flex;align-items:center;gap:5px;font-weight:500}
-.chip:hover{border-color:var(--gold);color:var(--gold)}
-.chip.active{background:var(--cream-soft);border-color:var(--gold);color:var(--ink);font-weight:600}
-.chip .flag{font-size:11px}
-
-/* Table */
-.table-wrap{background:var(--white-pure);border:1px solid var(--border);border-radius:4px;overflow:hidden;box-shadow:var(--shadow-card);position:relative}
-.table-wrap.gold-corner::before{content:'';position:absolute;top:0;right:0;width:40px;height:1px;background:var(--gold);z-index:2}
-table.props{width:100%;border-collapse:collapse;font-size:13px}
-table.props thead th{text-align:right;padding:13px 12px;background:var(--cream-soft);font-size:10px;letter-spacing:.5px;color:var(--ink-faint);font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap}
-table.props tbody td{padding:12px;border-bottom:1px solid var(--border);color:var(--ink-soft);vertical-align:middle;font-weight:400}
-table.props tbody tr{cursor:pointer;transition:background .12s}
-table.props tbody tr:hover{background:var(--paper)}
-.cell-status{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink-faint);font-weight:500}
-.dot-status{width:7px;height:7px;border-radius:50%;display:inline-block}
-.s-active{background:var(--gold)}
-.s-pending{background:var(--ink-whisper)}
-.s-sold{background:var(--gold-bright)}
-.s-lost{background:var(--danger)}
-.cell-addr{color:var(--ink);font-weight:600;font-size:13px}
-.cell-addr .sub{display:block;font-size:11px;color:var(--ink-faint);font-weight:400;margin-top:2px}
-.loc-badge{display:inline-block;padding:3px 9px;font-size:10px;border:1px solid var(--gold-line);color:var(--gold);border-radius:2px;letter-spacing:.3px;font-weight:600}
-.cell-price{font-size:15px;color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
-.cell-num{font-variant-numeric:tabular-nums;color:var(--ink-soft)}
-.score-bar{width:60px;height:5px;background:var(--cream-soft);border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:6px}
-.score-bar > span{display:block;height:100%;background:linear-gradient(90deg,var(--gold-bright),var(--gold))}
-.score-num{font-size:11px;color:var(--gold);font-weight:700;font-variant-numeric:tabular-nums;display:inline-block;width:24px}
-.actions-cell{position:relative;text-align:left}
-.kebab{background:transparent;border:0;color:var(--ink-faint);cursor:pointer;padding:4px;border-radius:2px}
-.kebab:hover{color:var(--gold);background:var(--cream-soft)}
-.kebab i{width:16px;height:16px}
-input[type=checkbox].cb{accent-color:var(--gold);cursor:pointer}
-
-.bulk-bar{position:sticky;bottom:18px;background:var(--ink);color:var(--white-pure);border-radius:4px;padding:11px 18px;display:none;align-items:center;gap:14px;box-shadow:var(--shadow-pop);margin-top:12px;z-index:5}
-.bulk-bar.show{display:flex}
-.bulk-bar .count{font-size:18px;font-weight:700}
-.bulk-bar .actions{display:flex;gap:6px;margin-right:auto}
-.bulk-bar .btn{background:transparent;color:var(--white-pure);border-color:rgba(255,255,255,0.25)}
-.bulk-bar .btn:hover{border-color:var(--gold-bright);color:var(--gold-bright);background:rgba(255,255,255,0.04)}
-
-/* DRAWER */
-.drawer-backdrop{position:fixed;inset:0;background:rgba(26,24,20,0.25);z-index:50;opacity:0;pointer-events:none;transition:opacity .2s}
-.drawer-backdrop.show{opacity:1;pointer-events:auto}
-.drawer{position:fixed;top:0;right:auto;left:0;width:560px;max-width:96vw;height:100vh;background:var(--cream);border-right:1px solid var(--border);box-shadow:var(--shadow-pop);z-index:60;transform:translateX(-100%);transition:transform .25s ease;display:flex;flex-direction:column}
-.drawer.show{transform:translateX(0)}
-.drawer-head{padding:22px 26px 14px;border-bottom:1px solid var(--border);background:var(--white-pure);position:relative}
-.drawer-head::before{content:'';position:absolute;top:0;right:0;width:40px;height:1px;background:var(--gold)}
-.drawer-close{position:absolute;top:18px;left:18px;background:transparent;border:0;cursor:pointer;color:var(--ink-faint);padding:6px;border-radius:50%}
-.drawer-close:hover{color:var(--gold);background:var(--cream-soft)}
-.drawer-meta{font-size:10px;letter-spacing:1.5px;color:var(--gold);margin-bottom:6px;font-weight:600}
-.drawer-title{font-size:24px;font-weight:700;line-height:1.2;color:var(--ink)}
-.drawer-sub{font-size:12px;color:var(--ink-faint);margin-top:5px;font-weight:400}
-.drawer-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--white-pure);padding:0 18px;overflow-x:auto;scrollbar-width:none}
-.drawer-tabs::-webkit-scrollbar{display:none}
-.drawer-tab{padding:11px 14px;font-size:11px;letter-spacing:.3px;color:var(--ink-faint);cursor:pointer;background:transparent;border:0;border-bottom:2px solid transparent;white-space:nowrap;font-weight:500}
-.drawer-tab:hover{color:var(--ink)}
-.drawer-tab.active{color:var(--ink);border-bottom-color:var(--gold);font-weight:600}
-.drawer-body{flex:1;overflow-y:auto;padding:20px 26px}
-.drawer-body::-webkit-scrollbar{width:6px}
-.drawer-body::-webkit-scrollbar-thumb{background:var(--gold-line);border-radius:3px}
-.drawer-pane{display:none}
-.drawer-pane.active{display:block}
-
-.kvgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px;margin-bottom:18px}
-.kv{display:flex;flex-direction:column;gap:3px;padding-bottom:10px;border-bottom:1px solid var(--border)}
-.kv .k{font-size:10px;letter-spacing:.5px;color:var(--ink-faint);font-weight:500}
-.kv .v{font-size:14px;color:var(--ink);font-variant-numeric:tabular-nums;font-weight:500}
-.kv .v.lg{font-size:22px;color:var(--gold);font-weight:700}
-
-/* WhatsApp chat in drawer */
-.chat{display:flex;flex-direction:column;gap:8px;padding:6px 0 12px}
-.bubble{max-width:78%;padding:8px 12px;font-size:13px;line-height:1.5;border-radius:10px;position:relative;font-weight:400}
-.bubble .ts{display:block;font-size:10px;color:var(--ink-whisper);margin-top:3px;font-weight:400}
-.bubble.in{align-self:flex-start;background:var(--white-pure);border:1px solid var(--border);color:var(--ink-soft);border-bottom-left-radius:2px}
-.bubble.out{align-self:flex-end;background:var(--gold-tint);border:1px solid var(--gold-line);color:var(--ink);border-bottom-right-radius:2px}
-.bubble.out .ts{text-align:left;color:var(--gold)}
-.day-sep{align-self:center;font-size:10px;color:var(--ink-whisper);letter-spacing:1px;background:var(--cream);padding:3px 10px;border-radius:10px;margin:8px 0;font-weight:500}
-
-.quick-templates{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding-top:12px;border-top:1px solid var(--border)}
-.composer{display:flex;gap:8px;align-items:flex-end;margin-top:12px;padding-top:14px;border-top:1px solid var(--border)}
-.composer textarea{flex:1;min-height:60px;background:var(--white-pure);border:1px solid var(--border);border-radius:4px;padding:10px 12px;font-size:13px;color:var(--ink);resize:vertical;outline:0;transition:border .15s;text-align:right;font-weight:400}
-.composer textarea:focus{border-color:var(--gold)}
-.composer .composer-actions{display:flex;flex-direction:column;gap:6px}
-
-/* AI block */
-.ai-block{background:linear-gradient(135deg,var(--gold-tint),rgba(125,106,212,.04));border:1px solid var(--gold-line);border-radius:4px;padding:14px 16px;margin-bottom:14px;position:relative}
-.ai-block::before{content:'';position:absolute;top:0;right:0;width:30px;height:1px;background:var(--ai-glow)}
-.ai-block-h{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.ai-block-h i{width:14px;height:14px;color:var(--ai-glow)}
-.ai-block-h span{font-size:11px;letter-spacing:.5px;color:var(--ai-glow);font-weight:600}
-.ai-block p{font-size:13px;line-height:1.6;color:var(--ink-soft);margin-bottom:8px;font-weight:400}
-.ai-block p:last-child{margin-bottom:0}
-.ai-block strong{color:var(--ink);font-weight:600}
-
-/* KANBAN */
-.kanban{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.kanban-col{background:var(--cream-soft);border:1px solid var(--border);border-radius:4px;padding:14px;min-height:500px;position:relative}
-.kanban-col::before{content:'';position:absolute;top:0;right:0;width:40px;height:1px;background:var(--gold)}
-.kanban-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
-.kanban-h .t{font-size:18px;color:var(--ink);font-weight:700;display:flex;align-items:center;gap:8px}
-.kanban-h .c{font-size:12px;color:var(--gold);font-weight:700;font-variant-numeric:tabular-nums}
-.lead-card{background:var(--white-pure);border:1px solid var(--border);border-radius:3px;padding:13px;margin-bottom:9px;cursor:grab;box-shadow:var(--shadow-card);position:relative}
-.lead-card:hover{border-color:var(--border-gold)}
-.lead-card .top{display:flex;gap:10px;align-items:center;margin-bottom:8px}
-.lead-card .name{font-size:13px;color:var(--ink);font-weight:600}
-.lead-card .name .heb{display:block;font-size:11px;color:var(--ink-faint);font-weight:400;margin-top:1px}
-.lead-card .budget{font-size:15px;color:var(--gold);font-weight:700;margin-bottom:6px}
-.lead-card .needs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
-.tag{font-size:10px;padding:2px 7px;background:var(--cream-soft);color:var(--ink-soft);border-radius:2px;letter-spacing:.2px;border:1px solid var(--border);font-weight:500}
-.tag.gold{background:var(--gold-tint);color:var(--gold);border-color:var(--gold-line)}
-.lead-card .foot{display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border)}
-.lead-card .last{font-size:10px;color:var(--ink-faint);font-weight:500}
-.lead-card .last i{width:11px;height:11px;display:inline-block;vertical-align:-2px;margin-left:3px}
-.lead-card .foot-actions{display:flex;gap:4px}
-
-/* INTL grid */
-.intl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.intl-grid .intl-card{flex:none}
-
-/* WHATSAPP HUB */
-.wa-hub{display:grid;grid-template-columns:340px 1fr;gap:0;background:var(--white-pure);border:1px solid var(--border);border-radius:4px;overflow:hidden;height:calc(100vh - 200px);min-height:560px;box-shadow:var(--shadow-card);position:relative}
-.wa-hub::before{content:'';position:absolute;top:0;right:0;width:40px;height:1px;background:var(--gold);z-index:2}
-.wa-list{border-left:1px solid var(--border);background:var(--cream-soft);display:flex;flex-direction:column;overflow:hidden}
-.wa-list-h{padding:14px 16px 12px;border-bottom:1px solid var(--border)}
-.wa-list-search{position:relative}
-.wa-list-search input{width:100%;background:var(--white-pure);border:1px solid var(--border);border-radius:18px;padding:7px 30px 7px 12px;font-size:12px;outline:0;text-align:right;font-weight:400}
-.wa-list-search input:focus{border-color:var(--gold)}
-.wa-list-search i{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:13px;height:13px;color:var(--ink-faint)}
-.wa-filters{display:flex;gap:5px;margin-top:10px;flex-wrap:wrap}
-.wa-filters .chip{font-size:10px;padding:4px 8px}
-.wa-conv-list{flex:1;overflow-y:auto}
-.wa-conv-list::-webkit-scrollbar{width:5px}
-.wa-conv-list::-webkit-scrollbar-thumb{background:var(--gold-line);border-radius:3px}
-.wa-conv{display:flex;gap:11px;padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer;align-items:center;transition:background .12s}
-.wa-conv:hover{background:var(--paper)}
-.wa-conv.active{background:var(--white-pure);border-right:2px solid var(--gold)}
-.wa-conv .lead-avatar{width:38px;height:38px;font-size:13px}
-.wa-conv-info{flex:1;min-width:0}
-.wa-conv-name{font-size:13px;color:var(--ink);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.wa-conv-prev{font-size:11px;color:var(--ink-faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:400}
-.wa-conv-meta{display:flex;flex-direction:column;align-items:flex-start;gap:4px}
-.wa-conv-time{font-size:10px;color:var(--ink-whisper);font-weight:500}
-.unread-dot{width:8px;height:8px;background:var(--gold);border-radius:50%}
-.wa-active{display:flex;flex-direction:column;background:var(--cream)}
-.wa-active-h{padding:14px 22px;border-bottom:1px solid var(--border);background:var(--white-pure);display:flex;justify-content:space-between;align-items:center;gap:10px}
-.wa-active-h .who .name{font-size:14px;color:var(--ink);font-weight:600}
-.wa-active-h .who .sub{font-size:11px;color:var(--ink-faint);margin-top:2px;font-weight:400}
-.wa-active-actions{display:flex;gap:6px}
-.wa-thread{flex:1;overflow-y:auto;padding:18px 22px;display:flex;flex-direction:column;gap:6px;background:repeating-linear-gradient(45deg,var(--cream),var(--cream) 18px,var(--paper) 18px,var(--paper) 36px)}
-.wa-thread::-webkit-scrollbar{width:6px}
-.wa-thread::-webkit-scrollbar-thumb{background:var(--gold-line);border-radius:3px}
-.wa-templates{padding:8px 22px;border-top:1px solid var(--border);background:var(--white-pure);display:flex;gap:6px;flex-wrap:wrap}
-.wa-composer{padding:12px 22px 16px;background:var(--white-pure);border-top:1px solid var(--border);display:flex;gap:10px;align-items:flex-end}
-
-/* PIXEL */
-.pixel-layout{display:grid;grid-template-columns:1fr 280px;gap:18px}
-.pixel-chat{background:var(--white-pure);border:1px solid var(--border);border-radius:4px;display:flex;flex-direction:column;height:calc(100vh - 200px);min-height:560px;overflow:hidden;box-shadow:var(--shadow-card);position:relative}
-.pixel-chat::before{content:'';position:absolute;top:0;right:0;width:40px;height:1px;background:var(--ai-glow);z-index:2}
-.pixel-h{padding:18px 24px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,var(--gold-tint),rgba(125,106,212,.04));display:flex;align-items:center;gap:14px}
-.pixel-h .ai-avatar{width:46px;height:46px;font-size:22px}
-.pixel-h .pixel-name{font-size:22px;color:var(--ink);font-weight:700;display:flex;align-items:center;gap:8px}
-.pixel-h .pixel-name .pulse-dot{background:var(--ai-glow)}
-.pixel-h .pixel-status{font-size:11px;color:var(--ink-faint);margin-top:3px;font-weight:400}
-.pixel-h .pixel-context{font-size:10px;color:var(--ai-glow);letter-spacing:.5px;margin-top:4px;font-weight:600}
-
-.pixel-thread{flex:1;overflow-y:auto;padding:22px 30px;display:flex;flex-direction:column;gap:18px}
-.pixel-thread::-webkit-scrollbar{width:6px}
-.pixel-thread::-webkit-scrollbar-thumb{background:var(--gold-line);border-radius:3px}
-.pixel-msg{display:flex;gap:12px;align-items:flex-start;max-width:88%}
-.pixel-msg.user{align-self:flex-end;flex-direction:row-reverse}
-.pixel-msg .avatar{flex-shrink:0;width:32px;height:32px;border-radius:50%;background:var(--gold-light);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;border:1px solid var(--border-gold)}
-.pixel-msg.pixel .avatar{background:radial-gradient(circle at 30% 30%,#bda4f0 0%,var(--gold-bright) 60%,var(--gold) 100%);color:#fff;border:0}
-.pixel-msg .msg-body{background:var(--cream-soft);border:1px solid var(--border);border-radius:4px;padding:12px 16px;font-size:13.5px;line-height:1.65;color:var(--ink-soft);font-weight:400}
-.pixel-msg.user .msg-body{background:var(--gold-tint);border-color:var(--gold-line);color:var(--ink)}
-.pixel-msg .msg-body strong{color:var(--ink);font-weight:600}
-.pixel-msg .msg-body em{color:var(--ai-glow);font-style:italic}
-.pixel-msg .msg-body ul,.pixel-msg .msg-body ol{margin:8px 0 8px 0;padding-right:18px}
-.pixel-msg .msg-body li{margin-bottom:4px}
-.pixel-msg .msg-body .pixel-card{background:var(--white-pure);border:1px solid var(--border);border-radius:3px;padding:10px 12px;margin:8px 0;display:flex;justify-content:space-between;align-items:center;gap:10px}
-.pixel-msg .msg-body .pixel-card .name{font-weight:600;color:var(--ink);font-size:13px}
-.pixel-msg .msg-body .pixel-card .meta{font-size:11px;color:var(--ink-faint);margin-top:2px;font-weight:400}
-.pixel-msg .msg-body .pixel-card .match{font-size:18px;color:var(--gold);font-weight:700}
-.pixel-msg .msg-body .quote{background:var(--white-pure);border-right:2px solid var(--gold);padding:8px 12px;margin:6px 0;font-size:13px;color:var(--ink);border-radius:0 3px 3px 0;font-weight:400}
-.pixel-msg .msg-body .pixel-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.pixel-msg .msg-body .pixel-actions .chip{font-size:11px;cursor:pointer}
-.typing{display:flex;gap:4px;padding:6px 0}
-.typing span{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:typing 1.2s infinite ease-in-out}
-.typing span:nth-child(2){animation-delay:.15s}
-.typing span:nth-child(3){animation-delay:.3s}
-@keyframes typing{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
-
-.pixel-composer{padding:14px 22px;border-top:1px solid var(--border);background:var(--white-pure)}
-.pixel-suggest{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
-.pixel-suggest .chip{cursor:pointer;font-size:11px}
-.pixel-input-row{display:flex;gap:10px;align-items:flex-end}
-.pixel-input-row textarea{flex:1;min-height:46px;background:var(--cream);border:1px solid var(--border);border-radius:4px;padding:11px 14px;font-size:13px;color:var(--ink);outline:0;resize:vertical;text-align:right;font-weight:400}
-.pixel-input-row textarea:focus{border-color:var(--ai-glow)}
-.pixel-input-row .btn{padding:11px 14px}
-
-.pixel-side{display:flex;flex-direction:column;gap:14px}
-.pixel-side .section{padding:16px 18px}
-.pixel-side .section-title{font-size:16px;margin-bottom:8px}
-.pixel-insight{padding:10px 0;border-bottom:1px solid var(--border);font-size:12.5px;color:var(--ink-soft);line-height:1.55;cursor:pointer;transition:color .15s;font-weight:400}
-.pixel-insight:hover{color:var(--ink)}
-.pixel-insight:last-child{border-bottom:0}
-.pixel-insight strong{color:var(--ai-glow);font-weight:600}
-.pixel-insight .take{display:inline-block;margin-top:5px;font-size:10px;color:var(--gold);letter-spacing:.5px;font-weight:600}
-.pixel-quick{display:flex;flex-direction:column;gap:6px}
-.pixel-quick .chip{text-align:right;justify-content:flex-start;font-size:12px;letter-spacing:0;padding:8px 10px}
-
-/* FAB */
-.pixel-fab{position:fixed;bottom:24px;left:24px;z-index:40}
-.pixel-fab-btn{width:60px;height:60px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#bda4f0 0%,var(--gold-bright) 60%,var(--gold) 100%);border:0;color:#fff;font-size:22px;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(125,106,212,.3),0 4px 8px rgba(168,134,46,.15);transition:transform .15s;position:relative}
-.pixel-fab-btn:hover{transform:scale(1.05)}
-.pixel-fab-btn::after{content:'';position:absolute;bottom:4px;right:4px;width:10px;height:10px;background:var(--ai-glow);border:2px solid var(--white-pure);border-radius:50%;animation:pulse 2s infinite}
-.pixel-fab-panel{position:absolute;bottom:74px;left:0;width:340px;height:480px;background:var(--white-pure);border:1px solid var(--border);border-radius:6px;box-shadow:var(--shadow-pop);display:none;flex-direction:column;overflow:hidden}
-.pixel-fab-panel.show{display:flex}
-.pixel-fab-panel::before{content:'';position:absolute;top:0;right:0;width:40px;height:1px;background:var(--ai-glow)}
-.pixel-fab-panel .pixel-h{padding:14px 18px}
-.pixel-fab-panel .pixel-h .ai-avatar{width:36px;height:36px;font-size:16px}
-.pixel-fab-panel .pixel-h .pixel-name{font-size:17px}
-.pixel-fab-panel .pixel-thread{padding:16px 20px;gap:14px}
-.pixel-fab-panel .pixel-msg{max-width:100%}
-.pixel-fab-panel .pixel-msg .msg-body{font-size:12.5px;padding:10px 12px}
-.pixel-fab-panel .pixel-composer{padding:10px 14px}
-.pixel-fab-panel .pixel-input-row textarea{min-height:38px;padding:8px 10px;font-size:12px}
-.fab-close{position:absolute;top:12px;left:12px;background:transparent;border:0;color:var(--ink-faint);cursor:pointer;padding:4px;border-radius:50%}
-.fab-close:hover{background:var(--cream-soft);color:var(--gold)}
-
-/* INTAKE */
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 18px}
-.field label{display:block;font-size:11px;letter-spacing:.3px;color:var(--ink-faint);margin-bottom:6px;font-weight:600}
-.field input,.field select,.field textarea{width:100%;background:var(--white-pure);border:1px solid var(--border);border-radius:3px;padding:9px 12px;font-size:13px;color:var(--ink);outline:0;transition:border .15s;text-align:right;font-weight:400}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}
-.field textarea{min-height:80px;resize:vertical}
-.field .hint{font-size:11px;color:var(--ink-faint);margin-top:4px;font-weight:400}
-.toggle-row{display:flex;gap:6px;background:var(--cream-soft);padding:4px;border-radius:3px;border:1px solid var(--border);width:fit-content}
-.toggle-opt{padding:8px 16px;font-size:12px;color:var(--ink-soft);cursor:pointer;border-radius:2px;background:transparent;border:0;font-weight:500}
-.toggle-opt.active{background:var(--white-pure);color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.05)}
-
-.tax-card{background:var(--cream-soft);border:1px solid var(--border-gold);border-radius:4px;padding:18px 20px;position:relative}
-.tax-card::before{content:'';position:absolute;top:0;right:0;width:30px;height:1px;background:var(--gold)}
-.tax-card .label{font-size:11px;letter-spacing:.5px;color:var(--gold);font-weight:600}
-.tax-card .v{font-size:28px;color:var(--ink);font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums}
-
-/* EXPORT */
-.export-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.export-card{background:var(--white-pure);border:1px solid var(--border);border-radius:4px;padding:20px;cursor:pointer;transition:all .15s;position:relative;box-shadow:var(--shadow-card)}
-.export-card::before{content:'';position:absolute;top:0;right:0;width:30px;height:1px;background:var(--gold)}
-.export-card:hover{border-color:var(--border-gold);transform:translateY(-1px)}
-.export-card .icon{width:36px;height:36px;border-radius:4px;background:var(--gold-tint);border:1px solid var(--gold-line);display:flex;align-items:center;justify-content:center;margin-bottom:12px}
-.export-card .icon i{width:18px;height:18px;color:var(--gold)}
-.export-card .t{font-size:17px;color:var(--ink);font-weight:700}
-.export-card .d{font-size:12px;color:var(--ink-faint);margin-top:5px;line-height:1.55;font-weight:400}
-.export-card .meta{margin-top:12px;font-size:10px;color:var(--gold);letter-spacing:.5px;font-weight:600}
-
-/* Toast */
-.toast-wrap{position:fixed;bottom:24px;left:24px;display:flex;flex-direction:column;gap:8px;z-index:90}
-.toast{background:var(--white-pure);border:1px solid var(--gold);border-right:3px solid var(--gold);padding:12px 18px;font-size:13px;color:var(--ink);box-shadow:var(--shadow-pop);border-radius:3px;display:flex;align-items:center;gap:10px;min-width:260px;animation:toast-in .25s ease;font-weight:500}
-.toast i{width:14px;height:14px;color:var(--gold)}
-@keyframes toast-in{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
-
-/* Screens */
-.screen{display:none}
-.screen.active{display:block;animation:fade .15s ease}
-@keyframes fade{from{opacity:0}to{opacity:1}}
-
-@media (max-width:1100px){
-  .app{grid-template-columns:1fr}
-  .sidebar{position:relative;height:auto}
-  .kpi-strip{grid-template-columns:repeat(2,1fr)}
-  .two-col,.bottom-row,.pixel-layout,.wa-hub{grid-template-columns:1fr}
-  .intl-grid,.kanban,.export-grid{grid-template-columns:1fr}
-}
-</style>
-</head>
-<body>
-
-<div class="app">
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-plaque">
-        <svg class="brand-skyline" viewBox="0 0 280 38" fill="none" stroke="#c8a96a" stroke-width="1.4">
-          <path d="M0 38 L0 26 L18 26 L18 20 L34 20 L34 24 L48 24 L48 16 L62 16 L62 22 L78 22 L78 18 L94 18 L94 25 L112 25 L112 14 L126 14 L126 8 L134 8 L134 2 L142 2 L142 8 L150 8 L150 14 L164 14 L164 22 L184 22 L184 18 L202 18 L202 26 L222 26 L222 20 L240 20 L240 24 L260 24 L260 22 L280 22 L280 38 Z"/>
-        </svg>
-        <div class="brand-logo">PEER</div>
-        <div class="brand-tagline">Luxury Real Estate</div>
-        <div class="brand-plaque-divider"></div>
-        <div class="brand-agent-he">אסתי הלר<span class="dot">·</span>ירושלים</div>
-        <div class="brand-agent-en">Esti Heller<span class="dot">·</span>Jerusalem</div>
-      </div>
-    </div>
-
-    <nav class="nav" id="nav"></nav>
-
-    <div class="sidebar-stats">
-      <div class="stats-label">יעד · 500 נכסים</div>
-      <div class="stats-num">247<small>/500</small></div>
-      <div class="stats-bar"><span></span></div>
-      <div class="stats-foot">49.4% · בקצב לרבעון 4</div>
-    </div>
-  </aside>
-
-  <main class="main">
-
-    <!-- OVERVIEW -->
-    <section class="screen active" id="screen-overview">
-      <div class="topbar">
-        <div>
-          <div class="page-meta">סקירה כללית</div>
-          <h1 class="page-title">בוקר טוב, אסתי</h1>
-          <div class="page-subtitle">יום שלישי, 7 במאי 2026 · ירושלים, 21° · 18 שיחות פעילות · 3 צפיות היום</div>
-        </div>
-        <div class="topbar-actions">
-          <button class="btn btn-ai" onclick="openPixel()"><i data-lucide="sparkles"></i>שאל את פיקסל</button>
-          <button class="btn btn-primary" onclick="navTo('intake')"><i data-lucide="plus"></i>נכס חדש</button>
-        </div>
-      </div>
-
-      <div class="kpi-strip">
-        <div class="kpi"><div class="kpi-label">נכסים במאגר</div><div class="kpi-value">247</div><div class="kpi-trend"><span class="arrow">▲</span> +12 החודש</div></div>
-        <div class="kpi"><div class="kpi-label">לידים פעילים</div><div class="kpi-value">38</div><div class="kpi-trend"><span class="arrow">▲</span> +5 השבוע</div></div>
-        <div class="kpi"><div class="kpi-label">מחיר ממוצע למ"ר · בית הכרם</div><div class="kpi-value"><small>₪</small>43,200</div><div class="kpi-trend"><span class="arrow">▲</span> +4.2% ברבעון</div></div>
-        <div class="kpi"><div class="kpi-label">שיעור המרה</div><div class="kpi-value">14<small>%</small></div><div class="kpi-trend"><span class="arrow">▲</span> +2.1pp השנה</div></div>
-      </div>
-
-      <div class="ai-banner">
-        <div class="ai-avatar">פ</div>
-        <div class="ai-content">
-          <span class="ai-name">פיקסל</span> שם לב: <strong>3 לידים</strong> במאגר החם תואמים את הנכס החדש ב<strong>החלוץ 24</strong>. רוצה לשלוח הודעות אישיות בוואטסאפ?
-        </div>
-        <div class="ai-actions">
-          <button class="btn btn-primary btn-sm" onclick="openPixel('match')">בדוק התאמות</button>
-          <button class="btn btn-ghost btn-sm">סגור</button>
-        </div>
-      </div>
-
-      <div class="two-col">
-        <div class="section gold-corner">
-          <div class="section-header">
-            <div><div class="section-eyebrow">היום</div><div class="section-title">פעילות אחרונה</div></div>
-            <button class="btn btn-ghost btn-sm">הצג הכל</button>
-          </div>
-          <div class="timeline">
-            <div class="timeline-item"><div class="tl-time">14:22</div><div class="tl-icon wa"><i data-lucide="message-circle"></i></div><div class="tl-body"><strong>דניאל כהן</strong> השיב · "אני יכול לראות את הדירה ביום חמישי בערב"<div class="tl-meta">בנוגע ל: החלוץ 24 · וואטסאפ</div></div></div>
-            <div class="timeline-item"><div class="tl-time">13:08</div><div class="tl-icon ai"><i data-lucide="sparkles"></i></div><div class="tl-body">פיקסל סימן <strong>2 בעלי נכסים</strong> שלא יצרת איתם קשר 30+ ימים · בית הלוי 18, יפה נוף 7<div class="tl-meta">תובנה אוטומטית · פעולה</div></div></div>
-            <div class="timeline-item"><div class="tl-time">11:45</div><div class="tl-icon"><i data-lucide="home"></i></div><div class="tl-body">נכס חדש נוסף · <strong>החלוץ 24</strong>, 4 חדרים, 102 מ"ר, ₪3,650,000<div class="tl-meta">מקור: ישיר · בית הכרם</div></div></div>
-            <div class="timeline-item"><div class="tl-time">10:30</div><div class="tl-icon"><i data-lucide="users"></i></div><div class="tl-body">דרור שיתף <strong>11 לידים חדשים</strong> מרשת אתונה<div class="tl-meta">מאגר בינלאומי · דרור לוין</div></div></div>
-            <div class="timeline-item"><div class="tl-time">09:15</div><div class="tl-icon wa"><i data-lucide="check-check"></i></div><div class="tl-body">צפייה אושרה · <strong>משפחת לוין</strong> בבית הלוי 18<div class="tl-meta">מחר 17:00 · וואטסאפ</div></div></div>
-          </div>
-        </div>
-
-        <div class="section gold-corner">
-          <div class="section-header"><div><div class="section-eyebrow">יעד שנתי</div><div class="section-title">לקראת 500 נכסים</div></div></div>
-          <div class="goal-card">
-            <div><div class="goal-label">במאגר עד כה</div><div class="goal-num">247<small>/500</small></div></div>
-            <div><div class="goal-bar"><span style="width:49.4%"></span></div><div class="goal-tics"><span>0</span><span>125</span><span>250</span><span>375</span><span>500</span></div></div>
-            <div class="goal-stats">
-              <div class="goal-stat"><div class="v">+12</div><div class="l">החודש</div></div>
-              <div class="goal-stat"><div class="v">+47</div><div class="l">ברבעון</div></div>
-              <div class="goal-stat"><div class="v">253</div><div class="l">נותרו</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bottom-row">
-        <div class="section gold-corner">
-          <div class="section-header"><div><div class="section-eyebrow">שיתף דרור</div><div class="section-title">מבחר בינלאומי</div></div><button class="btn btn-ghost btn-sm" onclick="navTo('international')">כל הנכסים →</button></div>
-          <div class="carousel" id="overview-intl"></div>
-        </div>
-        <div class="section gold-corner">
-          <div class="section-header"><div><div class="section-eyebrow">לידים חמים · מעקב</div><div class="section-title">דורש טיפול היום</div></div></div>
-          <div class="hot-leads" id="overview-hot"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- INTAKE -->
-    <section class="screen" id="screen-intake">
-      <div class="topbar">
-        <div>
-          <div class="page-meta">קליטת נכס</div>
-          <h1 class="page-title">נכס חדש</h1>
-          <div class="page-subtitle">הוסף נכס למאגר. פיקסל מנתח תמחור אוטומטית כשהזנת כתובת ושכונה.</div>
-        </div>
-        <div class="topbar-actions">
-          <span style="font-size:12px;color:var(--ink-faint);font-weight:500">טיוטה נשמרה · לפני 14 שניות</span>
-          <button class="btn">שמור טיוטה</button>
-          <button class="btn btn-primary">פרסם</button>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:18px;align-items:center;margin-bottom:18px;flex-wrap:wrap">
-        <div>
-          <label style="display:block;font-size:11px;color:var(--ink-faint);margin-bottom:6px;font-weight:600">מקור הנכס</label>
-          <div class="toggle-row" id="origin-toggle">
-            <button class="toggle-opt active" data-o="local">מקומי · ירושלים</button>
-            <button class="toggle-opt" data-o="intl">בינלאומי</button>
-          </div>
-        </div>
-        <div style="flex:1"></div>
-        <div>
-          <label style="display:block;font-size:11px;color:var(--ink-faint);margin-bottom:6px;font-weight:600">משויך ל</label>
-          <select style="background:var(--white-pure);border:1px solid var(--border);border-radius:3px;padding:9px 12px;font-size:13px;color:var(--ink);outline:0;min-width:160px;text-align:right;font-weight:400">
-            <option>אסתי הלר</option><option>דרור לוין</option><option>צוות המשרד</option>
-          </select>
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:2fr 1fr;gap:22px">
-        <div style="display:flex;flex-direction:column;gap:18px">
-
-          <div class="section gold-corner">
-            <div class="section-header"><div><div class="section-eyebrow">01</div><div class="section-title">מיקום ורישום</div></div></div>
-            <div class="form-grid">
-              <div class="field"><label>כתובת</label><input value="הרב הרצוג 28" /></div>
-              <div class="field local-only"><label>שכונה</label><select><option>בית הכרם</option><option>דניה</option><option>יפה נוף</option></select></div>
-              <div class="field intl-only" style="display:none"><label>מדינה / עיר</label><select><option>אתונה, יוון</option><option>לימסול, קפריסין</option><option>ליסבון, פורטוגל</option><option>מיאמי, ארה"ב</option></select></div>
-              <div class="field local-only"><label>גוש</label><input value="30178" /></div>
-              <div class="field local-only"><label>חלקה</label><input value="142" /></div>
-              <div class="field intl-only" style="display:none"><label>מספר רישום / קדסטר</label><input value="GR-AT-58291-K" /></div>
-              <div class="field"><label>מספר דירה</label><input value="7" /></div>
-            </div>
-          </div>
-
-          <div class="section gold-corner">
-            <div class="section-header"><div><div class="section-eyebrow">02</div><div class="section-title">מפרט</div></div></div>
-            <div class="form-grid">
-              <div class="field"><label>חדרים</label><input type="number" value="4" step="0.5" /></div>
-              <div class="field"><label>קומה / סך הכל</label><input value="3 / 5" /></div>
-              <div class="field"><label>מ"ר בנוי</label><input type="number" value="102" /></div>
-              <div class="field"><label>גינה (מ"ר)</label><input type="number" value="0" /></div>
-              <div class="field"><label>מרפסת (מ"ר)</label><input type="number" value="14" /></div>
-              <div class="field"><label>מקומות חניה</label><input type="number" value="1" /></div>
-              <div class="field"><label>שנת בנייה</label><input type="number" value="1968" /></div>
-              <div class="field"><label>שיפוץ אחרון</label><input type="number" value="2019" /></div>
-            </div>
-          </div>
-
-          <div class="section gold-corner">
-            <div class="section-header"><div><div class="section-eyebrow">03</div><div class="section-title">תמחור</div></div></div>
-            <div class="form-grid">
-              <div class="field"><label>מטבע</label><select id="currency-select"><option>₪ שקל</option><option>€ אירו</option><option>$ דולר</option><option>£ פאונד</option></select></div>
-              <div class="field"><label>מחיר מבוקש</label><input id="ask-price" type="number" value="3850000" /></div>
-              <div class="field"><label>ציפיית בעלים</label><input type="number" value="3700000" /></div>
-              <div class="field"><label>דמי רצינות</label><input type="number" value="50000" /></div>
-            </div>
-          </div>
-
-          <div class="ai-block">
-            <div class="ai-block-h"><i data-lucide="sparkles"></i><span>פיקסל · ניתוח תמחור</span></div>
-            <p>על פי <strong>4 עסקאות דומות</strong> בבית הכרם ברבעון הנוכחי (ממוצע ₪43,200/מ"ר), הנכס הזה מבוקש ב-<strong>₪37,745/מ"ר</strong> — כ-<strong>5% מעל</strong> חציון השוק לבנייה משופצת משנות ה-60. ממליצה על מחיר רישום של <strong>₪3,720,000</strong>.</p>
-            <p style="font-size:11px;color:var(--ink-faint)"><em>השוואות: הרב הרצוג 14 (₪3.6M, נמכר במרץ), הרב הרצוג 32 (₪3.85M, פעיל), שטראוס 6 (₪3.55M, נמכר בפברואר), בן מימון 11 (₪3.95M, פעיל).</em></p>
-            <div style="display:flex;gap:6px;margin-top:8px"><button class="btn btn-ai btn-sm"><i data-lucide="check"></i>החל ₪3,720,000</button><button class="btn btn-sm">ראה הסבר</button></div>
-          </div>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:14px">
-          <div class="tax-card local-only">
-            <div class="label">הערכת מס רכישה</div>
-            <div class="v" id="tax-est">₪61,500</div>
-            <div style="font-size:11px;color:var(--ink-faint);margin-top:6px;line-height:1.5;font-weight:400">דירה ראשונה, מגורים. מחושב מחדש לפי המחיר.</div>
-          </div>
-          <div class="tax-card intl-only" style="display:none">
-            <div class="label">הערכת מס מקומי</div>
-            <div class="v">€18,400</div>
-            <div style="font-size:11px;color:var(--ink-faint);margin-top:6px;line-height:1.5;font-weight:400">אתונה · ENFIA + מס העברה. אמת עם יועץ מקומי.</div>
-          </div>
-
-          <div class="section gold-corner">
-            <div class="section-header"><div class="section-title" style="font-size:16px">פרטי בעלים</div></div>
-            <div style="display:flex;flex-direction:column;gap:10px">
-              <div class="field"><label>שם</label><input value="יעקב ושרה לוי" /></div>
-              <div class="field"><label>טלפון</label><input value="050-555-1842" /></div>
-              <div class="field"><label>אימייל</label><input value="yaakov.levy@example.co.il" /></div>
-              <div class="field"><label>אופן יצירת קשר</label><select><option>וואטסאפ</option><option>טלפון</option><option>אימייל</option></select></div>
-            </div>
-          </div>
-
-          <div class="section gold-corner">
-            <div class="section-header"><div class="section-title" style="font-size:16px">סטטוס</div></div>
-            <div class="field"><label>שלב</label><select><option>פעיל בשוק</option><option>טרם רישום · הכנה</option><option>בהצעה</option><option>נמכר</option></select></div>
-            <div class="field" style="margin-top:10px"><label>מקור</label><select><option>קשר ישיר</option><option>הפנייה משרדית</option><option>רשת בינלאומית</option><option>פנייה קרה</option></select></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- DATABASE -->
-    <section class="screen" id="screen-database">
-      <div class="topbar">
-        <div>
-          <div class="page-meta">מאגר נכסים</div>
-          <h1 class="page-title">מאגר הנכסים</h1>
-          <div class="page-subtitle">תיעוד מרכזי · 247 נכסים בירושלים וברשת הבינלאומית</div>
-        </div>
-        <div class="topbar-actions">
-          <button class="btn btn-ai" onclick="openPixel()"><i data-lucide="sparkles"></i>שאל את פיקסל</button>
-          <button class="btn"><i data-lucide="sliders-horizontal"></i>סינונים</button>
-          <button class="btn btn-primary" onclick="exportProperties()"><i data-lucide="file-spreadsheet"></i>ייצוא לאקסל</button>
-        </div>
-      </div>
-
-      <div class="filter-bar">
-        <div class="search"><i data-lucide="search"></i><input id="db-search" placeholder="חפש כתובת, בעלים, גוש/חלקה…" /></div>
-        <div class="chips" id="db-chips">
-          <button class="chip active" data-f="all">הכל</button>
-          <button class="chip" data-f="beithakerem">מקומי · בית הכרם</button>
-          <button class="chip" data-f="denya">מקומי · דניה</button>
-          <button class="chip" data-f="athens"><span class="flag">🇬🇷</span>אתונה</button>
-          <button class="chip" data-f="cyprus"><span class="flag">🇨🇾</span>קפריסין</button>
-          <button class="chip" data-f="lisbon"><span class="flag">🇵🇹</span>ליסבון</button>
-          <button class="chip" data-f="miami"><span class="flag">🇺🇸</span>מיאמי</button>
-          <button class="chip" data-f="dror">שיתף דרור</button>
-        </div>
-      </div>
-
-      <div class="table-wrap gold-corner">
-        <table class="props">
-          <thead><tr>
-            <th style="width:34px"><input type="checkbox" class="cb" id="cb-all" /></th>
-            <th>סטטוס</th><th>כתובת</th><th>אזור</th><th>חדרים</th><th>מ"ר</th><th>קומה</th><th>מחיר</th><th>₪/מ"ר</th><th>מקור</th><th>קשר אחרון</th><th>ציון</th><th></th>
-          </tr></thead>
-          <tbody id="prop-tbody"></tbody>
-        </table>
-      </div>
-
-      <div class="bulk-bar" id="bulk-bar">
-        <div><span class="count" id="bulk-count">0</span> <span style="font-size:12px;opacity:.7">נבחרו</span></div>
-        <div class="actions">
-          <button class="btn btn-sm" onclick="exportProperties(true)"><i data-lucide="file-spreadsheet"></i>ייצוא נבחרים</button>
-          <button class="btn btn-sm"><i data-lucide="sparkles"></i>התאמה עם AI</button>
-          <button class="btn btn-sm"><i data-lucide="message-circle"></i>וואטסאפ</button>
-          <button class="btn btn-sm"><i data-lucide="archive"></i>ארכיב</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- LEADS -->
-    <section class="screen" id="screen-leads">
-      <div class="topbar">
-        <div>
-          <div class="page-meta">לידים</div>
-          <h1 class="page-title">לידים — חמים, פושרים, קרים</h1>
-          <div class="page-subtitle">גרור כרטיסים בין עמודות. וואטסאפ ופיקסל זמינים בלחיצה אחת על כל ליד.</div>
-        </div>
-        <div class="topbar-actions">
-          <button class="btn btn-ai" onclick="openPixel()"><i data-lucide="sparkles"></i>שאל את פיקסל</button>
-          <button class="btn btn-primary"><i data-lucide="plus"></i>ליד חדש</button>
-        </div>
-      </div>
-
-      <div class="kanban">
-        <div class="kanban-col"><div class="kanban-h"><div class="t"><span class="pulse-dot"></span>חמים</div><div class="c">12</div></div><div id="col-hot"></div></div>
-        <div class="kanban-col"><div class="kanban-h"><div class="t">פושרים</div><div class="c">29</div></div><div id="col-warm"></div></div>
-        <div class="kanban-col"><div class="kanban-h"><div class="t">קרים</div><div class="c">184</div></div><div id="col-cold"></div></div>
-      </div>
-    </section>
-
-    <!-- INTERNATIONAL -->
-    <section class="screen" id="screen-international">
-      <div class="topbar">
-        <div>
-          <div class="page-meta">בינלאומי</div>
-          <h1 class="page-title">נכסים בינלאומיים</h1>
-          <div class="page-subtitle">106 נכסים באתונה, קפריסין, ליסבון ומיאמי · שיתף דרור</div>
-        </div>
-        <div class="topbar-actions">
-          <button class="btn"><i data-lucide="sliders-horizontal"></i>סינונים</button>
-          <button class="btn btn-primary" onclick="exportProperties()"><i data-lucide="file-spreadsheet"></i>ייצוא</button>
-        </div>
-      </div>
-
-      <div class="filter-bar">
-        <div class="search"><i data-lucide="search"></i><input placeholder="חפש עיר, כתובת, מטבע…" /></div>
-        <div class="chips">
-          <button class="chip active">הכל</button>
-          <button class="chip"><span class="flag">🇬🇷</span>אתונה (54)</button>
-          <button class="chip"><span class="flag">🇨🇾</span>קפריסין (23)</button>
-          <button class="chip"><span class="flag">🇵🇹</span>ליסבון (18)</button>
-          <button class="chip"><span class="flag">🇺🇸</span>מיאמי (11)</button>
-        </div>
-      </div>
-
-      <div class="intl-grid" id="intl-grid"></div>
-    </section>
-
-    <!-- WHATSAPP -->
-    <section class="screen" id="screen-whatsapp">
-      <div class="topbar">
-        <div>
-          <div class="page-meta">וואטסאפ Business</div>
-          <h1 class="page-title">שיחות</h1>
-          <div class="page-subtitle">מחובר כ-PEER נדל"ן · 050-123-4567 · 18 שיחות פעילות · סונכרן לפני 2 דקות</div>
-        </div>
-        <div class="topbar-actions">
-          <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--whatsapp);font-weight:600"><span class="status-dot status-green"></span>מחובר</span>
-          <button class="btn">תבניות</button>
-          <button class="btn">הגדרות</button>
-        </div>
-      </div>
-
-      <div class="wa-hub">
-        <div class="wa-list">
-          <div class="wa-list-h">
-            <div class="wa-list-search"><i data-lucide="search"></i><input placeholder="חפש שיחות…" /></div>
-            <div class="wa-filters">
-              <button class="chip active">הכל</button>
-              <button class="chip">בעלים</button>
-              <button class="chip">לידים</button>
-              <button class="chip">משרד</button>
-              <button class="chip"><i data-lucide="sparkles" style="width:11px;height:11px"></i>פיקסל</button>
-            </div>
-          </div>
-          <div class="wa-conv-list" id="wa-conv-list"></div>
-        </div>
-
-        <div class="wa-active">
-          <div class="wa-active-h">
-            <div style="display:flex;gap:11px;align-items:center">
-              <div class="lead-avatar" style="width:40px;height:40px;font-size:14px">דכ</div>
-              <div class="who">
-                <div class="name">דניאל כהן</div>
-                <div class="sub">ליד חם · תקציב ₪3.5–4.2M · מחפש בבית הכרם</div>
-              </div>
-            </div>
-            <div class="wa-active-actions">
-              <button class="btn btn-sm"><i data-lucide="link"></i>קשר לנכס</button>
-              <button class="btn btn-sm"><i data-lucide="user-plus"></i>שמור כליד</button>
-              <button class="btn btn-icon btn-sm"><i data-lucide="more-vertical"></i></button>
-            </div>
-          </div>
-
-          <div class="wa-thread" id="wa-thread"></div>
-
-          <div class="wa-templates">
-            <button class="chip">קביעת צפייה</button>
-            <button class="chip">שלח פרטי נכס</button>
-            <button class="chip">אישור פגישה</button>
-            <button class="chip">מעקב</button>
-            <button class="chip">משא ומתן</button>
-          </div>
-
-          <div class="wa-composer">
-            <button class="btn btn-icon" title="צירוף"><i data-lucide="paperclip"></i></button>
-            <button class="btn btn-ai btn-icon" title="עזרה מפיקסל"><i data-lucide="sparkles"></i></button>
-            <textarea placeholder="הקלד הודעה…" style="flex:1;background:var(--cream);border:1px solid var(--border);border-radius:18px;padding:9px 14px;font-size:13px;color:var(--ink);outline:0;resize:none;min-height:38px;max-height:120px;text-align:right;font-weight:400"></textarea>
-            <button class="btn btn-primary"><i data-lucide="send"></i>שלח</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- PIXEL -->
-    <section class="screen" id="screen-pixel">
-      <div class="topbar">
-        <div>
-          <div class="page-meta">פיקסל · שותף AI</div>
-          <h1 class="page-title">פיקסל</h1>
-          <div class="page-subtitle">המוח השני שלך · מאומן על מאגר PEER המלא · דו-לשוני</div>
-        </div>
-        <div class="topbar-actions">
-          <button class="btn"><i data-lucide="history"></i>היסטוריה</button>
-          <button class="btn"><i data-lucide="info"></i>איך פיקסל עובד</button>
-          <button class="btn btn-primary"><i data-lucide="message-circle-plus"></i>שיחה חדשה</button>
-        </div>
-      </div>
-
-      <div class="pixel-layout">
-        <div class="pixel-chat">
-          <div class="pixel-h">
-            <div class="ai-avatar">פ</div>
-            <div style="flex:1">
-              <div class="pixel-name">פיקסל <span class="pulse-dot"></span></div>
-              <div class="pixel-status">מאומן על מאגר מלא · עודכן לפני 2 דקות · 247 נכסים · 225 לידים</div>
-              <div class="pixel-context">הקשר: נכסים בבית הכרם + לידים חמים</div>
-            </div>
-          </div>
-
-          <div class="pixel-thread" id="pixel-thread"></div>
-
-          <div class="pixel-composer">
-            <div class="pixel-suggest" id="pixel-suggest">
-              <button class="chip" onclick="askPixel(this.textContent)">למי כדאי להתקשר היום?</button>
-              <button class="chip" onclick="askPixel(this.textContent)">התאם את החלוץ 24 ללידים</button>
-              <button class="chip" onclick="askPixel(this.textContent)">מגמת מחירים בבית הכרם?</button>
-              <button class="chip" onclick="askPixel(this.textContent)">נסח וואטסאפ לדניאל כהן</button>
-            </div>
-            <div class="pixel-input-row">
-              <button class="btn btn-icon" title="קולי"><i data-lucide="mic"></i></button>
-              <button class="btn btn-icon" title="העלה קובץ"><i data-lucide="upload"></i></button>
-              <textarea id="pixel-input" placeholder="שאל את פיקסל בעברית או באנגלית…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();askPixel(this.value);this.value=''}"></textarea>
-              <button class="btn btn-primary" onclick="const t=document.getElementById('pixel-input');askPixel(t.value);t.value=''"><i data-lucide="send"></i>שלח</button>
-            </div>
-          </div>
-        </div>
-
-        <aside class="pixel-side">
-          <div class="section gold-corner">
-            <div class="section-header"><div class="section-title">תובנות אחרונות</div></div>
-            <div class="pixel-insight"><strong>3 לידים</strong> תואמים את הנכס החדש בהחלוץ 24<div class="take">פעולה →</div></div>
-            <div class="pixel-insight"><strong>2 בעלי נכסים</strong> ללא קשר 30+ ימים<div class="take">פעולה →</div></div>
-            <div class="pixel-insight">מחירי בית הכרם <strong>+4.2%</strong> ברבעון<div class="take">דוח →</div></div>
-            <div class="pixel-insight">אזהרת טאבו ב<strong>בית הלוי 18</strong> · משכנתא בתהליך<div class="take">בדוק →</div></div>
-            <div class="pixel-insight">מועד חוזה מתקרב · <strong>יפה נוף 7</strong> בעוד 6 ימים<div class="take">פתח →</div></div>
-          </div>
-
-          <div class="section gold-corner">
-            <div class="section-header"><div class="section-title">פעולות מהירות</div></div>
-            <div class="pixel-quick">
-              <button class="chip" onclick="askPixel(this.textContent)">סכם לי את השבוע</button>
-              <button class="chip" onclick="askPixel(this.textContent)">דרג לידים חמים לפי התאמה</button>
-              <button class="chip" onclick="askPixel(this.textContent)">השווה אתונה לליסבון</button>
-              <button class="chip" onclick="askPixel(this.textContent)">נסח חוברת להחלוץ 24</button>
-            </div>
-          </div>
-        </aside>
-      </div>
-    </section>
-
-    <!-- EXPORT -->
-    <section class="screen" id="screen-export">
-      <div class="topbar">
-        <div>
-          <div class="page-meta">מרכז ייצוא</div>
-          <h1 class="page-title">ייצוא נתונים</h1>
-          <div class="page-subtitle">קבצי .xlsx מעוצבים בכותרות זהב של PEER · מותאם RTL · עמודות רגישות מוסתרות כברירת מחדל</div>
-        </div>
-      </div>
-
-      <div class="export-grid">
-        <div class="export-card" onclick="exportProperties()"><div class="icon"><i data-lucide="database"></i></div><div class="t">מאגר נכסים מלא</div><div class="d">כל 247 הנכסים ברשת המקומית והבינלאומית. חוברת רב-גיליונית.</div><div class="meta">.xlsx · ~85 KB</div></div>
-        <div class="export-card" onclick="exportLeads()"><div class="icon"><i data-lucide="users"></i></div><div class="t">מאגר לידים</div><div class="d">לידים חמים, פושרים וקרים עם תקציב, מקור וקשר אחרון.</div><div class="meta">.xlsx · ~42 KB</div></div>
-        <div class="export-card" onclick="exportProperties()"><div class="icon"><i data-lucide="map-pin"></i></div><div class="t">מקומי · בית הכרם ודניה</div><div class="d">148 נכסים בשכונות היעד שלך בלבד.</div><div class="meta">.xlsx · ~52 KB</div></div>
-        <div class="export-card" onclick="exportProperties()"><div class="icon"><i data-lucide="globe"></i></div><div class="t">רשת בינלאומית</div><div class="d">אתונה · קפריסין · ליסבון · מיאמי. גיליונות לפי מדינה עם הערות מטבע.</div><div class="meta">.xlsx · ~38 KB</div></div>
-        <div class="export-card"><div class="icon"><i data-lucide="message-circle"></i></div><div class="t">שיחות וואטסאפ</div><div class="d">30 הימים האחרונים, מקובצים לפי איש קשר. מסונן לפרטיות.</div><div class="meta">.xlsx · ~28 KB</div></div>
-        <div class="export-card"><div class="icon"><i data-lucide="sparkles"></i></div><div class="t">יומן תובנות פיקסל</div><div class="d">כל התובנות שעיינת בהן, עם הפעולה שננקטה והתוצאה.</div><div class="meta">.xlsx · ~14 KB</div></div>
-      </div>
-    </section>
-
-  </main>
-</div>
-
-<!-- DRAWER -->
-<div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()"></div>
-<aside class="drawer" id="drawer">
-  <div class="drawer-head">
-    <button class="drawer-close" onclick="closeDrawer()"><i data-lucide="x"></i></button>
-    <div class="drawer-meta" id="d-meta">בית הכרם · פעיל</div>
-    <div class="drawer-title" id="d-title">הרב הרצוג 28</div>
-    <div class="drawer-sub" id="d-sub">4 חדרים · 102 מ"ר · קומה 3/5 · ₪3,850,000</div>
-  </div>
-  <div class="drawer-tabs" id="drawer-tabs">
-    <button class="drawer-tab active" data-t="overview">סקירה</button>
-    <button class="drawer-tab" data-t="pricing">תמחור</button>
-    <button class="drawer-tab" data-t="history">היסטוריה</button>
-    <button class="drawer-tab" data-t="matches">לידים תואמים</button>
-    <button class="drawer-tab" data-t="whatsapp">וואטסאפ</button>
-    <button class="drawer-tab" data-t="ai">תובנות AI</button>
-    <button class="drawer-tab" data-t="notes">הערות</button>
-  </div>
-  <div class="drawer-body">
-    <div class="drawer-pane active" data-p="overview">
-      <div class="kvgrid">
-        <div class="kv"><span class="k">מבוקש</span><span class="v lg" id="d-price">₪3,850,000</span></div>
-        <div class="kv"><span class="k">₪/מ"ר</span><span class="v" id="d-perm2">₪37,745</span></div>
-        <div class="kv"><span class="k">בעלים</span><span class="v">יעקב ושרה לוי</span></div>
-        <div class="kv"><span class="k">מקור</span><span class="v">קשר ישיר</span></div>
-        <div class="kv"><span class="k">שנת בנייה</span><span class="v">1968 · שופץ 2019</span></div>
-        <div class="kv"><span class="k">ציון</span><span class="v">8.4 / 10</span></div>
-      </div>
-      <div style="height:200px;background:repeating-linear-gradient(135deg,var(--cream-soft),var(--cream-soft) 8px,var(--paper) 8px,var(--paper) 16px);border:1px solid var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;color:var(--ink-whisper);font-size:11px;letter-spacing:1px;font-weight:500">תמונת נכס</div>
-      <p style="font-size:13px;color:var(--ink-soft);line-height:1.7;margin-top:14px;font-weight:400">דירת 4 חדרים מרווחת בקומה 3 ברחוב הרב הרצוג, בלב בית הכרם. שופצה ב-2019, מטבח חדש, מרפסת שמש דרומית 14 מ"ר, חניה צמודה. בניין שמור עם מעלית. קרוב לגן סאקר, לתחנת הרכבת הקלה ולמרכז העיר.</p>
-    </div>
-    <div class="drawer-pane" data-p="whatsapp">
-      <div class="chat" id="drawer-wa-chat"></div>
-      <div class="quick-templates">
-        <button class="chip">קביעת צפייה</button><button class="chip">שלח חוברת</button><button class="chip">אישור מחיר</button><button class="chip">מותאם…</button>
-      </div>
-      <div class="composer">
-        <textarea placeholder="הקלד הודעה… פיקסל יציע 3 וריאציות בלחיצה על הכוכב"></textarea>
-        <div class="composer-actions">
-          <button class="btn btn-ai btn-icon"><i data-lucide="sparkles"></i></button>
-          <button class="btn btn-primary btn-icon"><i data-lucide="send"></i></button>
-        </div>
-      </div>
-    </div>
-    <div class="drawer-pane" data-p="ai">
-      <div class="ai-block">
-        <div class="ai-block-h"><i data-lucide="sparkles"></i><span>הערכת תמחור</span></div>
-        <p><strong>מעט מעל מחיר השוק</strong> ב-₪37,745/מ"ר. דירות משופצות בבנייה משנות ה-60 בבית הכרם נמכרות ב-₪35,500–37,000/מ"ר. ממליצה על ₪3,720,000 (₪36,470/מ"ר) למכירה תוך 2–3 שבועות.</p>
-      </div>
-      <div class="ai-block">
-        <div class="ai-block-h"><i data-lucide="sparkles"></i><span>פרופיל ליד אופטימלי</span></div>
-        <p>משפחה של 4–5 נפשות, תקציב ₪3.5–4M, מעדיפה בנייה משנות ה-60 משופצת עם מעלית וחניה, נותנת עדיפות לקרבה לגן סאקר ולרכבת הקלה. <strong>3 לידים במאגר הפושר</strong> תואמים לפרופיל.</p>
-        <p style="margin-top:8px"><em>התאמה מובילה: דניאל כהן (94%)</em></p>
-      </div>
-      <div class="ai-block">
-        <div class="ai-block-h"><i data-lucide="alert-triangle"></i><span>גורמי סיכון</span></div>
-        <p>בטאבו רשומה <strong>משכנתא פעילה</strong> בתהליך — ודאי שחרור לפני ניסוח חוזה. אין אזהרות נוספות.</p>
-      </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">
-        <button class="btn btn-ai btn-sm"><i data-lucide="file-text"></i>נסח חוברת</button>
-        <button class="btn btn-ai btn-sm"><i data-lucide="message-circle"></i>נסח פנייה</button>
-        <button class="btn btn-sm">אסטרטגיית מו"מ</button>
-      </div>
-    </div>
-    <div class="drawer-pane" data-p="pricing"><div class="ai-block"><p>גרף השוואות והיסטוריית מחירים מופיעים כאן.</p></div></div>
-    <div class="drawer-pane" data-p="history"><div class="ai-block"><p>תיעוד מלא — צפיות, הצעות, שינויי מחיר, אירועי חוזה.</p></div></div>
-    <div class="drawer-pane" data-p="matches"><div class="ai-block"><p>רשימת לידים מדורגת לפי התאמה לפרופיל הנכס.</p></div></div>
-    <div class="drawer-pane" data-p="notes"><div class="ai-block"><p>הערות חופשיות — נראות לאסתי ולדרור.</p></div></div>
-  </div>
-</aside>
-
-<!-- FAB -->
-<div class="pixel-fab">
-  <div class="pixel-fab-panel" id="fab-panel">
-    <button class="fab-close" onclick="togglePixelFab(false)"><i data-lucide="x"></i></button>
-    <div class="pixel-h">
-      <div class="ai-avatar">פ</div>
-      <div>
-        <div class="pixel-name">פיקסל <span class="pulse-dot"></span></div>
-        <div class="pixel-status">מודע להקשר · <span id="fab-context">סקירה</span></div>
-      </div>
-    </div>
-    <div class="pixel-thread" id="fab-thread"></div>
-    <div class="pixel-composer">
-      <div class="pixel-input-row">
-        <textarea id="fab-input" placeholder="שאל כל דבר…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();askPixel(this.value,'fab');this.value=''}"></textarea>
-        <button class="btn btn-primary btn-icon" onclick="const t=document.getElementById('fab-input');askPixel(t.value,'fab');t.value=''"><i data-lucide="send"></i></button>
-      </div>
-    </div>
-  </div>
-  <button class="pixel-fab-btn" onclick="togglePixelFab()" title="שאל את פיקסל">פ</button>
-</div>
-
-<div class="toast-wrap" id="toasts"></div>
-
-<!-- V3 SCREENS injected -->
-<style>
-.import-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:18px}
-.import-tab{padding:12px 22px;font-size:13px;color:var(--ink-faint);cursor:pointer;background:transparent;border:0;border-bottom:2px solid transparent;font-weight:500}
-.import-tab.active{color:var(--ink);border-bottom-color:var(--gold);font-weight:600}
-.dropzone{border:2px dashed var(--gold-line);border-radius:6px;padding:48px 24px;text-align:center;background:var(--paper);cursor:pointer;transition:all .15s}
-.dropzone:hover,.dropzone.over{border-color:var(--gold);background:var(--gold-tint)}
-.dropzone i{width:42px;height:42px;color:var(--gold);margin-bottom:10px}
-.dropzone .t{font-size:18px;color:var(--ink);font-weight:600}
-.dropzone .s{font-size:12px;color:var(--ink-faint);margin-top:6px}
-.import-status{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
-.status-card{background:var(--white-pure);border:1px solid var(--border);border-radius:4px;padding:14px 16px;position:relative;box-shadow:var(--shadow-card)}
-.status-card::before{content:'';position:absolute;top:0;right:0;width:30px;height:1px;background:var(--gold)}
-.status-card .lbl{font-size:10px;letter-spacing:1px;color:var(--gold);font-weight:600}
-.status-card .val{font-size:24px;color:var(--ink);font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums}
-.status-card .meta{font-size:11px;color:var(--ink-faint);margin-top:4px;font-weight:400}
-.mapper-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
-.mapper-row{display:contents}
-.mapper-from{background:var(--cream-soft);border:1px solid var(--border);border-radius:3px;padding:9px 12px;font-size:13px;color:var(--ink);font-weight:500}
-.mapper-arrow{display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:14px}
-.mapper-to{background:var(--white-pure);border:1px solid var(--border);border-radius:3px;padding:7px 10px;font-size:13px;outline:0;text-align:right;font-weight:400}
-.preview-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px}
-.preview-table th,.preview-table td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:right;font-weight:400}
-.preview-table th{background:var(--cream-soft);font-weight:600;color:var(--ink-faint);font-size:10px;letter-spacing:.5px}
-.row-warn{background:rgba(184,127,31,0.06)}
-.row-err{background:rgba(160,72,72,0.06)}
-.dot-warn{color:var(--warning);font-weight:700}
-.dot-err{color:var(--danger);font-weight:700}
-.sheets-card{background:var(--cream-soft);border:1px solid var(--border);border-radius:4px;padding:18px;margin-top:12px;font-size:12.5px;color:var(--ink-soft);line-height:1.65;font-weight:400}
-.sheets-card strong{color:var(--ink);font-weight:600}
-.sheets-card ol{margin:8px 18px 0 0;padding:0}
-.sheets-input{width:100%;background:var(--white-pure);border:1px solid var(--border);border-radius:3px;padding:11px 14px;font-size:13px;outline:0;text-align:left;direction:ltr;font-family:'Heebo',monospace !important}
-.sheets-input:focus{border-color:var(--gold)}
-.quick-add-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.quick-counter{background:var(--gold-tint);border:1px solid var(--gold-line);border-radius:4px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.quick-counter .v{font-size:28px;color:var(--gold);font-weight:700}
-
-/* Neighborhood */
-.nbh-grid{display:grid;grid-template-columns:1.2fr 1.4fr 1fr;gap:14px;margin-bottom:14px}
-.nbh-col{background:var(--white-pure);border:1px solid var(--border);border-radius:4px;padding:0;box-shadow:var(--shadow-card);position:relative;overflow:hidden;display:flex;flex-direction:column}
-.nbh-col::before{content:'';position:absolute;top:0;right:0;width:40px;height:1px;background:var(--gold);z-index:2}
-.nbh-h{padding:14px 18px 10px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.nbh-h .t{font-size:15px;font-weight:700;color:var(--ink)}
-.nbh-h .s{font-size:10px;letter-spacing:1px;color:var(--gold);font-weight:600;margin-top:2px}
-.nbh-body{padding:14px 18px;flex:1;overflow-y:auto;max-height:calc(100vh - 320px)}
-.nbh-body::-webkit-scrollbar{width:6px}
-.nbh-body::-webkit-scrollbar-thumb{background:var(--gold-line);border-radius:3px}
-.map-svg{width:100%;height:auto;background:var(--paper);border:1px solid var(--border);border-radius:3px}
-.map-controls{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
-.map-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:11px;color:var(--ink-faint);font-weight:500}
-.map-legend .item{display:flex;align-items:center;gap:5px}
-.map-legend .swatch{width:9px;height:9px;border-radius:50%}
-.nbh-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:12px}
-.nbh-tab{padding:8px 14px;font-size:12px;color:var(--ink-faint);cursor:pointer;background:transparent;border:0;border-bottom:2px solid transparent;font-weight:500}
-.nbh-tab.active{color:var(--ink);border-bottom-color:var(--gold);font-weight:700}
-.street-card{background:var(--cream-soft);border:1px solid var(--border);border-radius:4px;padding:12px 14px;margin-bottom:9px;position:relative}
-.street-card .nm{font-size:14px;font-weight:700;color:var(--ink)}
-.street-card .meta{display:flex;gap:10px;font-size:11px;color:var(--ink-faint);margin-top:4px;font-weight:500}
-.street-card .meta .v{color:var(--gold);font-weight:700}
-.street-card p{font-size:12px;color:var(--ink-soft);margin-top:6px;line-height:1.55;font-weight:400}
-.street-card .actions{display:flex;gap:6px;margin-top:8px}
-.insight-row{padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--ink-soft);line-height:1.55;font-weight:400;display:flex;gap:10px;align-items:flex-start}
-.insight-row:last-child{border-bottom:0}
-.insight-row .ico{font-size:16px;flex-shrink:0}
-.insight-row strong{color:var(--ink);font-weight:600}
-.pixel-nbh-card{background:linear-gradient(135deg,var(--gold-tint),rgba(125,106,212,.04));border:1px solid var(--gold-line);border-radius:3px;padding:11px 13px;margin-bottom:9px;font-size:12.5px;line-height:1.55;color:var(--ink-soft);font-weight:400}
-.pixel-nbh-card strong{color:var(--ai-glow);font-weight:700}
-.pixel-nbh-card .actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
-.nbh-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;background:var(--white-pure);border:1px solid var(--border);border-radius:4px;padding:14px 18px;box-shadow:var(--shadow-card);position:relative}
-.nbh-kpis::before{content:'';position:absolute;top:0;right:0;width:40px;height:1px;background:var(--gold)}
-.nbh-kpi .lbl{font-size:10px;color:var(--ink-faint);letter-spacing:.5px;font-weight:500}
-.nbh-kpi .v{font-size:20px;color:var(--ink);font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums}
-.nbh-kpi .v small{font-size:12px;color:var(--gold);font-weight:600;margin-right:4px}
-
-/* Welcome modal */
-.modal-bg{position:fixed;inset:0;background:rgba(26,24,20,0.4);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
-.modal-bg.show{display:flex}
-.modal{background:var(--white-pure);border-radius:6px;border:1px solid var(--border);max-width:520px;width:100%;padding:32px 36px;box-shadow:var(--shadow-pop);position:relative}
-.modal::before{content:'';position:absolute;top:0;right:0;width:60px;height:1px;background:var(--gold)}
-.modal h2{font-size:24px;color:var(--ink);margin-bottom:8px;font-weight:700}
-.modal p{font-size:13.5px;color:var(--ink-soft);line-height:1.7;margin-bottom:12px;font-weight:400}
-.modal .actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
-
-/* Task panel */
-.task-toggle{position:fixed;left:24px;bottom:100px;z-index:30;background:var(--white-pure);border:1px solid var(--border-strong);width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-card)}
-.task-toggle:hover{border-color:var(--gold)}
-.task-toggle i{width:18px;height:18px;color:var(--ink-soft)}
-.task-toggle .badge{position:absolute;top:-4px;right:-4px;background:var(--gold);color:#fff;font-size:10px;font-weight:700;border-radius:10px;padding:2px 6px;border:2px solid var(--white-pure)}
-.task-panel{position:fixed;left:24px;bottom:160px;z-index:30;width:300px;background:var(--white-pure);border:1px solid var(--border);border-radius:6px;box-shadow:var(--shadow-pop);display:none;overflow:hidden}
-.task-panel.show{display:block}
-.task-panel::before{content:'';position:absolute;top:0;right:0;width:40px;height:1px;background:var(--gold)}
-.task-panel .head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.task-panel .head .t{font-size:13px;font-weight:700;color:var(--ink)}
-.task-panel .head .c{font-size:11px;color:var(--gold);font-weight:600}
-.task-panel ul{list-style:none;max-height:300px;overflow-y:auto}
-.task-panel li{padding:10px 16px;border-bottom:1px solid var(--border);font-size:12.5px;color:var(--ink-soft);display:flex;gap:8px;align-items:flex-start;cursor:pointer;font-weight:400}
-.task-panel li:hover{background:var(--paper)}
-.task-panel li.done{opacity:0.5;text-decoration:line-through}
-.task-panel li input{margin-top:3px;accent-color:var(--gold)}
-</style>
-
-<!-- IMPORT SCREEN -->
-<section class="screen" id="screen-import" style="display:none">
-  <div class="topbar">
-    <div>
-      <div class="page-meta">כלים</div>
-      <h1 class="page-title">ייבוא נתונים</h1>
-      <div class="page-subtitle">העלי קובץ, סנכרני עם Google Sheets, או הזיני ידנית. כל הנתונים נשמרים מקומית בדפדפן.</div>
-    </div>
-    <div class="topbar-actions">
-      <button class="btn" onclick="downloadTemplate()"><i data-lucide="download"></i>תבנית אקסל</button>
-      <button class="btn" onclick="openFieldConfig()"><i data-lucide="settings-2"></i>הגדרת שדות</button>
-    </div>
-  </div>
-
-  <div class="import-status">
-    <div class="status-card"><div class="lbl">סך נכסים</div><div class="val" id="im-total">—</div><div class="meta">במאגר המקומי</div></div>
-    <div class="status-card"><div class="lbl">ייבוא אחרון</div><div class="val" style="font-size:14px">לפני 5 דקות</div><div class="meta">Yad2 export · 23 חדשים</div></div>
-    <div class="status-card"><div class="lbl">פילוח מקור</div><div class="val" style="font-size:14px;display:flex;gap:5px">יד2 42% · ידני 28% · דרור 18% · מדלן 12%</div><div class="meta">5 דקות אחרונות</div></div>
-  </div>
-
-  <div class="import-tabs">
-    <button class="import-tab active" data-it="csv">העלאת CSV / Excel</button>
-    <button class="import-tab" data-it="sheets">Google Sheets</button>
-    <button class="import-tab" data-it="manual">הזנה ידנית</button>
-  </div>
-
-  <div class="import-pane" data-ip="csv">
-    <div class="dropzone" id="dz" onclick="document.getElementById('file-in').click()">
-      <i data-lucide="upload-cloud"></i>
-      <div class="t">גררי קובץ לכאן או לחצי לבחירה</div>
-      <div class="s">קבצי .csv .xlsx .xls · מנותח מקומית בדפדפן</div>
-      <input type="file" id="file-in" accept=".csv,.xlsx,.xls" style="display:none" />
-    </div>
-    <div id="csv-result" style="margin-top:18px"></div>
-  </div>
-
-  <div class="import-pane" data-ip="sheets" style="display:none">
-    <div class="field"><label>קישור Google Sheets</label><input class="sheets-input" id="gs-url" placeholder="https://docs.google.com/spreadsheets/d/..." /></div>
-    <div style="display:flex;gap:8px;margin-top:10px"><button class="btn btn-primary" onclick="syncSheets()"><i data-lucide="refresh-cw"></i>סנכרון עכשיו</button><button class="btn">הגדרות סנכרון</button></div>
-    <div class="sheets-card">
-      <strong>איך לשתף את הגיליון</strong>
-      <ol><li>פתחי את Google Sheets → שיתוף</li><li>בחרי "כל מי שיש לו את הקישור יכול לצפות"</li><li>העתיקי את הקישור והדביקי כאן</li></ol>
-      <p style="margin-top:10px;font-size:11px;color:var(--ink-faint)"><em>הערה: עבור גיליונות פרטיים השתמשי בלשונית "העלאת CSV". פיתוח OAuth מלא בגרסה הבאה.</em></p>
-    </div>
-  </div>
-
-  <div class="import-pane" data-ip="manual" style="display:none">
-    <div class="quick-counter"><div><div style="font-size:11px;color:var(--gold);font-weight:600;letter-spacing:1px">נוספו היום</div><div style="font-size:13px;color:var(--ink-soft);margin-top:3px">המשיכי להזין · התקדמות נשמרת אוטומטית</div></div><div class="v" id="qa-count">23</div></div>
-    <div class="section gold-corner">
-      <div class="section-header"><div><div class="section-eyebrow">הוספה מהירה</div><div class="section-title">נכס חדש · 6 שדות</div></div><button class="btn btn-ghost btn-sm"><i data-lucide="mic"></i>קולי (בקרוב)</button></div>
-      <div class="quick-add-grid">
-        <div class="field"><label>כתובת</label><input id="qa-addr" placeholder="הרב הרצוג 28" /></div>
-        <div class="field"><label>חדרים</label><input id="qa-rooms" type="number" step="0.5" placeholder="4" /></div>
-        <div class="field"><label>מ"ר</label><input id="qa-m2" type="number" placeholder="102" /></div>
-        <div class="field"><label>מחיר (₪)</label><input id="qa-price" type="number" placeholder="3650000" /></div>
-        <div class="field"><label>מקור</label><select id="qa-src"><option>סיור</option><option>יד2</option><option>מדלן</option><option>פנייה</option><option>דרור</option></select></div>
-        <div class="field"><label>הערות</label><input id="qa-notes" placeholder="שלט בכניסה, מעלית" /></div>
-      </div>
-      <button class="btn btn-primary" style="margin-top:14px" onclick="quickAdd()"><i data-lucide="plus"></i>הוסף והבא</button>
-    </div>
-  </div>
-</section>
-
-<!-- NEIGHBORHOOD SCREEN -->
-<section class="screen" id="screen-neighborhood" style="display:none">
-  <div class="topbar">
-    <div>
-      <div class="page-meta">מודיעין שכונתי</div>
-      <h1 class="page-title">בית הכרם · דניה</h1>
-      <div class="page-subtitle">המפה החיה, מילון השכונה, ותובנות פיקסל. נבני יחד את המומחיות שלך.</div>
-    </div>
-    <div class="topbar-actions">
-      <button class="btn"><i data-lucide="printer"></i>הדפס דוח</button>
-      <button class="btn btn-ai" onclick="openPixel()"><i data-lucide="sparkles"></i>שאלי את פיקסל</button>
-    </div>
-  </div>
-
-  <div class="nbh-grid">
-    <div class="nbh-col">
-      <div class="nbh-h"><div><div class="s">המפה החיה</div><div class="t">בית הכרם · דניה</div></div><button class="btn btn-ghost btn-sm" id="heat-toggle">מצב חום</button></div>
-      <div class="nbh-body">
-        <svg class="map-svg" viewBox="0 0 360 280" id="nbh-map"></svg>
-        <div class="map-legend" id="map-legend">
-          <span class="item"><span class="swatch" style="background:#a8862e"></span>פעיל</span>
-          <span class="item"><span class="swatch" style="background:#c8a96a"></span>נמכר</span>
-          <span class="item"><span class="swatch" style="background:var(--cream-soft);border:1px solid #a8862e"></span>פוטנציאל</span>
-          <span class="item"><span class="swatch" style="background:#7d6ad4"></span>עם ליד חם</span>
-        </div>
-        <div class="map-controls"><button class="btn btn-sm">+</button><button class="btn btn-sm">−</button><button class="btn btn-sm">בית הכרם</button><button class="btn btn-sm">דניה</button></div>
-      </div>
-    </div>
-    <div class="nbh-col">
-      <div class="nbh-h"><div><div class="s">מילון</div><div class="t">המידע הפנימי שלך</div></div><button class="btn btn-sm"><i data-lucide="plus"></i>הוסף תובנה</button></div>
-      <div class="nbh-body">
-        <div class="nbh-tabs">
-          <button class="nbh-tab active" data-nt="streets">רחובות</button>
-          <button class="nbh-tab" data-nt="buildings">בניינים</button>
-          <button class="nbh-tab" data-nt="local">תובנות מקומיות</button>
-        </div>
-        <div class="nbh-pane" data-np="streets" id="np-streets"></div>
-        <div class="nbh-pane" data-np="buildings" style="display:none" id="np-buildings"></div>
-        <div class="nbh-pane" data-np="local" style="display:none" id="np-local"></div>
-      </div>
-    </div>
-    <div class="nbh-col">
-      <div class="nbh-h"><div><div class="s" style="color:var(--ai-glow)">פיקסל</div><div class="t">תובנות שכונה</div></div></div>
-      <div class="nbh-body" id="pixel-nbh"></div>
-    </div>
-  </div>
-
-  <div class="nbh-kpis">
-    <div class="nbh-kpi"><div class="lbl">ממוצע · 4 חדרים</div><div class="v"><small>₪</small>3,950,000</div></div>
-    <div class="nbh-kpi"><div class="lbl">זמן ממוצע במאגר</div><div class="v">47 <small>ימים</small></div></div>
-    <div class="nbh-kpi"><div class="lbl">עסקאות 12 חודשים</div><div class="v">128</div></div>
-    <div class="nbh-kpi"><div class="lbl">מגמת מחירים</div><div class="v" style="color:var(--gold)">▲ 4.2%</div></div>
-    <div class="nbh-kpi"><div class="lbl">מבוקש/נמכר</div><div class="v">96.8%</div></div>
-  </div>
-</section>
-
-<!-- WELCOME MODAL -->
-<div class="modal-bg" id="welcome-modal">
-  <div class="modal">
-    <h2>ברוכה הבאה ל-PEER CRM, אסתי 👋</h2>
-    <p>המערכת אותחלה עם <strong>48 דירות לדוגמה</strong> ו-<strong>15 תובנות שכונתיות</strong> מבית הכרם ודניה. הם מבוססים על נתונים אמיתיים אבל לא מאומתים — מומלץ לאמת ולעדכן.</p>
-    <p>כדי להתחיל לעבוד עם הנתונים האמיתיים שלך, יש לך 3 אפשרויות:</p>
-    <ol style="margin-right:18px;font-size:13px;color:var(--ink-soft);line-height:1.85;font-weight:400">
-      <li>ייבאי קובץ Excel / CSV שכבר יש לך</li>
-      <li>סנכרני עם Google Sheets של המשרד</li>
-      <li>הזיני ידנית, דירה אחר דירה</li>
-    </ol>
-    <div class="actions">
-      <button class="btn btn-primary" onclick="closeWelcome();navTo('import')">התחילי ייבוא נתונים</button>
-      <button class="btn" onclick="closeWelcome()">המשיכי עם נתוני דמה</button>
-    </div>
-  </div>
-</div>
-
-<!-- TASK PANEL -->
-<button class="task-toggle" id="task-toggle" onclick="document.getElementById('task-panel').classList.toggle('show')" title="המשימות שלי"><i data-lucide="check-square"></i><span class="badge" id="task-badge">5</span></button>
-<div class="task-panel" id="task-panel">
-  <div class="head"><div class="t">המשימות שלי היום</div><div class="c"><span id="task-done">0</span> / <span id="task-total">5</span></div></div>
-  <ul id="task-list"></ul>
-</div>
-
-<script>
-/* =============== V3 INIT =============== */
-const STREETS_BHK_REAL=['הרב הרצוג','החלוץ','בית הלל','המעפיל','יפה נוף','הזית','חיים בר-לב','שמואל בית הלוי','הרב ברלין','אבן עזרא','ז\'בוטינסקי','הרב פנחס לוין'];
-const STREETS_DENYA_REAL=['הקבלן','ראובן','ירון','שמעון רוקח','אביעד','ארלוזורוב'];
-const GUSH_BHK=[30148,30150,30168,30174,30197];
-const GUSH_DENYA=[30203,30210];
-
-const STREETS_INTEL=[
-  {n:'הרב הרצוג',count:8,permm:43200,note:'ציר ראשי, רעש מהכביש, מבוקש לזוגות צעירים בקצה הצפוני'},
-  {n:'החלוץ',count:6,permm:42700,note:'רחוב שקט, בנייה משנות ה-70, מבוקש למשפחות'},
-  {n:'בית הלל',count:5,permm:43500,note:'קרוב לקניון מלחה, בנייה חדשה יותר'},
-  {n:'המעפיל',count:4,permm:41800,note:'בלב השכונה הוותיקה, בניינים נמוכים'},
-  {n:'יפה נוף',count:3,permm:46100,note:'נוף לוואדי, מחירים גבוהים'},
-  {n:'הקבלן (דניה)',count:3,permm:52400,note:'וילות צמודות קרקע, מחירים מ-8M ומעלה'},
-  {n:'הזית',count:2,permm:42000,note:'רחוב פנימי, חניות מוגבלות'},
-  {n:'חיים בר-לב',count:3,permm:43800,note:'דירות גדולות עם מרפסות גן'},
-];
-const BUILDINGS_INTEL=[
-  {a:'הרב הרצוג 28',y:1968,floors:5,units:14,notes:'מעלית הוחלפה 2024 · ועד בית 800₪'},
-  {a:'החלוץ 24',y:1972,floors:4,units:12,notes:'תמ״א 38 בתהליך · אישור עירייה Q3 2026'},
-  {a:'בית הלל 14',y:2008,floors:8,units:24,notes:'בנייה חדשה · חניון תת-קרקעי · ממ״ד מלא'},
-  {a:'יפה נוף 7',y:1965,floors:3,units:6,notes:'בנייה ותיקה · פוטנציאל פינוי-בינוי'},
-  {a:'המעפיל 11',y:1958,floors:3,units:8,notes:'אבן ירושלמית · ועד שמרני, החלפת חברים נדירה'},
-];
-const LOCAL_INTEL=[
-  {ico:'🏫',cat:'חינוך',t:'יסודי גבעת רם — כיתות א\'-ו\', עומס בכיתות א\' לשנת תשפ"ז'},
-  {ico:'🏫',cat:'חינוך',t:'תיכון בית הכרם — מסלול ריאלי חזק, כיתות מצומצמות'},
-  {ico:'🏫',cat:'חינוך',t:'גן עמית (פרטי) — רשימת המתנה של 8 חודשים'},
-  {ico:'🚌',cat:'תחבורה',t:'קו 4א מגיע למרכז העיר תוך 12 דקות'},
-  {ico:'🚆',cat:'תחבורה',t:'תחנת רכבת קלה "יפה נוף" — 6 דקות הליכה ממרכז השכונה'},
-  {ico:'🛒',cat:'קניות',t:'סופר רמי לוי בית הכרם — הכי קרוב, ברחוב החלוץ'},
-  {ico:'🛒',cat:'קניות',t:'קניון מלחה — 4 דקות נסיעה, חניה חינם 3 שעות'},
-  {ico:'🏛️',cat:'דת',t:'בית כנסת "אהל יעקב" — קהילה אשכנזית-ירושלמית, מתאים לקונים דתיים'},
-  {ico:'🏛️',cat:'דת',t:'בית הכנסת המרכזי בדניה — ספרדי-מסורתי, פעיל מאוד'},
-  {ico:'🌳',cat:'פנאי',t:'גן סאקר — הליכה של 8 דקות, מסלול ריצה 2.4 ק"מ'},
-  {ico:'🏥',cat:'בריאות',t:'מרפאת כללית בית הכרם — קופ"ח עיקרית בשכונה'},
-  {ico:'☕',cat:'פנאי',t:'בית קפה "תל אביב" ברחוב החלוץ — נקודת מפגש מקומית'},
-];
-const PIXEL_NBH_INSIGHTS=[
-  {t:'<strong>השבוע:</strong> עליית מחירים של <strong>2.1%</strong> ברחוב החלוץ — ייתכן בעקבות פתיחת קו תחבורה ציבורית',a:['פתחי דוח','פני לבעלים']},
-  {t:'<strong>5 דירות ירדו מהשוק החודש</strong> — שני בעלים החליטו לא למכור, שלושה נמכרו',a:['ראי פירוט']},
-  {t:'<strong>שני קונים שואלים על דניה השבוע</strong>, אבל אין מספיק היצע',a:['סקרי היצע דניה','פני לבעלי דניה']},
-  {t:'<strong>מגמה:</strong> דירות 5+ חדרים בבית הכרם עם זמן ממוצע גבוה במאגר',a:['ניתוח מחיר']},
-  {t:'<strong>פוטנציאל תמ״א 38:</strong> 4 בניינים ברחוב המעפיל מתאימים — אבל אף אחד לא בתהליך',a:['פני לבעלים']},
-];
-
-/* === IndexedDB === */
-const DB_NAME='peer_crm_v3';
-function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DB_NAME,1);r.onupgradeneeded=e=>{const db=e.target.result;['properties','tasks','intel','custom'].forEach(s=>{if(!db.objectStoreNames.contains(s))db.createObjectStore(s,{keyPath:'k'})})};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
-async function dbSet(store,key,val){const db=await openDB();return new Promise(res=>{const tx=db.transaction(store,'readwrite');tx.objectStore(store).put({k:key,v:val});tx.oncomplete=()=>res()})}
-async function dbGet(store,key){const db=await openDB();return new Promise(res=>{const tx=db.transaction(store,'readonly');const r=tx.objectStore(store).get(key);r.onsuccess=()=>res(r.result?r.result.v:null);r.onerror=()=>res(null)})}
-
-/* === Tasks === */
-const TASKS=[
-  {t:'התקשרי לדניאל כהן · החלוץ 24',done:false},
-  {t:'אישור צפייה משפחת לוין · בית הלוי 18',done:false},
-  {t:'עדכון בעלים · יפה נוף 7 · 30+ ימים ללא קשר',done:false},
-  {t:'סקירת 11 לידים חדשים מאתונה · דרור',done:false},
-  {t:'בדיקת טאבו · בית הלוי 18 · משכנתא',done:false},
-];
-function renderTasks(){
-  const ul=document.getElementById('task-list');
-  ul.innerHTML=TASKS.map((t,i)=>`<li class="${t.done?'done':''}" onclick="toggleTask(${i})"><input type="checkbox" ${t.done?'checked':''} onclick="event.stopPropagation();toggleTask(${i})"/><span>${t.t}</span></li>`).join('');
-  const done=TASKS.filter(t=>t.done).length;
-  document.getElementById('task-done').textContent=done;
-  document.getElementById('task-total').textContent=TASKS.length;
-  document.getElementById('task-badge').textContent=TASKS.length-done;
-}
-function toggleTask(i){TASKS[i].done=!TASKS[i].done;renderTasks();dbSet('tasks','list',TASKS)}
-
-/* === Real Beit HaKerem seed (REPLACES random gen) === */
-function rebuildSeedBHK(){
-  PROPERTIES.length=0;
-  let id=1;
-  const bands=[
-    {rooms:3,m2:[72,85],price:[2800000,3400000]},
-    {rooms:3.5,m2:[78,92],price:[3000000,3600000]},
-    {rooms:4,m2:[90,110],price:[3500000,4500000]},
-    {rooms:4.5,m2:[100,120],price:[3900000,5100000]},
-    {rooms:5,m2:[110,140],price:[4500000,6500000]},
-  ];
-  STREETS_BHK_REAL.forEach((s,i)=>{
-    const num=2+(i*7)%56;
-    const b=bands[i%bands.length];
-    const m2=b.m2[0]+Math.floor(((i*13)%100)/100*(b.m2[1]-b.m2[0]));
-    const price=b.price[0]+Math.floor(((i*17)%100)/100*(b.price[1]-b.price[0]));
-    PROPERTIES.push({id:id++,status:i===2?'pending':(i===5?'sold':'active'),address:`${s} ${num}`,location:'בית הכרם',loc:'beithakerem',rooms:b.rooms,m2,floor:`${1+i%5}/${4+i%4}`,price,currency:'₪',src:['ישיר','משרד','יד2','מדלן','סיור'][i%5],owner:['יעקב לוי','שרה כהן','דוד בן דוד','רחל פרידמן','משה רוזן'][i%5],last:`לפני ${1+i*2} ימים`,score:(7+(i%4)*0.4).toFixed(1),gush:GUSH_BHK[i%GUSH_BHK.length],chelka:80+i*7});
-  });
-  for(let i=0;i<24;i++){
-    const s=STREETS_BHK_REAL[i%STREETS_BHK_REAL.length];
-    const num=4+(i*11)%80;
-    const b=bands[i%bands.length];
-    const m2=b.m2[0]+(((i*23)%100)/100)*(b.m2[1]-b.m2[0])|0;
-    const price=b.price[0]+(((i*29)%100)/100)*(b.price[1]-b.price[0])|0;
-    PROPERTIES.push({id:id++,status:i===3?'pending':(i===8?'sold':'active'),address:`${s} ${num}`,location:'בית הכרם',loc:'beithakerem',rooms:b.rooms,m2,floor:`${1+i%5}/${4+i%4}`,price,currency:'₪',src:['ישיר','משרד','יד2','מדלן','סיור','דרור'][i%6],owner:['יעקב לוי','שרה כהן','דוד בן דוד','רחל פרידמן','משה רוזן','חנה מזרחי','אברהם גולן'][i%7],last:`לפני ${2+i} ימים`,score:(6.5+(i%5)*0.4).toFixed(1),gush:GUSH_BHK[i%GUSH_BHK.length],chelka:90+i*5});
-  }
-  STREETS_DENYA_REAL.forEach((s,i)=>{
-    const num=1+i*3;
-    const m2=140+i*15;
-    const price=6000000+i*900000;
-    PROPERTIES.push({id:id++,status:i===1?'pending':'active',address:`${s} ${num}`,location:'דניה',loc:'denya',rooms:[5,5,6,5.5,6,7][i],m2,floor:`${i%3}/${2+i%2}`,price,currency:'₪',src:['ישיר','משרד','דרור'][i%3],owner:['אבי מזרחי','משפחת קליין','דוד פרידמן','גדעון לוי','משה אדרי','רחל בן דוד'][i],last:`לפני ${3+i*4} ימים`,score:(7.5+(i%3)*0.3).toFixed(1),gush:GUSH_DENYA[i%2],chelka:100+i*9});
-  });
-  /* International remains as-is */
-  const ATHENS=['Kolonaki, Skoufa 14','Glyfada, Vouliagmeni 218','Plaka, Adrianou 86','Kifisia, Kassaveti 3','Voula, Iliou 22'];
-  ATHENS.forEach((a,i)=>PROPERTIES.push({id:id++,status:'active',address:a,location:'אתונה',loc:'athens',rooms:[3,4,4,5,3][i],m.app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
 
 /* SIDEBAR (desktop) */
 .sidebar{background:var(--cream-soft);border-left:1px solid var(--border);padding:22px 18px 20px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:40}
@@ -1725,24 +370,6 @@ function rebuildSeedBHK(){
   .card{break-inside:avoid}
 }
 </style>
-<style>
-.sync-status{position:fixed;top:10px;left:10px;background:var(--white);border:1px solid var(--gold-line);padding:6px 12px;border-radius:20px;font-size:11px;color:var(--ink-faint);z-index:100;display:flex;align-items:center;gap:6px;box-shadow:var(--sh-card);transition:all .2s}
-.sync-status.success{border-color:var(--success);color:var(--success)}
-.sync-status.warning{border-color:var(--warning);color:var(--warning);background:#fff8eb}
-.sync-status.error{border-color:var(--danger);color:var(--danger);background:#fef0f0}
-.sync-status.syncing{border-color:var(--gold);color:var(--gold);background:var(--gold-tint)}
-.sync-status .pulse{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.gh-setup-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
-.gh-setup{background:var(--white);border-radius:8px;padding:28px;max-width:500px;width:100%;border-top:4px solid var(--gold)}
-.gh-setup h2{font-size:20px;margin-bottom:8px;color:var(--ink)}
-.gh-setup p{font-size:13px;color:var(--ink-faint);margin-bottom:14px;line-height:1.6}
-.gh-setup label{display:block;font-size:12px;color:var(--ink);font-weight:600;margin:14px 0 4px}
-.gh-setup input{width:100%;padding:10px 12px;border:1px solid var(--border-strong);border-radius:4px;font:inherit;font-size:13px}
-.gh-setup .step{background:var(--cream);padding:12px 14px;border-radius:4px;margin:6px 0;font-size:12px}
-.gh-setup .step b{color:var(--gold)}
-</style>
-<div class="sync-status" id="sync-status"><span class="pulse"></span> טוען...</div>
 </head>
 <body>
 
@@ -1758,7 +385,6 @@ function rebuildSeedBHK(){
   <div class="right">
     <button class="iconbtn" onclick="navTo('whatsapp')" aria-label="וואטסאפ"><i data-lucide="message-circle"></i></button>
     <button class="iconbtn" onclick="navTo('pixel')" aria-label="פיקסל"><i data-lucide="sparkles" style="color:var(--ai)"></i></button>
-    <button class="iconbtn" onclick="navTo('settings')" aria-label="הגדרות"><i data-lucide="settings"></i></button>
   </div>
 </div>
 
@@ -1825,8 +451,6 @@ function rebuildSeedBHK(){
     <section class="screen" id="screen-import"></section>
     <!-- DATABASE -->
     <section class="screen" id="screen-database"></section>
-    <!-- SETTINGS -->
-    <section class="screen" id="screen-settings"></section>
   </main>
 </div>
 
@@ -1868,12 +492,7 @@ function rebuildSeedBHK(){
 <div class="toasts" id="toasts"></div>
 
 <script>
-// === V5: GitHub Sync System ===
-let PEER_DATA = null;
-let GH_CONFIG = null;
-let DATA_SHA = null;
-let saveTimer = null;
-let pendingChanges = false;
+const PEER_DATA = {"bhkSale":[{"addr":"גבעת בית הכרם","nbh":"רמת בית הכרם","type":"דירה","rooms":3,"floor":"3","m2":64,"price":2795000,"permm":43672,"agent":"יהודה נכסים","notes":""},{"addr":"הארזים","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"6","m2":116,"price":3240000,"permm":27931,"agent":"תיווך ון דייק","notes":""},{"addr":"שדרות הרצל","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"7","m2":97,"price":3990000,"permm":41134,"agent":"LE HOUSE","notes":""},{"addr":"רבי בנימין 9","nbh":"רמת בית הכרם","type":"דירת גן","rooms":5.5,"floor":"1","m2":235,"price":7700000,"permm":32766,"agent":"פרטי","notes":"נוף פתוח, יחידת הורים"},{"addr":"הבנאי 2","nbh":"רמת בית הכרם","type":"דירת גן","rooms":2,"floor":"קרקע","m2":92,"price":3850216,"permm":41850,"agent":"יזם","notes":"חדש מקבלן, חניה, ממ\"ד"},{"addr":"משה קול 25","nbh":"רמת בית הכרם","type":"דירת גן","rooms":4,"floor":"קרקע","m2":229,"price":4950000,"permm":21616,"agent":"פרטי","notes":"חניה, ממ\"ד"},{"addr":"משה קול 4","nbh":"רמת בית הכרם","type":"פנטהאוז","rooms":5,"floor":"4","m2":157,"price":"לא צוין","permm":null,"agent":"פרטי","notes":"מחיר לא צוין"},{"addr":"נוף הרים 10","nbh":"רמת בית הכרם","type":"דירה","rooms":3,"floor":"1","m2":67,"price":2850000,"permm":42537,"agent":"פרטי","notes":"חניה, 3 כיווני אוויר"},{"addr":"שדרות הרצל 61","nbh":"רמת בית הכרם","type":"דירה","rooms":3,"floor":"8","m2":84,"price":3800000,"permm":45238,"agent":"פרטי","notes":"חניה, ממ\"ד"},{"addr":"תרצה 14","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"2","m2":87,"price":3450000,"permm":39655,"agent":"פרטי","notes":""},{"addr":"הארזים 4","nbh":"רמת בית הכרם","type":"דירה","rooms":11,"floor":"קרקע","m2":580,"price":8400000,"permm":14483,"agent":"פרטי","notes":"4 כיווני אוויר, חניה"},{"addr":"בית הכרם 10","nbh":"בית הכרם","type":"דירה","rooms":3.5,"floor":"2","m2":85,"price":3750000,"permm":44118,"agent":"פרטי","notes":""},{"addr":"משה קול","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"3","m2":92,"price":3530000,"permm":38370,"agent":"אנגלו סכסון","notes":"חניה, ממ\"ד, בלעדי"},{"addr":"משה קול","nbh":"רמת בית הכרם","type":"פנטהאוז","rooms":3,"floor":"3","m2":50,"price":3980000,"permm":79600,"agent":"promise","notes":"חדש מקבלן, חניה, ממ\"ד"},{"addr":"רחל המשוררת","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"4","m2":95,"price":3300000,"permm":34737,"agent":"רות שניידרמן","notes":"חניה, 2 מרפסות, מטבח גדול"},{"addr":"יעקב סלמן","nbh":"רמת בית הכרם","type":"דירת גן","rooms":4,"floor":"1","m2":198,"price":4790000,"permm":24192,"agent":"promise","notes":"חניה, ממ\"ד, 2 מרפסות"},{"addr":"רמת בית הכרם","nbh":"רמת בית הכרם","type":"דירה","rooms":5,"floor":"1","m2":117,"price":"לא צוין","permm":null,"agent":"promise","notes":"חניה, ממ\"ד, בניין משופץ"},{"addr":"הבנאי","nbh":"רמת בית הכרם","type":"פנטהאוז","rooms":6,"floor":"4","m2":290,"price":"לא צוין","permm":null,"agent":"פוינט נדל\"ן","notes":"חדש מקבלן, חניה, 3 מרפסות"},{"addr":"בית הכרם","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"8","m2":100,"price":3470000,"permm":34700,"agent":"פוינט נדל\"ן","notes":"חניה, בניין משופץ"},{"addr":"שדרות הרצל","nbh":"רמת בית הכרם","type":"דירה","rooms":3.5,"floor":"3","m2":88,"price":3490000,"permm":39659,"agent":"promise","notes":"חדש מקבלן, חניה, ממ\"ד"},{"addr":"מרה","nbh":"רמת בית הכרם","type":"פנטהאוז","rooms":5.5,"floor":"4","m2":130,"price":4950000,"permm":38077,"agent":"promise","notes":"חניה, ממ\"ד, 3 מרפסות"},{"addr":"חיים נחמן ביאליק","nbh":"רמת בית הכרם","type":"דירת גן","rooms":5,"floor":"קרקע","m2":240,"price":7000000,"permm":29167,"agent":"רות שניידרמן","notes":"חניה, ממ\"ד, קרוב לפארק"},{"addr":"בית הכרם","nbh":"רמת בית הכרם","type":"דירת גן","rooms":6.5,"floor":"קרקע","m2":290,"price":8200000,"permm":28276,"agent":"פוינט נדל\"ן","notes":"משופצת אדריכלית, חניה, ממ\"ד"},{"addr":"בית הכרם","nbh":"רמת בית הכרם","type":"דירה","rooms":4.5,"floor":"2","m2":110,"price":4000000,"permm":36364,"agent":"רות שניידרמן","notes":"חניה, בהזדמנות"},{"addr":"בית הכרם","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"2","m2":102,"price":3850000,"permm":37745,"agent":"ענבר יהודה","notes":"חניה, ממ\"ד, יחידת הורים"},{"addr":"שדרות הרצל","nbh":"רמת בית הכרם","type":"דירה","rooms":5,"floor":"4","m2":130,"price":5180000,"permm":39846,"agent":"promise","notes":"חדש מקבלן, חניה, ממ\"ד"},{"addr":"חיים נחמן ביאליק","nbh":"רמת בית הכרם","type":"דירה","rooms":6,"floor":"3","m2":115,"price":4250000,"permm":36957,"agent":"רות שניידרמן","notes":"קרוב לפארק"},{"addr":"החלוץ","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"2","m2":112,"price":4280000,"permm":38214,"agent":"promise","notes":"חניה, בלעדי"},{"addr":"האלוף יוחאי בן נון","nbh":"רמת בית הכרם","type":"דירת גן","rooms":5,"floor":"קרקע","m2":240,"price":6200000,"permm":25833,"agent":"רות שניידרמן","notes":"חניה, ממ\"ד, 2 מרפסות"},{"addr":"החלוץ","nbh":"רמת בית הכרם","type":"דירת גן","rooms":4,"floor":"1","m2":100,"price":4400000,"permm":44000,"agent":"promise","notes":"מטבח גדול, יחידת הורים"},{"addr":"יעקב סלמן","nbh":"רמת בית הכרם","type":"דירת גן","rooms":4,"floor":"1","m2":93,"price":4790000,"permm":51505,"agent":"promise","notes":"חניה, ממ\"ד, 3 מרפסות, בלעדי"},{"addr":"שדרות הרצל","nbh":"רמת בית הכרם","type":"דירה","rooms":6.5,"floor":"7","m2":40,"price":8980000,"permm":224500,"agent":"רות שניידרמן","notes":"חניה, ממ\"ד, 2 מרפסות"},{"addr":"יעקב שריבוים 12","nbh":"רמת בית הכרם","type":"פנטהאוז","rooms":5,"floor":"3","m2":130,"price":5400000,"permm":41538,"agent":"פרטי","notes":"חניה, 4 כיווני אוויר, 2 מרפסות"},{"addr":"דגניה 3","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"1","m2":80,"price":3500000,"permm":43750,"agent":"פרטי","notes":""},{"addr":"בית הכרם 9","nbh":"בית הכרם","type":"דירה","rooms":3,"floor":"2","m2":77,"price":3400000,"permm":44156,"agent":"פרטי","notes":""},{"addr":"כתריאל טחורש","nbh":"רמת בית הכרם","type":"דירה","rooms":3,"floor":"2","m2":73,"price":2790000,"permm":38219,"agent":"תיווך ון דייק","notes":""},{"addr":"בית פרטי/ קוטג'","nbh":"בית הכרם","type":"בית פרטי","rooms":5.5,"floor":"קרקע","m2":240,"price":5950000,"permm":24792,"agent":"פוינט נדל\"ן","notes":""},{"addr":"שדרות הרצל","nbh":"רמת בית הכרם","type":"דופלקס","rooms":6.5,"floor":"1","m2":125,"price":6100000,"permm":48800,"agent":"גוב-ארי נכסים","notes":""},{"addr":"כתריאל טחורש","nbh":"רמת בית הכרם","type":"דירה","rooms":3,"floor":"2","m2":75,"price":2790000,"permm":37200,"agent":"תיווך ון דייק","notes":"חניה, ממ\"ד, בניין משופץ"},{"addr":"הבנאי","nbh":"רמת בית הכרם","type":"דירת גן","rooms":5.5,"floor":"קרקע","m2":115,"price":4690000,"permm":40783,"agent":"promise","notes":"בלעדי, חבל לפספס"},{"addr":"חזון ציון","nbh":"רמת בית הכרם","type":"דירת גן","rooms":6,"floor":"2","m2":160,"price":7350000,"permm":45938,"agent":"רות שניידרמן","notes":"חניה, משופצת אדריכלית"},{"addr":"יעקב שריבוים","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"2","m2":90,"price":3500000,"permm":38889,"agent":"promise","notes":"חניה, ממ\"ד"},{"addr":"הארזים 5","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"5","m2":117,"price":4095000,"permm":35000,"agent":"פוינט נדל\"ן","notes":"נכס חדש, ממ\"ד, משופצת אדריכלית"},{"addr":"רחל המשוררת 4","nbh":"רמת בית הכרם","type":"דירת גן","rooms":6.5,"floor":"קרקע","m2":354,"price":8700000,"permm":24576,"agent":"רות שניידרמן","notes":"חניה, 3 מרפסות, ירד 250 אלף"},{"addr":"משה קול","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"1","m2":95,"price":3880000,"permm":40842,"agent":"promise","notes":"חניה, ממ\"ד"},{"addr":"משה קול","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"3","m2":85,"price":3750000,"permm":44118,"agent":"promise","notes":"חניה, ממ\"ד, בניין משופץ"},{"addr":"משה קול","nbh":"רמת בית הכרם","type":"דירת גן","rooms":3.5,"floor":"1","m2":70,"price":3650000,"permm":52143,"agent":"promise","notes":"חניה, ממ\"ד"},{"addr":"יעקב סלמן","nbh":"רמת בית הכרם","type":"פנטהאוז","rooms":5,"floor":"3","m2":100,"price":4690000,"permm":46900,"agent":"רות שניידרמן","notes":"חניה, ממ\"ד, מטבח גדול"},{"addr":"שילר","nbh":"רמת בית הכרם","type":"דירה","rooms":5,"floor":"קרקע","m2":132,"price":5700000,"permm":43182,"agent":"רות שניידרמן","notes":"חניה, מטבח גדול"},{"addr":"בית הכרם","nbh":"רמת בית הכרם","type":"דירה","rooms":3,"floor":"6","m2":106,"price":3250000,"permm":30660,"agent":"פוינט נדל\"ן","notes":"נכס חדש, חניה, ממ\"ד"},{"addr":"החלוץ","nbh":"רמת בית הכרם","type":"דירת גן","rooms":4,"floor":"1","m2":100,"price":4400000,"permm":44000,"agent":"רות שניידרמן","notes":"מטבח גדול, גמיש במחיר"},{"addr":"רחל המשוררת","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"1","m2":100,"price":3650000,"permm":36500,"agent":"דניאל בוזגלו","notes":"חניה, ירד 400 אלף"},{"addr":"משה קול","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"1","m2":102,"price":4579994,"permm":44902,"agent":"promise","notes":"חניה, ממ\"ד, משופצת אדריכלית"},{"addr":"משה קול","nbh":"רמת בית הכרם","type":"דירה","rooms":5,"floor":"2","m2":118,"price":4790000,"permm":40593,"agent":"promise","notes":"חניה, ממ\"ד, 2 מרפסות, ירד 100 אלף"},{"addr":"יעקב שריבוים","nbh":"רמת בית הכרם","type":"דירת גן","rooms":4,"floor":"קרקע","m2":90,"price":4450000,"permm":49444,"agent":"רות שניידרמן","notes":"חניה, ממ\"ד"},{"addr":"משה קול","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"3","m2":95,"price":4390000,"permm":46211,"agent":"promise","notes":"חניה, ממ\"ד, יחידת הורים"},{"addr":"משה קול","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"1","m2":118,"price":3830000,"permm":32458,"agent":"promise","notes":"חניה, ממ\"ד, 2 מרפסות"},{"addr":"שדרות הרצל","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"5","m2":115,"price":4850000,"permm":42174,"agent":"רות שניידרמן","notes":"נכס חדש, חניה, יחידת הורים"},{"addr":"בית הכרם","nbh":"רמת בית הכרם","type":"דירה","rooms":5.5,"floor":"2","m2":160,"price":"לא צוין","permm":null,"agent":"promise","notes":"חניה, ממ\"ד, 3 מרפסות"},{"addr":"סה\"כ נכסים: 59","nbh":"","type":"","rooms":"","floor":"","m2":"ממוצע:","price":4646185.63636364,"permm":42446,"agent":"","notes":""}],"denyaSale":[{"addr":"גלבר 13","nbh":"רמת דניה","type":"דירה","rooms":5,"floor":"2","m2":128,"price":5500000,"permm":42969,"agent":"רימקס שירז נדל\"ן","notes":""},{"addr":"גלבר","nbh":"רמת דניה","type":"דירה","rooms":3,"floor":"5","m2":95,"price":3250000,"permm":34211,"agent":"אבן ירושלמית","notes":"בלעדי"},{"addr":"גלבר","nbh":"רמת דניה","type":"דירה","rooms":5,"floor":"5","m2":126,"price":3180000,"permm":25238,"agent":"promise","notes":""},{"addr":"גלבר 20","nbh":"רמת דניה","type":"דירה","rooms":3,"floor":"5","m2":90,"price":2800000,"permm":31111,"agent":"פרטי","notes":""},{"addr":"גלבר 13","nbh":"רמת דניה","type":"דירה","rooms":5,"floor":"2","m2":127,"price":5550000,"permm":43701,"agent":"פרטי","notes":"ירד 700 אלף"},{"addr":"אריה ל. קובובי","nbh":"רמת דניה","type":"דירה","rooms":4,"floor":"1","m2":83,"price":2850000,"permm":34337,"agent":"אבן ירושלמית","notes":"קרוב לפארק, מומלץ, בלעדי"},{"addr":"אריה ל. קובובי","nbh":"רמת דניה","type":"דירה","rooms":3,"floor":"1","m2":71,"price":2990000,"permm":42113,"agent":"promise","notes":"בלעדי"},{"addr":"אריה ל. קובובי","nbh":"רמת דניה","type":"דירה","rooms":4,"floor":"1","m2":93,"price":2850000,"permm":30645,"agent":"אבן ירושלמית","notes":"בלעדי"},{"addr":"רמת דניה","nbh":"רמת דניה","type":"דירה","rooms":4.5,"floor":"6","m2":118,"price":3180000,"permm":26949,"agent":"ים נדל\"ן","notes":""},{"addr":"גלבר","nbh":"רמת דניה","type":"דירה","rooms":3,"floor":"5","m2":95,"price":3250000,"permm":34211,"agent":"אבן ירושלמית","notes":"בלעדי"},{"addr":"סה\"כ נכסים: 10","nbh":"","type":"","rooms":"","floor":"","m2":"ממוצע:","price":3540000,"permm":34548,"agent":"","notes":""}],"bhkRent":[{"addr":"משה קול","nbh":"רמת בית הכרם","type":"דירה","rooms":5,"floor":"1","m2":120,"rent":12000,"agent":"promise","notes":"ירד 1,000 ₪"},{"addr":"הארזים 23","nbh":"רמת בית הכרם","type":"דירה","rooms":4.5,"floor":"3","m2":100,"rent":2600,"agent":"פרטי","notes":"3 כיווני אוויר"},{"addr":"רבי בנימין 13","nbh":"רמת בית הכרם","type":"דירה","rooms":6,"floor":"13","m2":128,"rent":9900,"agent":"פרטי","notes":"3 כיווני אוויר, חניה"},{"addr":"הבנאי 21","nbh":"רמת בית הכרם","type":"דירה","rooms":3.5,"floor":"1","m2":67,"rent":5500,"agent":"פרטי","notes":""},{"addr":"משכן שילה 5","nbh":"רמת בית הכרם","type":"דירה","rooms":3,"floor":"2","m2":72,"rent":7600,"agent":"פרטי","notes":""},{"addr":"רחל המשוררת 9","nbh":"רמת בית הכרם","type":"דירה","rooms":3,"floor":"2","m2":80,"rent":7000,"agent":"פרטי","notes":""},{"addr":"משה קול 38","nbh":"רמת בית הכרם","type":"דירה","rooms":5.5,"floor":"4","m2":144,"rent":13000,"agent":"פרטי","notes":""},{"addr":"משה קול 51","nbh":"רמת בית הכרם","type":"דירה","rooms":3,"floor":"3","m2":75,"rent":7500,"agent":"פרטי","notes":""},{"addr":"דה רוסי 9","nbh":"רמת בית הכרם","type":"דירה","rooms":3,"floor":"2","m2":60,"rent":6000,"agent":"פרטי","notes":""},{"addr":"משה קול 38","nbh":"רמת בית הכרם","type":"דירה","rooms":5.5,"floor":"4","m2":130,"rent":13000,"agent":"פרטי","notes":""},{"addr":"הארזים 12","nbh":"רמת בית הכרם","type":"דירה","rooms":2.5,"floor":"3","m2":65,"rent":4900,"agent":"פרטי","notes":""},{"addr":"משה קול 56","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"1","m2":130,"rent":"לא צוין","agent":"פרטי","notes":"מחיר לא צוין"},{"addr":"שדרות הרצל 80","nbh":"רמת בית הכרם","type":"דירה","rooms":3,"floor":"3","m2":65,"rent":7300,"agent":"קבוצת איתן","notes":""},{"addr":"משה קול","nbh":"רמת בית הכרם","type":"דירה","rooms":3,"floor":"2","m2":75,"rent":7400,"agent":"תיווך ספיר","notes":"ממ\"ד, חניה"},{"addr":"שדרות הרצל 80","nbh":"רמת בית הכרם","type":"דירה","rooms":2,"floor":"4","m2":45,"rent":5700,"agent":"קבוצת איתן","notes":"חדש מקבלן"},{"addr":"שדרות הרצל 80","nbh":"רמת בית הכרם","type":"דירה","rooms":1,"floor":"3","m2":30,"rent":4300,"agent":"קבוצת איתן","notes":"חדש מקבלן"},{"addr":"משה קול","nbh":"רמת בית הכרם","type":"דירה","rooms":5,"floor":"4","m2":125,"rent":13000,"agent":"לוקיישן נכסים","notes":""},{"addr":"משה קול","nbh":"רמת בית הכרם","type":"דירה","rooms":3,"floor":"4","m2":78,"rent":7100,"agent":"טופיה נדל\"ן","notes":""},{"addr":"הארזים 6","nbh":"רמת בית הכרם","type":"דירה","rooms":3,"floor":"1","m2":82,"rent":7800,"agent":"נדלן IN","notes":""},{"addr":"משה קול","nbh":"רמת בית הכרם","type":"דירה","rooms":5,"floor":"4","m2":120,"rent":13000,"agent":"ענבר יהודה","notes":""},{"addr":"בית הכרם","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"3","m2":105,"rent":9500,"agent":"לוקיישן נכסים","notes":""},{"addr":"משה חובב","nbh":"רמת בית הכרם","type":"דירה","rooms":2,"floor":"2","m2":60,"rent":6800,"agent":"עידית לוי","notes":""},{"addr":"משה קול","nbh":"רמת בית הכרם","type":"דירה","rooms":5,"floor":"4","m2":130,"rent":13000,"agent":"ירושלמי דבי בן-עמי","notes":""},{"addr":"שדרות הרצל 80","nbh":"רמת בית הכרם","type":"דירה","rooms":3,"floor":"3","m2":65,"rent":7300,"agent":"קבוצת איתן","notes":"חדש מקבלן"},{"addr":"בית הכרם","nbh":"רמת בית הכרם","type":"דירה","rooms":5,"floor":"3","m2":110,"rent":11000,"agent":"רות שניידרמן","notes":""},{"addr":"משה קול","nbh":"רמת בית הכרם","type":"דירה","rooms":5,"floor":"4","m2":132,"rent":14000,"agent":"תיווך דניאל","notes":""},{"addr":"שדרות הרצל","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"2","m2":95,"rent":"לא צוין","agent":"promise","notes":"מחיר לא צוין"},{"addr":"החלוץ","nbh":"רמת בית הכרם","type":"דירה","rooms":4.5,"floor":"1","m2":96,"rent":8900,"agent":"promise","notes":"ירד 1,100 ₪"},{"addr":"החלוץ","nbh":"רמת בית הכרם","type":"דירה","rooms":4,"floor":"1","m2":100,"rent":9000,"agent":"פיקס נדל\"ן","notes":""},{"addr":"החלוץ","nbh":"רמת בית הכרם","type":"דירה","rooms":5,"floor":"2","m2":128,"rent":8000,"agent":"תיווך דניאל","notes":""},{"addr":"סה\"כ נכסים: 30","nbh":"","type":"","rooms":"","floor":"","m2":"ממוצע:","rent":8646.42857142857,"agent":"","notes":""}],"sold":[{"addr":"הגיא","nbh":"בית הכרם","type":"דירה יד שנייה","rooms":"-","m2":"-","price":3450000,"date":"מרץ 2026, מבוקש 3.79M","source":"JNEWS / לשכת המתווכים"},{"addr":"בית הכרם 21","nbh":"בית הכרם","type":"נכס לשימור (1,600 מ\"ר קרקע)","rooms":"-","m2":"70","price":23320000,"date":"נמכר מכינוס נכסים","source":"כל העיר ירושלים"},{"addr":"הרצל/חזון ציון","nbh":"בית הכרם","type":"מגרש 2 דונם (72 יח\"ד)","rooms":"-","m2":"-","price":130000000,"date":"נרכש ע\"י \"בית ירושלמי\"","source":"גלובס"},{"addr":"יעקב סימן טוב 4","nbh":"רמת בית הכרם","type":"דירה יד שנייה","rooms":"3","m2":"69","price":2050000,"date":"קומת קרקע, חניה","source":"מדלן (וואלה)"},{"addr":"חובב משה 2","nbh":"רמת בית הכרם","type":"דירה יד שנייה","rooms":"5","m2":"144","price":3300000,"date":"קומה 3 + 30 מ\"ר גג","source":"מדלן (וואלה)"},{"addr":"מרה 1","nbh":"רמת בית הכרם","type":"דירה יד שנייה","rooms":"4","m2":"113","price":3450000,"date":"מרץ","source":"מדלן (וואלה)"},{"addr":"יעקב שרייבום","nbh":"רמת בית הכרם","type":"דירה יד שנייה","rooms":"3","m2":"57","price":1835000,"date":"2 כיווני אוויר, מבוקש 1.99M","source":"פרומיס/וואלה נדל\"ן"},{"addr":"יעקב סימן טוב","nbh":"רמת בית הכרם","type":"דירה","rooms":"2","m2":"70","price":2500000,"date":"+ 9 מ\"ר מרפסת, קומה 2/3","source":"YNet"},{"addr":"בית הכרם","nbh":"בית הכרם","type":"דירה משופצת","rooms":"3.5","m2":"71","price":950000,"date":"אחרי שיפוץ + מחסן","source":"כלכליסט"},{"addr":"משכן שילה","nbh":"רמת בית הכרם","type":"דירה יד שנייה","rooms":"3","m2":"65","price":1750000,"date":"מבוקש - מצב שמור","source":"מדלן (וואלה)"},{"addr":"דה רוסי","nbh":"רמת בית הכרם","type":"דירת גן","rooms":"3","m2":"80","price":3200000,"date":"מבוקש - כחדשה","source":"מדלן (וואלה)"},{"addr":"משה קול","nbh":"רמת בית הכרם","type":"דירה משופצת","rooms":"5","m2":"110","price":4600000,"date":"מבוקש - 2 חניות","source":"מדלן (וואלה)"}],"peerSaleIL":[{"desc":"דירה במגדלי אוקינוס - בלעדיות","city":"הרצליה פיתוח","type":"דירה","rooms":"3","baths":"2","m2":"75","price":9000000,"notes":"מגדלי יוקרה"},{"desc":"דירה בפרויקט אחד העם","city":"תל אביב יפו","type":"דירה","rooms":"2","baths":"-","m2":"47","price":5700000,"notes":"פרויקט חדש"},{"desc":"דירה במגדלי פארק בבלי - בלעדיות","city":"תל אביב יפו","type":"דירה","rooms":"4","baths":"-","m2":"147","price":12529471,"notes":"מגדלי יוקרה"},{"desc":"דירה במגדלי פארק בבלי - בלעדיות","city":"תל אביב יפו","type":"דירה","rooms":"4","baths":"-","m2":"211","price":16243863,"notes":"דירת יוקרה גדולה"},{"desc":"בית פרטי ברמת אפעל","city":"רמת גן","type":"בית פרטי","rooms":"7","baths":"-","m2":"240","price":9000000,"notes":"בית פרטי גדול"},{"desc":"דירה במגדלי גינדי TLV הנמוכים","city":"תל אביב יפו","type":"דירה","rooms":"4","baths":"-","m2":"107","price":6000000,"notes":"הנמוכים, \"מחיר 6 ₪\" באתר - פרטים אצל המתווך"},{"desc":"דירה ברחוב הגנים, נווה גן - בלעדיות","city":"רמת השרון","type":"דירה","rooms":"5","baths":"3","m2":"175","price":10500000,"notes":"נווה גן"},{"desc":"בית פרטי בשכונת מלחה","city":"ירושלים","type":"בית פרטי","rooms":"-","baths":"-","m2":"440","price":17600000,"notes":"מלחה, ירושלים - בית פרטי גדול"},{"desc":"דופלקס פנטהאוז שכונת המשתלה, סשה ארגוב","city":"תל אביב יפו","type":"דופלקס פנטהאוז","rooms":"4","baths":"2","m2":"250","price":8900000,"notes":"המשתלה, ת״א"},{"desc":"דירת דופלקס ברחוב מלצט","city":"תל אביב יפו","type":"דופלקס","rooms":"3","baths":"2","m2":"112","price":7900000,"notes":"מלצט"},{"desc":"דירה בשכונת נאות אפקה ב׳, מנורה","city":"תל אביב יפו","type":"דירה","rooms":"5","baths":"2","m2":"130","price":5400000,"notes":"נאות אפקה ב׳"},{"desc":"מגרש בפרדס חנה","city":"פרדס חנה","type":"מגרש","rooms":"-","baths":"-","m2":"-","price":3700000,"notes":"מגרש למכירה"},{"desc":"סה\"כ נכסים: 12","city":"","type":"","rooms":"","baths":"","m2":"ממוצע:","price":9372777.83333333,"notes":""}],"peerRentIL":[{"desc":"דירה במגדל ולנברג, נווה שרת - בלעדיות","city":"תל אביב יפו","type":"דירה","rooms":"5","baths":"3","m2":113,"rent":10000,"notes":"נווה שרת"},{"desc":"דירה בגני שרונה","city":"תל אביב יפו","type":"דירה","rooms":"3","baths":"-","m2":72,"rent":11500,"notes":"גני שרונה"},{"desc":"דו משפחתי ברמות","city":"ירושלים","type":"דו משפחתי","rooms":"6","baths":"-","m2":260,"rent":30000,"notes":"רמות, ירושלים"},{"desc":"דירה במגדלי הצעירים, מנחם בגין","city":"תל אביב יפו","type":"דירה","rooms":"2","baths":"-","m2":63,"rent":8100,"notes":"מנחם בגין"},{"desc":"דירה ברחוב הירקון","city":"תל אביב יפו","type":"דירה","rooms":"3","baths":"-","m2":74,"rent":8500,"notes":"הירקון"},{"desc":"דירה בנופי ים, הגוש הגדול","city":"תל אביב יפו","type":"דירה","rooms":"4","baths":"-","m2":135,"rent":16000,"notes":"הגוש הגדול"},{"desc":"דירה במגדלי איסט","city":"תל אביב יפו","type":"דירה","rooms":"4","baths":"2","m2":102,"rent":10500,"notes":"מגדלי איסט"},{"desc":"דופלקס ברחוב מלצ׳ט","city":"תל אביב יפו","type":"דופלקס","rooms":"3","baths":"1","m2":71,"rent":14000,"notes":"מלצ׳ט"},{"desc":"דירה בכוכב הצפון, ישראל גלילי","city":"תל אביב יפו","type":"דירה","rooms":"3","baths":"2","m2":130,"rent":11000,"notes":"כוכב הצפון"},{"desc":"דירה בשדרות דוד המלך","city":"תל אביב יפו","type":"דירה","rooms":"3.5","baths":"-","m2":105,"rent":12500,"notes":"שדרות דוד המלך"},{"desc":"חצי קומה בפארק צמרת","city":"תל אביב יפו","type":"חצי קומה","rooms":"4","baths":"2","m2":280,"rent":40000,"notes":"פארק צמרת - יוקרה"},{"desc":"סה\"כ נכסים: 11","city":"","type":"","rooms":"","baths":"","m2":"ממוצע:","rent":15645.4545454545,"notes":""}],"peerGreece":[{"desc":"בניין דירות - שכונת קיפסלי","area":"אתונה","type":"בניין דירות","rooms":"-","m2":"-","price":1320000,"notes":"שכונת קיפסלי"},{"desc":"דירות חדשות בסלוניקי","area":"סלוניקי","type":"דירה","rooms":"-","m2":"-","price":100000,"notes":"תשואה 10% השכרה, ליד מטרו"},{"desc":"בתים באי טאסוס - הפנינה של יוון","area":"טאסוס","type":"בית","rooms":"-","m2":"-","price":100000,"notes":"במרחק פסיעה מהמים"},{"desc":"דירות בבנייני סטודנטים פיליון","area":"וולוס","type":"דירה","rooms":"-","m2":"-","price":100000,"notes":"למגורי סטודנטים"},{"desc":"Nausica Complex - בתים בסקאלה רחוניו","area":"סקאלה רחוניו","type":"בית פרטי","rooms":"3","m2":"50","price":90000,"notes":"2 שירותים"},{"desc":"בתים פרטיים בעיירה אופריניו","area":"אופריניו (טאסוס)","type":"בית פרטי","rooms":"-","m2":"-","price":90000,"notes":"החל מ-65,000 € באתר"},{"desc":"וילות על חוף אופריניו","area":"אופריניו","type":"וילה","rooms":"-","m2":"-","price":1750000,"notes":"10 מ׳ מהמים"},{"desc":"פרויקט \"אתנה\" אופריניון","area":"אופריניון (קוולה)","type":"דירה","rooms":"-","m2":"-","price":235000,"notes":"חוף 17 ק\"מ, טברנות וקפה"},{"desc":"סה\"כ נכסים: 8","area":"","type":"","rooms":"","m2":"ממוצע:","price":473125,"notes":""}],"peerCyprus":[{"desc":"דירות יוקרה למכירה והשקעה","area":"לרנקה","type":"דירה","rooms":"2","m2":"61","price":165300,"notes":"יוקרה"},{"desc":"פרויקט וילות OLIVIA","area":"פרוטארס פמגוסטה","type":"וילה","rooms":"3","m2":"128","price":440000,"notes":"פרויקט וילות"},{"desc":"וילות יוקרה Ariel","area":"פרוטארס","type":"וילה","rooms":"4","m2":"138","price":530000,"notes":"יוקרה"},{"desc":"דירות יוקרה Amaya","area":"פרוטארס","type":"דירה","rooms":"3","m2":"67","price":235000,"notes":"יוקרה"},{"desc":"דירות יוקרה Nur","area":"פרלימני","type":"דירה","rooms":"-","m2":"88","price":195000,"notes":"יוקרה"},{"desc":"קוטג׳ים","area":"Frenaros-Vrysoulles","type":"קוטג","rooms":"4","m2":"120","price":280000,"notes":""},{"desc":"וילות","area":"Pervolia","type":"וילה","rooms":"5","m2":"140","price":620000,"notes":""},{"desc":"וילות ודירות יוקרה","area":"פרוטארס","type":"וילה/דירה","rooms":"-","m2":"75","price":185000,"notes":""},{"desc":"סה\"כ נכסים: 8","area":"","type":"","rooms":"","m2":"ממוצע:","price":331287.5,"notes":""}],"peerCommercial":[{"desc":"משרדים בפארק העסקים עזריאלי","city":"חולון","type":"משרד","rooms":"-","m2":"-","deal":"השכרה","price":"75 ₪/מ\"ר","notes":"מחיר למ\"ר"},{"desc":"משרד במגדלי הארבעה היוקרתיים","city":"תל אביב יפו","type":"משרד","rooms":"3","m2":"86","deal":"השכרה","price":"139 ₪/מ\"ר","notes":"מגדלי הארבעה"},{"desc":"משרד בעזריאלי שרונה","city":"תל אביב יפו","type":"משרד","rooms":"-","m2":"414","deal":"השכרה","price":"180 ₪/מ\"ר","notes":"עזריאלי שרונה"},{"desc":"משרד בבית זמיר רמת החייל","city":"תל אביב יפו","type":"משרד","rooms":"12","m2":"270","deal":"השכרה","price":"70 ₪/מ\"ר","notes":"בית זמיר"},{"desc":"שטחי מסחר באלעד","city":"אלעד","type":"שטח מסחרי","rooms":"-","m2":"-","deal":"מכירה","price":"25,000 ₪","notes":"מסחר"},{"desc":"משרד בצומת סביון","city":"סביון","type":"משרד","rooms":"10","m2":"378","deal":"השכרה","price":"38,000 ₪","notes":"צומת סביון"},{"desc":"משרד במגדל בסר 2","city":"בני ברק","type":"משרד","rooms":"6","m2":"143","deal":"השכרה","price":"9,500 ₪","notes":"בסר 2"},{"desc":"נכס מסחרי","city":"חדרה","type":"מסחרי","rooms":"-","m2":"-","deal":"מכירה","price":"10,810,000 ₪","notes":"חדרה"},{"desc":"משרד באקרו","city":"קריית אונו","type":"משרד","rooms":"-","m2":"170","deal":"השכרה","price":"85 ₪/מ\"ר","notes":"אקרו"},{"desc":"משרד במגדל ווי WE","city":"תל אביב יפו","type":"משרד","rooms":"6","m2":"105","deal":"השכרה","price":"125 ₪/מ\"ר","notes":"מגדל WE"},{"desc":"משרד במגדלי בסר","city":"פתח תקווה","type":"משרד","rooms":"8","m2":"227","deal":"השכרה","price":"70 ₪/מ\"ר","notes":"בסר פ\"ת"},{"desc":"משרד במגדל מידטאון","city":"תל אביב יפו","type":"משרד","rooms":"6","m2":"153","deal":"מכירה","price":"4,800,000 ₪","notes":"מידטאון"},{"desc":"בניין משרדים בלב תל אביב","city":"תל אביב יפו","type":"בניין","rooms":"-","m2":"594","deal":"מכירה","price":"20,000,000 ₪","notes":"לב ת\"א"},{"desc":"חנות + יחידת דיור ברחוב יפת","city":"תל אביב יפו (יפו)","type":"חנות+יחידה","rooms":"-","m2":"100","deal":"מכירה","price":"3,500,000 ₪","notes":"יפת, יפו"},{"desc":"משרד במגדל מידטאון","city":"תל אביב יפו","type":"משרד","rooms":"-","m2":"161","deal":"השכרה","price":"25,700 ₪","notes":"מידטאון"},{"desc":"משרד במגדל מידטאון","city":"תל אביב יפו","type":"משרד","rooms":"-","m2":"100","deal":"השכרה","price":"12,500 ₪","notes":"מידטאון"},{"desc":"שטח משרדים במגדלי דה וינצי","city":"תל אביב יפו","type":"משרד","rooms":"-","m2":"268","deal":"השכרה","price":"32,160 ₪","notes":"דה וינצי"},{"desc":"חנות חדשה ברחוב קצנלסון","city":"תל אביב יפו","type":"חנות","rooms":"-","m2":"150","deal":"השכרה","price":"30,000 ₪","notes":"קצנלסון"},{"desc":"שטח מסחרי בפארק המדע רחובות","city":"רחובות","type":"שטח מסחרי","rooms":"-","m2":"252","deal":"מכירה","price":"2,700,000 ₪","notes":"פארק המדע"},{"desc":"משרד במגדלי הצעירים","city":"תל אביב יפו","type":"משרד","rooms":"2","m2":"95","deal":"השכרה","price":"11,500 ₪","notes":"הצעירים"},{"desc":"בית בחד נס בגולן","city":"חד נס","type":"בית","rooms":"-","m2":"-","deal":"מכירה","price":"3,960,000 ₪","notes":"גולן"},{"desc":"2 משרדים במגדל WE","city":"תל אביב יפו","type":"משרד","rooms":"-","m2":"20","deal":"מכירה","price":"950,000 ₪","notes":"WE"},{"desc":"מסעדה בחוף הים","city":"ראשון לציון","type":"מסעדה","rooms":"-","m2":"300","deal":"השכרה","price":"50,000 ₪","notes":"חוף הים"},{"desc":"חנות בבן יהודה","city":"תל אביב יפו","type":"חנות","rooms":"-","m2":"82","deal":"השכרה","price":"19,000 ₪","notes":"בן יהודה"},{"desc":"פוד טראק בטיילת","city":"בת ים","type":"פוד טראק","rooms":"-","m2":"-","deal":"השכרה","price":"12,000 ₪","notes":"טיילת ב\"ים"},{"desc":"חנות ביפו העתיקה","city":"תל אביב יפו","type":"חנות","rooms":"-","m2":"20","deal":"השכרה","price":"15,000 ₪","notes":"יפו העתיקה"},{"desc":"חנות בכצנלסון - בלעדיות","city":"גבעתיים","type":"חנות","rooms":"-","m2":"257","deal":"השכרה","price":"62,000 ₪","notes":"כצנלסון"},{"desc":"משרד 7 חדרים במונטיפיורי","city":"תל אביב יפו","type":"משרד","rooms":"7","m2":"130","deal":"השכרה","price":"13,000 ₪","notes":"מונטיפיורי"},{"desc":"משרד 4 חדרים ברמת החייל","city":"תל אביב יפו","type":"משרד","rooms":"5","m2":"150","deal":"השכרה","price":"15,000 ₪","notes":"רמת החייל"},{"desc":"משרדים במגדלי ב.ס.ר פ\"ת - בלעדיות","city":"פתח תקווה","type":"משרד","rooms":"-","m2":"1300","deal":"השכרה","price":"11,500 ₪","notes":"בסר פ\"ת"},{"desc":"משרד במגדל רסיטל","city":"תל אביב יפו","type":"משרד","rooms":"-","m2":"81","deal":"השכרה","price":"11,000 ₪","notes":"רסיטל"},{"desc":"משרדים במגדלי B.S.R","city":"רמת גן","type":"משרד","rooms":"-","m2":"270","deal":"מכירה","price":"4,320,000 ₪","notes":"BSR"},{"desc":"משרדים במגדלי B.S.R","city":"רמת גן","type":"משרד","rooms":"9","m2":"260","deal":"השכרה","price":"16,900 ₪","notes":"BSR"},{"desc":"משרדים במידטאון (2 חדרים)","city":"תל אביב יפו","type":"משרד","rooms":"2","m2":"-","deal":"השכרה","price":"8,000 ₪","notes":"מידטאון"},{"desc":"משרדים במידטאון (גדולים)","city":"תל אביב יפו","type":"משרד","rooms":"-","m2":"660","deal":"השכרה","price":"כנסו לפרטים","notes":"מידטאון"},{"desc":"משרדים במגדל WE","city":"תל אביב יפו","type":"משרד","rooms":"-","m2":"-","deal":"השכרה","price":"כנסו לפרטים","notes":"WE"},{"desc":"משרדים במגדלי B.S.R City - בלעדיות","city":"פתח תקווה","type":"משרד","rooms":"-","m2":"1300","deal":"מכירה","price":"100,000 ₪","notes":"BSR City"},{"desc":"משרדים במרכז מסחרי מטלון סנטר","city":"פתח תקווה","type":"משרד","rooms":"-","m2":"-","deal":"השכרה","price":"כנסו לפרטים","notes":"מטלון"},{"desc":"משרדים במגדלי B.S.R","city":"רמת גן","type":"משרד","rooms":"-","m2":"166","deal":"השכרה","price":"6,640 ₪","notes":"BSR"},{"desc":"משרדים במגדל משה אביב","city":"רמת גן","type":"משרד","rooms":"9","m2":"239","deal":"השכרה","price":"19,120 ₪","notes":"משה אביב"},{"desc":"משרדים ברחוב הברזל","city":"תל אביב יפו","type":"משרד","rooms":"-","m2":"-","deal":"השכרה","price":"4,500 ₪","notes":"הברזל"},{"desc":"משרדים במגדלי B.S.R","city":"רמת גן","type":"משרד","rooms":"5","m2":"221","deal":"השכרה","price":"18,785 ₪","notes":"BSR"},{"desc":"משרדים במגדלי B.S.R","city":"רמת גן","type":"משרד","rooms":"7","m2":"195","deal":"השכרה","price":"12,900 ₪","notes":"BSR"},{"desc":"סה\"כ נכסים: 43","city":"","type":"","rooms":"","m2":"","deal":"","price":"","notes":""}],"peerLand":[{"desc":"מגרש בפרדס חנה","city":"פרדס חנה","type":"מגרש","m2":"-","price":3700000,"notes":""},{"desc":"מגרש עם זכויות בניה בנווה צדק","city":"תל אביב יפו","type":"מגרש","m2":"-","price":20000000,"notes":"נווה צדק"},{"desc":"מגרש 394 מ\"ר בירקון","city":"תל אביב יפו","type":"מגרש","m2":"394","price":51000000,"notes":"ירקון, ת\"א - מיקום מצוין"},{"desc":"מגרש בחדרה","city":"חדרה","type":"מגרש","m2":"-","price":10810000,"notes":"חדרה"},{"desc":"נחלה במושב כרם מהר\"ל","city":"מושב כרם מהר\"ל","type":"נחלה","m2":"-","price":17000000,"notes":"אזור זיכרון יעקב"},{"desc":"בית מדהים בחד נס בגולן","city":"חד נס (גולן)","type":"בית/מגרש","m2":"115","price":3960000,"notes":"3 חדרים"},{"desc":"יחידת קרקע בחוף התכלת","city":"הרצליה","type":"יחידת קרקע","m2":"-","price":1350000,"notes":"חוף התכלת"},{"desc":"מגרש במשולש המרוני","city":"תל אביב יפו","type":"מגרש","m2":"-","price":38000000,"notes":"משולש המרוני"},{"desc":"מגרש בשדה דב","city":"תל אביב יפו","type":"מגרש","m2":"-","price":2700000,"notes":"שדה דב"},{"desc":"מגרש + היתר בנייה בנווה צדק - בלעדיות","city":"תל אביב יפו","type":"מגרש+היתר","m2":"815","price":42000000,"notes":"נווה צדק - היתר בניה"},{"desc":"מגרש עם היתר בניה בנתניה","city":"נתניה","type":"מגרש+היתר","m2":"-","price":140000000,"notes":"נתניה - מגרש ענק"},{"desc":"5 מגרשים עם אפשרות בניה","city":"הרצליה פיתוח","type":"מגרשים","m2":"-","price":6000000,"notes":"הרצליה פיתוח - 5 מגרשים"},{"desc":"מגרש בהוד השרון","city":"הוד השרון","type":"מגרש","m2":"-","price":12700000,"notes":"הוד השרון"},{"desc":"סה\"כ מגרשים: 13","city":"","type":"","m2":"ממוצע:","price":26863076.9230769,"notes":""}]};
 </script>
 
 <script>
@@ -1902,44 +521,38 @@ async function dbSet(s,k,v){const db=await idb();return new Promise(r=>{const tx
 async function dbGet(s,k){const db=await idb();return new Promise(r=>{const tx=db.transaction(s,'readonly');const q=tx.objectStore(s).get(k);q.onsuccess=()=>r(q.result?q.result.v:null);q.onerror=()=>r(null)})}
 
 /* ============== NAV ============== */
-function buildNav(){
-  const D = PEER_DATA || {};
-  return [
-    {section:'מבט-על',items:[
-      {id:'overview',label:'מסך הבית',icon:'layout-dashboard'},
-      {id:'database',label:'כל הנכסים',icon:'database'},
-    ]},
-    {section:'בית הכרם · ירושלים',items:[
-      {id:'bhk-sale',label:'מכירה',icon:'home',count:D.bhkSale?.length||0},
-      {id:'denya-sale',label:'רמת דניה',icon:'home',count:D.denyaSale?.length||0},
-      {id:'bhk-rent',label:'השכרה',icon:'key',count:D.bhkRent?.length||0},
-      {id:'sold',label:'נמכרו לאחרונה',icon:'check-circle',count:D.sold?.length||0},
-      {id:'neighborhood',label:'מודיעין שכונה',icon:'map-pin'},
-    ]},
-    {section:'פאר תיווך · קטלוג',items:[
-      {id:'peer-il-sale',label:'מכירה ישראל',icon:'building-2',count:D.peerSaleIL?.length||0},
-      {id:'peer-il-rent',label:'השכרה ישראל',icon:'key-round',count:D.peerRentIL?.length||0},
-      {id:'peer-greece',label:'יוון 🇬🇷',icon:'globe',count:D.peerGreece?.length||0},
-      {id:'peer-cyprus',label:'קפריסין 🇨🇾',icon:'globe',count:D.peerCyprus?.length||0},
-      {id:'peer-commercial',label:'מסחרי',icon:'briefcase',count:D.peerCommercial?.length||0},
-      {id:'peer-land',label:'מגרשים',icon:'map',count:D.peerLand?.length||0},
-    ]},
-    {section:'אינטגרציות',items:[
-      {id:'whatsapp',label:'וואטסאפ Business',icon:'message-circle',status:'wa'},
-      {id:'pixel',label:'פיקסל · עוזר AI',icon:'sparkles',status:'ai'},
-      {id:'leads',label:'לידים',icon:'users'},
-      {id:'intake',label:'הוספת נכס',icon:'plus-square'},
-      {id:'import',label:'מיזוג שבועי',icon:'upload-cloud'},
-    ]},
-    {section:'מערכת',items:[
-      {id:'settings',label:'הגדרות',icon:'settings'},
-    ]},
-  ];
-}
+const NAV=[
+  {section:'מבט-על',items:[
+    {id:'overview',label:'מסך הבית',icon:'layout-dashboard'},
+    {id:'database',label:'כל הנכסים',icon:'database'},
+  ]},
+  {section:'בית הכרם · ירושלים',items:[
+    {id:'bhk-sale',label:'מכירה',icon:'home',count:PEER_DATA.bhkSale.length},
+    {id:'denya-sale',label:'רמת דניה',icon:'home',count:PEER_DATA.denyaSale.length},
+    {id:'bhk-rent',label:'השכרה',icon:'key',count:PEER_DATA.bhkRent.length},
+    {id:'sold',label:'נמכרו לאחרונה',icon:'check-circle',count:PEER_DATA.sold.length},
+    {id:'neighborhood',label:'מודיעין שכונה',icon:'map-pin'},
+  ]},
+  {section:'פאר תיווך · קטלוג',items:[
+    {id:'peer-il-sale',label:'מכירה ישראל',icon:'building-2',count:PEER_DATA.peerSaleIL.length},
+    {id:'peer-il-rent',label:'השכרה ישראל',icon:'key-round',count:PEER_DATA.peerRentIL.length},
+    {id:'peer-greece',label:'יוון 🇬🇷',icon:'globe',count:PEER_DATA.peerGreece.length},
+    {id:'peer-cyprus',label:'קפריסין 🇨🇾',icon:'globe',count:PEER_DATA.peerCyprus.length},
+    {id:'peer-commercial',label:'מסחרי',icon:'briefcase',count:PEER_DATA.peerCommercial.length},
+    {id:'peer-land',label:'מגרשים',icon:'map',count:PEER_DATA.peerLand.length},
+  ]},
+  {section:'אינטגרציות',items:[
+    {id:'whatsapp',label:'וואטסאפ Business',icon:'message-circle',status:'wa'},
+    {id:'pixel',label:'פיקסל · עוזר AI',icon:'sparkles',status:'ai'},
+    {id:'leads',label:'לידים',icon:'users'},
+    {id:'intake',label:'הוספת נכס',icon:'plus-square'},
+    {id:'import',label:'מיזוג שבועי',icon:'upload-cloud'},
+  ]},
+];
 
 function renderNav(){
   const r=$('#nav-root');
-  r.innerHTML=buildNav().map(s=>`<div class="nav-section">${s.section}</div>${s.items.map(i=>`<button class="nav-item ${i.id===STATE.current?'active':''}" data-nav="${i.id}"><i data-lucide="${i.icon}"></i><span>${i.label}</span>${i.count!=null?`<span class="count">${i.count}</span>`:''}${i.status?`<span class="dot-status dot-${i.status}"></span>`:''}</button>`).join('')}`).join('');
+  r.innerHTML=NAV.map(s=>`<div class="nav-section">${s.section}</div>${s.items.map(i=>`<button class="nav-item ${i.id===STATE.current?'active':''}" data-nav="${i.id}"><i data-lucide="${i.icon}"></i><span>${i.label}</span>${i.count!=null?`<span class="count">${i.count}</span>`:''}${i.status?`<span class="dot-status dot-${i.status}"></span>`:''}</button>`).join('')}`).join('');
   r.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>navTo(b.dataset.nav));
 }
 
@@ -1976,7 +589,6 @@ function renderScreen(id){
     'peer-commercial':()=>renderCatalog('peer-commercial'),'peer-land':()=>renderCatalog('peer-land'),
     neighborhood:renderNeighborhood,intake:renderIntake,leads:renderLeads,
     whatsapp:renderWhatsApp,pixel:renderPixel,import:renderImport,database:renderDatabase,
-    settings:renderSettings,
   };
   if(fns[id])fns[id]();
 }
@@ -2000,7 +612,6 @@ function renderOverview(){
       <div class="topbar-act">
         <button class="btn" onclick="window.print()"><i data-lucide="printer"></i>הדפס</button>
         <button class="btn btn-ai" onclick="navTo('pixel')"><i data-lucide="sparkles"></i>שאלי את פיקסל</button>
-        <button class="btn" onclick="navTo('settings')" title="הגדרות"><i data-lucide="settings"></i></button>
       </div>
     </div>
 
@@ -2330,7 +941,7 @@ function renderLeads(){
       ${SAMPLE_LEADS.map(l=>`<div class="card">
         <div class="hd"><div style="flex:1"><div class="addr">${l.n}</div><div class="nbh">${l.want}</div></div><span class="badge ${l.stage==='חם'?'b-active':'b-pending'}">${l.stage}</span></div>
         <div class="stats"><span class="s">תקציב <b style="color:var(--gold)">${l.budget}</b></span><span class="s">ציון <b>${l.score}</b></span></div>
-        <div class="footer"><span class="agent">${l.last}</span><span class="acts"><button class="iconbtn wa" onclick="event.stopPropagation();openWhatsAppLead('${l.id}')" title="פתח WhatsApp"><i data-lucide="message-circle"></i></button><button class="iconbtn" onclick="event.stopPropagation();window.location.href='tel:${l.phone}'" title="התקשרי"><i data-lucide="phone"></i></button></span></div>
+        <div class="footer"><span class="agent">${l.last}</span><span class="acts"><button class="iconbtn wa" onclick="navTo('whatsapp')"><i data-lucide="message-circle"></i></button><button class="iconbtn"><i data-lucide="phone"></i></button></span></div>
       </div>`).join('')}
     </div>
   `;
@@ -2354,7 +965,7 @@ function renderWhatsApp(){
         <h1 class="page-title">שיחות</h1>
         <div class="page-sub">מחובר כ-PEER נדל"ן · 050-540-0407 · 5 שיחות פעילות</div>
       </div>
-      <div class="topbar-act"><button class="btn" onclick="navTo('settings')"><i data-lucide="settings"></i>הגדרות</button></div>
+      <div class="topbar-act"><button class="btn"><i data-lucide="settings"></i>הגדרות</button></div>
     </div>
     <div class="wa-hub">
       <div class="wa-list">
@@ -2394,28 +1005,25 @@ function waSend(){
   $('#wa-input').value='';renderWAActive();renderWAList();
 }
 
-/* ============== PIXEL + CLAUDE FULL INTEGRATION ============== */
+/* ============== PIXEL ============== */
 const PIXEL_HISTORY=[
-  {who:'ai',t:'שלום אסתי 👋 אני פיקסל, העוזרת האישית של PEER Luxury Real Estate. יש לי גישה לכל הנכסים, הלידים והעסקאות. במה אוכל לעזור לך היום?'}
+  {who:'ai',t:'שלום אסתי 👋 אני פיקסל. יש לך 283 נכסים במאגר, 5 לידים פעילים, ו-12 עסקאות שנמכרו לאחרונה. במה אעזור?'}
 ];
-
 function renderPixel(){
   $('#screen-pixel').innerHTML=`
     <div class="topbar">
       <div>
         <div class="page-meta">פיקסל · עוזר AI</div>
         <h1 class="page-title">שאלי אותי</h1>
-        <div class="page-sub">Claude 3.5 Sonnet · יודע על כל 283 הנכסים והלידים</div>
+        <div class="page-sub">המומחה הפנימי שלך · יודע על כל 283 הנכסים והעסקאות</div>
       </div>
-      <div class="topbar-act">
-        <button class="btn" onclick="clearPixelHistory()"><i data-lucide="trash-2"></i>נקה שיחה</button>
-      </div>
+      <div class="topbar-act"><button class="btn"><i data-lucide="history"></i>היסטוריה</button></div>
     </div>
     <div class="pixel-layout">
       <div>
         <div class="pixel-thread" id="pixel-thread"></div>
         <div class="pixel-comp">
-          <input id="pixel-input" placeholder="שאלי את פיקסל משהו..." />
+          <input id="pixel-input" placeholder="שאלי את פיקסל…" />
           <button class="btn btn-ai" onclick="askPixel()"><i data-lucide="send"></i></button>
         </div>
       </div>
@@ -2423,146 +1031,265 @@ function renderPixel(){
         <div class="sec gold">
           <div class="sec-h"><div><div class="sec-eyebrow">הצעות</div><div class="sec-title">שאלות מומלצות</div></div></div>
           <div class="pixel-suggest">
-            <button class="sg" onclick="askPixel('מה דעתך על השוק הנוכחי בירושלים?')">מה דעתך על השוק הנוכחי?</button>
-            <button class="sg" onclick="askPixel('התאימי 3 נכסים לדניאל כהן')">התאימי נכסים לדניאל כהן</button>
             <button class="sg" onclick="askPixel('מה הממוצע בבית הכרם?')">מה הממוצע בבית הכרם?</button>
-            <button class="sg" onclick="askPixel('ניתחי את הנכסים ברחוב משה קול')">ניתחי נכסים במשה קול</button>
+            <button class="sg" onclick="askPixel('איזה רחוב הכי פעיל?')">איזה רחוב הכי פעיל?</button>
+            <button class="sg" onclick="askPixel('דירות מתחת לממוצע')">הראי דירות מתחת לממוצע</button>
+            <button class="sg" onclick="askPixel('התאם דירות ללקוח דניאל כהן')">התאם דירות לדניאל כהן</button>
+            <button class="sg" onclick="askPixel('מה ההזדמנויות בקפריסין?')">מה ההזדמנויות בקפריסין?</button>
             <button class="sg" onclick="askPixel('סיכום שבועי')">סיכום שבועי</button>
+          </div>
+        </div>
+        <div class="sec gold">
+          <div class="sec-h"><div><div class="sec-eyebrow">מצב</div><div class="sec-title">מאגר</div></div></div>
+          <div style="font-size:12px;color:var(--ink-soft);line-height:1.7">
+            <div>סך נכסים: <b>${totalProperties()}</b></div>
+            <div>בית הכרם: <b>${PEER_DATA.bhkSale.length}</b></div>
+            <div>רמת דניה: <b>${PEER_DATA.denyaSale.length}</b></div>
+            <div>השכרה: <b>${PEER_DATA.bhkRent.length}</b></div>
+            <div>קטלוג פאר: <b>${PEER_DATA.peerSaleIL.length+PEER_DATA.peerRentIL.length+PEER_DATA.peerCommercial.length+PEER_DATA.peerLand.length+PEER_DATA.peerGreece.length+PEER_DATA.peerCyprus.length}</b></div>
           </div>
         </div>
       </aside>
     </div>
   `;
   renderPixelThread();
-  const input = $('#pixel-input');
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      askPixel();
-    }
-  });
-  if(window.lucide) lucide.createIcons();
+  $('#pixel-input').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();askPixel()}});
+  if(window.lucide)lucide.createIcons();
 }
-
 function renderPixelThread(){
-  let html = '';
-  PIXEL_HISTORY.forEach(m => {
-    html += `<div class="pixel-msg ${m.who==='ai' ? 'ai' : 'you'}">${m.t}</div>`;
-  });
-  $('#pixel-thread').innerHTML = html;
-  $('#pixel-thread').scrollTop = $('#pixel-thread').scrollHeight;
+  $('#pixel-thread').innerHTML=PIXEL_HISTORY.map(m=>`<div class="pixel-msg ${m.who==='ai'?'ai':'you'}">${m.t}</div>`).join('');
+  $('#pixel-thread').scrollTop=$('#pixel-thread').scrollHeight;
 }
-
-function showTyping() {
-  const thread = $('#pixel-thread');
-  const id = 'typing-' + Date.now();
-  thread.innerHTML += `<div id="${id}" class="pixel-msg ai">פיקסל חושבת <span style="display:inline-block;animation: typing 1.4s steps(4,end) infinite">...</span></div>`;
-  thread.scrollTop = thread.scrollHeight;
-  return id;
-}
-
-async function askPixel(q) {
-  q = q || $('#pixel-input').value.trim();
-  if (!q) return;
-
-  PIXEL_HISTORY.push({who: 'you', t: q});
-  $('#pixel-input').value = '';
-  renderPixelThread();
-
-  const typingId = showTyping();
-
-  try {
-    const apiKey = localStorage.getItem('claude_api_key');
-    if (!apiKey) {
-      throw new Error('API Key לא נמצא. ודאי שהזנת אותו בהגדרות.');
+function askPixel(q){
+  q=q||$('#pixel-input').value.trim();if(!q)return;
+  PIXEL_HISTORY.push({who:'you',t:q});
+  $('#pixel-input').value='';renderPixelThread();
+  setTimeout(()=>{
+    let a;
+    const ql=q.toLowerCase();
+    if(ql.includes('ממוצע')&&ql.includes('בית הכרם')){
+      a=`בית הכרם · ממוצע <strong>₪${(bhkPriceAvg()/1000000).toFixed(2)}M</strong> לפי ${PEER_DATA.bhkSale.length} דירות. ₪/מ"ר ממוצע: <strong>${bhkPermmAvg().toLocaleString('he-IL')}</strong>. הטווח: ₪2.79M–₪8.98M.`;
+    } else if(ql.includes('רחוב')&&ql.includes('פעיל')){
+      const streets={};PEER_DATA.bhkSale.forEach(p=>{const s=String(p.addr||'').split(/\s+/)[0];if(s)streets[s]=(streets[s]||0)+1});
+      const top=Object.entries(streets).sort((a,b)=>b[1]-a[1]).slice(0,5);
+      a='הרחובות הפעילים ביותר בבית הכרם:<br>'+top.map(([s,c],i)=>`<strong>${i+1}. ${s}</strong> · ${c} נכסים`).join('<br>');
+    } else if(ql.includes('מתחת לממוצע')||ql.includes('הזדמנות')){
+      const avg=bhkPermmAvg();
+      const cheap=PEER_DATA.bhkSale.filter(p=>p.permm>0&&p.permm<avg*0.85).sort((a,b)=>a.permm-b.permm).slice(0,4);
+      a=`מצאתי ${cheap.length} דירות עם ₪/מ"ר נמוך משמעותית מהממוצע (${avg.toLocaleString('he-IL')}):<br>`+cheap.map(p=>`• <strong>${p.addr}</strong> · ₪${p.permm.toLocaleString('he-IL')}/מ"ר · ₪${(p.price/1000000).toFixed(2)}M (${p.rooms} חד', ${p.m2} מ"ר)`).join('<br>');
+    } else if(ql.includes('דניאל')||ql.includes('התאם')){
+      const matches=PEER_DATA.bhkSale.filter(p=>p.rooms===4&&typeof p.price==='number'&&p.price>=3500000&&p.price<=4200000).slice(0,4);
+      a=`לדניאל כהן (₪3.5–4.2M, 4 חדרים בבית הכרם) זיהיתי ${matches.length} התאמות מצוינות:<br>`+matches.map(p=>`• <strong>${p.addr}</strong> · ₪${(p.price/1000000).toFixed(2)}M · ${p.m2} מ"ר · קומה ${p.floor} · ${p.agent}`).join('<br>');
+    } else if(ql.includes('קפריסין')){
+      a=`בקפריסין יש לפאר ${PEER_DATA.peerCyprus.length} נכסים. הזדמנויות בולטות:<br>`+PEER_DATA.peerCyprus.slice(0,3).map(p=>`• <strong>${p.desc}</strong> · €${fmt(p.price)} (${p.area})`).join('<br>')+'<br>הטווח: €165K–€620K. אזורים מובילים: פרוטארס, לרנקה, פרלימני.';
+    } else if(ql.includes('שבועי')||ql.includes('סיכום')){
+      a=`<strong>סיכום השבוע (7 במאי 2026):</strong><br>• ${PEER_DATA.bhkSale.length} נכסים פעילים בבית הכרם<br>• ממוצע: ₪${(bhkPriceAvg()/1000000).toFixed(2)}M (▲ 4.2% מהרבעון הקודם)<br>• רחוב משה קול הוביל עם 11 נכסים<br>• 12 עסקאות שנמכרו לאחרונה (לשכת המתווכים)<br>• 5 לידים פעילים, 2 חמים<br>• בקטלוג פאר: 95 נכסים בישראל וחו"ל`;
+    } else {
+      a='שאלה מצוינת! אני עדיין מחבר את עצמי לכל המאגרים. נסי שאלה ספציפית יותר — למשל "ממוצע בית הכרם" או "התאם דירות ללקוח X".';
     }
-
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: "claude-3-5-sonnet-20240620",
-        max_tokens: 1200,
-        temperature: 0.7,
-        system: `את פיקסל - עוזרת AI יוקרתית, מקצועית ומנוסה של PEER Luxury Real Estate בירושלים.
-את מדברת עברית אלגנטית, חמה, בטוחה ומכובדת. 
-את יועצת נדל"ן בכירה עם טעם מצוין וידע עמוק על שוק היוקרה.
-תמיד תני תשובות אישיות, מדויקות ומעשיות. אל תהיי גנרית. השתמשי בנתונים מהמאגר.`,
-        messages: PIXEL_HISTORY.slice(-12).map(m => ({
-          role: m.who === 'ai' ? 'assistant' : 'user',
-          content: m.t
-        }))
-      })
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`API Error: ${response.status} - ${errText}`);
-    }
-
-    const data = await response.json();
-    const answer = data.content[0].text;
-
-    document.getElementById(typingId)?.remove();
-
-    PIXEL_HISTORY.push({who: 'ai', t: answer});
+    PIXEL_HISTORY.push({who:'ai',t:a});
     renderPixelThread();
-
-  } catch (err) {
-    console.error("Claude API Error:", err);
-    document.getElementById(typingId)?.remove();
-    PIXEL_HISTORY.push({who: 'ai', t: 'סליחה אסתי, יש לי בעיה זמנית בחיבור ל-Claude. תנסי שוב בעוד רגע או תשאלי שאלה פשוטה יותר.'});
-    renderPixelThread();
-  }
-}
-
-function clearPixelHistory() {
-  if (confirm('לנקות את כל היסטוריית השיחה עם פיקסל?')) {
-    PIXEL_HISTORY.length = 0;
-    PIXEL_HISTORY.push({who:'ai', t:'שלום אסתי 👋 השיחה נוקתה. במה אעזור לך עכשיו?'});
-    renderPixelThread();
-  }
+  },700);
 }
 
 /* ============== IMPORT (weekly merge) ============== */
-// (השארתי את שאר הקוד הקיים כפי שהוא - קצרתי לצורך העדכון)
-// ... (כל שאר הפונקציות כמו renderImport, renderDatabase וכו' נשארות כפי שהיו)
+const SCHEMA={
+  'סטטוס':'status','כתובת':'addr','חדרים':'rooms','מ"ר':'m2','קומה':'floor','מחיר (₪)':'price','מחיר':'price','מטבע':'currency','שכ"ד חודשי (₪)':'rent','מתווך':'agent','מקור':'src','הערות':'notes','שכונה':'nbh','סוג נכס':'type','מחיר למ"ר (₪)':'permm','עיר/אזור':'city','תיאור הנכס':'desc'
+};
+function normAddr(a){return String(a||'').trim().replace(/\s+/g,' ').toLowerCase()}
+function rowToProp(r){const p={};Object.keys(r).forEach(k=>{const f=SCHEMA[String(k).trim()];if(f)p[f]=r[k]});return p}
+
+function renderImport(){
+  $('#screen-import').innerHTML=`
+    <div class="topbar">
+      <div>
+        <div class="page-meta">כלים</div>
+        <h1 class="page-title">מיזוג שבועי</h1>
+        <div class="page-sub">גררי את הגיליון השבועי כאן. המערכת תשווה לנתונים הקודמים, תאיר שינויים, ותוסיף רק חדשים — בלי למחוק את העבודה שלך.</div>
+      </div>
+    </div>
+
+    <div class="merge-summary">
+      <div class="merge-card"><div class="lbl" style="color:var(--gold)">סך מאגר</div><div class="v" id="im-total">${totalProperties()}</div><div class="meta">נכסים פעילים</div></div>
+      <div class="merge-card"><div class="lbl">מיזוג אחרון</div><div class="v" style="font-size:14px" id="im-last">טרם בוצע</div><div class="meta" id="im-last-meta">המיזוג הראשון יקבע בסיס</div></div>
+      <div class="merge-card"><div class="lbl" style="color:var(--success)">חדשים השבוע</div><div class="v" id="im-new">0</div><div class="meta">מהמיזוג האחרון</div></div>
+      <div class="merge-card"><div class="lbl" style="color:var(--warning)">עודכנו</div><div class="v" id="im-upd">0</div><div class="meta">שדות השתנו</div></div>
+    </div>
+
+    <div class="dropzone" id="dz" onclick="document.getElementById('file-in').click()">
+      <i data-lucide="upload-cloud"></i>
+      <div class="t">גררי את "רשימת נכסים.xlsx" השבועי לכאן</div>
+      <div class="s">.xlsx .csv · נשמר לפעם הבאה · השוואה אוטומטית</div>
+      <input type="file" id="file-in" accept=".csv,.xlsx,.xls" style="display:none" />
+    </div>
+    <div id="merge-result" style="margin-top:14px"></div>
+  `;
+  if(window.lucide)lucide.createIcons();
+  setupImport();
+  dbGet('meta','lastMerge').then(lm=>{
+    if(lm){
+      const d=new Date(lm.when);
+      $('#im-last').textContent=d.toLocaleDateString('he-IL');
+      $('#im-last-meta').textContent=`${d.toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}`;
+      $('#im-new').textContent=lm.added;$('#im-upd').textContent=lm.updated;
+    }
+  });
+}
+function setupImport(){
+  const dz=$('#dz');const inp=$('#file-in');
+  ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('over')}));
+  ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('over')}));
+  dz.addEventListener('drop',e=>handleFile(e.dataTransfer.files[0]));
+  inp.addEventListener('change',e=>handleFile(e.target.files[0]));
+}
+function handleFile(f){
+  if(!f)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const wb=XLSX.read(e.target.result,{type:'array'});
+    const sheetName=wb.SheetNames.find(n=>n.includes('בית הכרם'))||wb.SheetNames[0];
+    const ws=wb.Sheets[sheetName];
+    let rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+    // skip metadata row
+    if(rows.length>2&&typeof rows[0][0]==='string'&&rows[0][0].startsWith('מקור'))rows=rows.slice(1);
+    const headers=rows[0].map(h=>String(h));
+    const data=rows.slice(1).filter(r=>r.some(v=>v!==''&&v!=null)).map(r=>{const o={};headers.forEach((h,i)=>o[h]=r[i]);return o});
+    showMerge(data,headers,sheetName);
+  };
+  reader.readAsArrayBuffer(f);
+}
+function showMerge(rows,headers,sheetName){
+  const mapped=rows.map(rowToProp).filter(p=>p.addr);
+  const targetKey=sheetName.includes('דניה')?'denyaSale':(sheetName.includes('השכרה')?'bhkRent':'bhkSale');
+  const existing=new Map(PEER_DATA[targetKey].map(p=>[normAddr(p.addr),p]));
+  const incoming=new Map();mapped.forEach(p=>incoming.set(normAddr(p.addr),p));
+  const newRows=[],updated=[],unchanged=[];
+  incoming.forEach((p,k)=>{
+    const ex=existing.get(k);
+    if(!ex){newRows.push(p);return}
+    const changes=[];
+    ['price','rooms','m2','agent','status'].forEach(f=>{if(p[f]!==undefined&&String(p[f])!==String(ex[f])&&p[f]!=='')changes.push({f,from:ex[f],to:p[f]})});
+    if(changes.length)updated.push({p,ex,changes});else unchanged.push(p);
+  });
+  window._merge={newRows,updated,targetKey};
+  $('#merge-result').innerHTML=`
+  <div class="sec gold">
+    <div class="sec-h"><div><div class="sec-eyebrow">תוצאות ניתוח · ${sheetName}</div><div class="sec-title">${rows.length} שורות נסרקו</div></div></div>
+    <div class="merge-summary">
+      <div class="merge-card"><div class="lbl" style="color:var(--success)">חדשים</div><div class="v">${newRows.length}</div></div>
+      <div class="merge-card"><div class="lbl" style="color:var(--warning)">עודכנו</div><div class="v">${updated.length}</div></div>
+      <div class="merge-card"><div class="lbl">ללא שינוי</div><div class="v">${unchanged.length}</div></div>
+      <div class="merge-card"><div class="lbl">סה"כ במאגר</div><div class="v">${PEER_DATA[targetKey].length}</div></div>
+    </div>
+    ${updated.length?`<h4 style="font-size:13px;font-weight:700;margin:12px 0 6px;color:var(--ink)">שינויים בנכסים קיימים</h4><table class="tbl"><thead><tr><th>כתובת</th><th>שדה</th><th>היה</th><th>הופך ל</th></tr></thead><tbody>${updated.flatMap(({p,changes})=>changes.map((c,i)=>`<tr><td>${i===0?p.addr:''}</td><td>${({price:'מחיר',rooms:'חד\'',m2:'מ"ר',agent:'מתווך',status:'סטטוס'})[c.f]||c.f}</td><td style="color:var(--ink-faint)">${fmt(c.from)}</td><td style="color:var(--ink);font-weight:700">${fmt(c.to)}</td></tr>`)).join('')}</tbody></table>`:''}
+    ${newRows.length?`<h4 style="font-size:13px;font-weight:700;margin:12px 0 6px;color:var(--ink)">נכסים חדשים</h4><div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">${newRows.slice(0,12).map(p=>`<div class="card"><div class="addr">${p.addr}</div><div class="stats"><span class="s">${p.rooms||'-'} חד'</span><span class="s">${p.m2||'-'} מ"ר</span></div><div class="price">₪${fmt(p.price||p.rent)}</div></div>`).join('')}</div>`:''}
+    <div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end;flex-wrap:wrap">
+      <button class="btn" onclick="document.getElementById('merge-result').innerHTML=''">ביטול</button>
+      <button class="btn btn-pri" onclick="finalizeMerge()"><i data-lucide="check"></i>מזגי ${newRows.length+updated.length} שינויים</button>
+    </div>
+  </div>`;
+  if(window.lucide)lucide.createIcons();
+}
+async function finalizeMerge(){
+  const m=window._merge;if(!m)return;
+  const {newRows,updated,targetKey}=m;
+  const existing=new Map(PEER_DATA[targetKey].map((p,i)=>[normAddr(p.addr),i]));
+  updated.forEach(({p})=>{const i=existing.get(normAddr(p.addr));if(i!==undefined)Object.assign(PEER_DATA[targetKey][i],p)});
+  newRows.forEach(p=>PEER_DATA[targetKey].unshift(p));
+  await dbSet('custom','data',PEER_DATA);
+  await dbSet('meta','lastMerge',{when:new Date().toISOString(),added:newRows.length,updated:updated.length});
+  $('#merge-result').innerHTML='';
+  toast(`✓ מוזגו ${newRows.length} חדשים, ${updated.length} עודכנו`);
+  renderImport();renderNav();updateSidebarStats();
+}
+
+/* ============== DATABASE ============== */
+function renderDatabase(){
+  const all=[];
+  Object.entries(CAT_CFG).forEach(([id,cfg])=>{PEER_DATA[cfg.data].forEach(p=>all.push({...p,_cat:id,_cfg:cfg}))});
+  const q=(STATE.dbQ||'').toLowerCase();
+  const filtered=q?all.filter(p=>JSON.stringify(p).toLowerCase().includes(q)):all;
+  $('#screen-database').innerHTML=`
+    <div class="topbar">
+      <div>
+        <div class="page-meta">מאגר נכסים</div>
+        <h1 class="page-title">כל ${all.length} הנכסים</h1>
+        <div class="page-sub">תצוגה מאוחדת · ${Object.keys(CAT_CFG).length} קטגוריות · עודכן 7 במאי 2026</div>
+      </div>
+      <div class="topbar-act"><button class="btn" onclick="exportAll()"><i data-lucide="file-spreadsheet"></i>ייצוא Excel</button></div>
+    </div>
+    <div class="filters">
+      <div class="search"><i data-lucide="search"></i><input id="db-q" placeholder="חיפוש חופשי..." value="${q}" /></div>
+      <div class="chips" id="db-chips"></div>
+    </div>
+    <div class="cards">
+      ${filtered.slice(0,60).map(p=>{
+        const idx=PEER_DATA[p._cfg.data].indexOf(PEER_DATA[p._cfg.data].find(x=>x===p||(x.addr===p.addr&&x.price===p.price)));
+        return `<div class="card" onclick="showDetail('','${idx>=0?idx:0}','${p._cfg.data}')">
+          <div class="hd"><div style="flex:1;min-width:0"><div class="addr">${p.addr||p.desc||'—'}</div><div class="nbh">${p._cfg.eyebrow}</div></div></div>
+          <div class="stats">${p.rooms&&p.rooms!=='-'?`<span class="s"><i data-lucide="bed"></i>${p.rooms}</span>`:''}${p.m2&&p.m2!=='-'?`<span class="s"><i data-lucide="ruler"></i>${p.m2}מ"ר</span>`:''}</div>
+          <div class="price">${typeof (p.price||p.rent)==='number'?(p._cfg.cur==='€'?'€':'₪')+fmt(p.price||p.rent):(p.price||p.rent||'—')}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    ${filtered.length>60?`<p style="text-align:center;color:var(--ink-faint);padding:14px;font-size:12px">מציג 60 מתוך ${filtered.length}</p>`:''}
+  `;
+  if(window.lucide)lucide.createIcons();
+  $('#db-q').oninput=e=>{STATE.dbQ=e.target.value;renderDatabase();setTimeout(()=>$('#db-q').focus(),0)};
+}
+
+function exportCatalog(id){
+  const cfg=CAT_CFG[id];const data=PEER_DATA[cfg.data];
+  if(!data.length){toast('אין נתונים לייצוא');return}
+  const ws=XLSX.utils.json_to_sheet(data);
+  if(!ws['!views'])ws['!views']=[{}];ws['!views'][0].RTL=true;
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,cfg.title.slice(0,30));
+  XLSX.writeFile(wb,'peer-'+id+'-'+new Date().toISOString().slice(0,10)+'.xlsx');
+  toast('הקובץ הורד');
+}
+function exportAll(){
+  const wb=XLSX.utils.book_new();
+  Object.entries(CAT_CFG).forEach(([id,cfg])=>{const data=PEER_DATA[cfg.data];if(!data.length)return;const ws=XLSX.utils.json_to_sheet(data);if(!ws['!views'])ws['!views']=[{}];ws['!views'][0].RTL=true;XLSX.utils.book_append_sheet(wb,ws,cfg.eyebrow.slice(0,30))});
+  XLSX.writeFile(wb,'peer-full-'+new Date().toISOString().slice(0,10)+'.xlsx');
+  toast('הקובץ המלא הורד');
+}
+
+/* ============== TASKS ============== */
+function renderTasks(){
+  $('#task-list').innerHTML=TASKS.map((t,i)=>`<li class="${t.done?'done':''}"><input type="checkbox" ${t.done?'checked':''} onchange="TASKS[${i}].done=this.checked;renderTasks();dbSet('tasks','list',TASKS)"/><span>${t.t}</span></li>`).join('');
+  const done=TASKS.filter(t=>t.done).length;
+  $('#task-done').textContent=done;$('#task-total').textContent=TASKS.length;$('#task-badge').textContent=TASKS.length-done;
+}
+
+/* ============== SIDEBAR STATS ============== */
+function updateSidebarStats(){
+  const t=totalProperties();
+  $('#ss-total').innerHTML=`${t}<small>/500</small>`;
+  $('#ss-bar').style.width=Math.min(100,t/5)+'%';
+  $('#ss-foot').textContent=`${(t/5).toFixed(0)}% · בקצב לרבעון 4`;
+}
+
+/* ============== WELCOME ============== */
+function closeWelcome(){$('#welcome').classList.remove('show');localStorage.setItem('peer_v4_seen','1')}
 
 /* ============== INIT ============== */
 async function init(){
-  // ... (קוד init קיים)
+  // restore custom data
   const custom=await dbGet('custom','data');
   if(custom){Object.keys(custom).forEach(k=>{if(PEER_DATA[k])PEER_DATA[k]=custom[k]})}
   const savedTasks=await dbGet('tasks','list');if(savedTasks)TASKS.splice(0,TASKS.length,...savedTasks);
   
-  (async function boot(){
-    try {
-      await initGitHubSync();
-      await loadDataFromGitHub();
-      if(window.lucide)lucide.createIcons();
-      renderNav();
-      navTo('overview');
-      const hasToken = !!localStorage.getItem('peer_crm_github_token');
-      showSyncStatus(hasToken ? '✓ מסונכרן' : 'מצב קריאה - הזיני Token לשמירה', hasToken ? 'success' : 'warning');
-    } catch(err) {
-      console.error('Boot failed:', err);
-      showSyncStatus('⚠ שגיאה: ' + err.message, 'error');
-      if(PEER_DATA){renderNav();navTo('overview');}
-    }
-  })();
+  renderNav();
+  navTo('overview');
   updateSidebarStats();
   renderTasks();
   
+  // bottom nav
   $$('.bottom-nav .item').forEach(b=>b.onclick=()=>navTo(b.dataset.bn));
   
   if(!localStorage.getItem('peer_v4_seen')){setTimeout(()=>$('#welcome').classList.add('show'),400)}
   if(window.lucide)lucide.createIcons();
 }
-
 window.addEventListener('DOMContentLoaded',init);
 </script>
 </body>
