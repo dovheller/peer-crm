@@ -1565,7 +1565,16 @@ async function askPixel(q){
   typing.className='pixel-msg ai';typing.id='pixel-typing';
   typing.innerHTML='<span style="display:inline-flex;gap:4px"><span style="width:6px;height:6px;background:var(--ai);border-radius:50%;animation:pulse 1s infinite"></span><span style="width:6px;height:6px;background:var(--ai);border-radius:50%;animation:pulse 1s infinite .2s"></span><span style="width:6px;height:6px;background:var(--ai);border-radius:50%;animation:pulse 1s infinite .4s"></span></span>';
   thread.appendChild(typing);thread.scrollTop=thread.scrollHeight;
-  
+
+  // Build the messages array from the conversation, folding the live DB context
+  // and system guidance into the first user turn so it works on both backends.
+  const convo=PIXEL_HISTORY.filter(m=>m.who==='you'||m.who==='ai');
+  while(convo.length&&convo[0].who==='ai')convo.shift();
+  const messages=convo.map(m=>({role:m.who==='you'?'user':'assistant',content:m.t}));
+  if(messages.length&&messages[0].role==='user'){
+    messages[0]={role:'user',content:'להלן נתוני המאגר המלאים בפורמט JSON. ענה אך ורק לפי הנתונים האלה — אל תמציא נכסים או מספרים:\n\n'+JSON.stringify(buildPixelContext())+'\n\n--- שאלת המשתמשת ---\n'+messages[0].content};
+  }
+
   try{
     if(window.claude&&window.claude.complete){
       const reply=await window.claude.complete({system:PIXEL_SYSTEM,messages});
