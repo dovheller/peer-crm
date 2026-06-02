@@ -1420,34 +1420,32 @@ function waSend(){
 
 /* ============== PIXEL ============== */
 const PIXEL_API_KEY_LS='peer_pixel_anthropic_key';
-function getPixelKey(){return localStorage.getItem(PIXEL_API_KEY_LS)||''}
-function setPixelKey(k){if(k)localStorage.setItem(PIXEL_API_KEY_LS,k);else localStorage.removeItem(PIXEL_API_KEY_LS);updatePixelBadge()}
-function updatePixelBadge(){const b=document.getElementById('pixel-mode-badge');if(!b)return;const key=getPixelKey();const hasClaudeFn=!!(window.claude&&window.claude.complete);if(key){b.textContent='✨ מחוברת ל-Claude';b.style.background='var(--ai)';b.style.color='#fff'}else if(hasClaudeFn){b.textContent='✨ פעילה';b.style.background='var(--gold-tint)';b.style.color='var(--gold)';b.style.border='1px solid var(--gold-line)'}else{b.textContent='מצב בסיסי';b.style.background='var(--cream-soft)';b.style.color='var(--ink-faint)';b.style.border='1px solid var(--border)'}}
+function getPixelKey(){return ''}
+function setPixelKey(){updatePixelBadge()}
+function updatePixelBadge(){const b=document.getElementById('pixel-mode-badge');if(!b)return;const hasClaudeFn=!!(window.claude&&window.claude.complete);if(hasClaudeFn){b.textContent='✨ פעילה';b.style.background='var(--gold-tint)';b.style.color='var(--gold)';b.style.border='1px solid var(--gold-line)'}else{b.textContent='✨ מחוברת ל-Claude';b.style.background='var(--ai)';b.style.color='#fff'}}
 
 function openPixelSettings(){
-  const cur=getPixelKey();
   const m=document.createElement('div');m.className='modal-bg show';m.id='pixel-settings';
   m.innerHTML=`<div class="modal"><h2>הגדרות פיקסל</h2>
-  <p>כדי שפיקסל תגיב בעברית טבעית על כל שאלה, הדביקי מפתח API מ-<a href="https://platform.claude.com/settings/keys" target="_blank" style="color:var(--gold);text-decoration:underline">platform.claude.com/settings/keys</a>. המפתח נשמר רק בדפדפן שלך — לא נשלח לשום שרת חיצוני.</p>
-  <div class="field"><label>מפתח Anthropic API</label><input id="pixel-key-input" type="password" placeholder="sk-ant-..." value="${cur}" autocomplete="off"/></div>
-  <p style="font-size:11.5px;color:var(--ink-faint);background:var(--paper);padding:8px 11px;border-radius:3px;border:1px solid var(--border)">השימוש ב-Claude הוא ממומן מתקציב Anthropic. עלות משוערת — כמה אגורות לשאלה. לא נדרש אלא כמצטברת אמיתית.</p>
-  <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
-    <button class="btn btn-pri" onclick="setPixelKey(document.getElementById('pixel-key-input').value.trim());document.getElementById('pixel-settings').remove();toast('פיקסל מחוברת ל-Claude')" style="flex:1">שמור</button>
-    <button class="btn" onclick="setPixelKey('');document.getElementById('pixel-settings').remove();toast('מפתח הוסר')">נתקי</button>
+  <p>פיקסל מחוברת ל-Claude דרך שרת מאובטח (proxy) — מפתח ה-API נשמר בשרת בלבד ולא נחשף בדפדפן.</p>
+  <p style="font-size:11.5px;color:var(--ink-faint);background:var(--paper);padding:8px 11px;border-radius:3px;border:1px solid var(--border)">כתובת השרת מוגדרת בקוד (<code>PIXEL_PROXY_URL</code>). אם פיקסל לא עונה — ודאו שה-proxy פרוס ב-Vercel ושכתובתו נכונה. השימוש ב-Claude עולה כמה אגורות לשאלה ומחויב מתקציב ה-API.</p>
+  <div style="display:flex;gap:8px;margin-top:14px">
     <button class="btn" onclick="document.getElementById('pixel-settings').remove()">סגירה</button>
   </div></div>`;
   document.body.appendChild(m);
   m.onclick=e=>{if(e.target===m)m.remove()};
 }
 
-async function callAnthropicDirect(system,messages){
-  const key=getPixelKey();if(!key)throw new Error('NO_KEY');
-  const res=await fetch('https://api.anthropic.com/v1/messages',{
+/* ⚠️ שנה לכתובת ה-proxy שלך ב-Vercel (אותו proxy של Esti) */
+const PIXEL_PROXY_URL='https://peer-proxy.vercel.app/api/claude';
+
+async function callPixelProxy(system,messages){
+  const res=await fetch(PIXEL_PROXY_URL,{
     method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:'claude-haiku-4-5',max_tokens:1024,system,messages})
   });
-  if(!res.ok){const e=await res.text();throw new Error('API '+res.status+': '+e.slice(0,200))}
+  if(!res.ok){const e=await res.text();throw new Error('PROXY '+res.status+': '+e.slice(0,200))}
   const data=await res.json();
   return data.content?.[0]?.text||'קיבלתי תשובה ריקה.';
 }
@@ -1576,6 +1574,7 @@ async function askPixel(q){
   }
 
   try{
+    // עדיפות 1: בתוך Claude.ai (לבדיקות) — window.claude.complete
     if(window.claude&&window.claude.complete){
       const reply=await window.claude.complete({system:PIXEL_SYSTEM,messages});
       document.getElementById('pixel-typing')?.remove();
@@ -1583,20 +1582,20 @@ async function askPixel(q){
       renderPixelThread();
       return;
     }
-    if(getPixelKey()){
-      const reply=await callAnthropicDirect(PIXEL_SYSTEM,messages);
-      document.getElementById('pixel-typing')?.remove();
-      PIXEL_HISTORY.push({who:'ai',t:reply});
-      renderPixelThread();
-      return;
-    }
-    throw new Error('NO_BACKEND');
+    // עדיפות 2: דרך ה-proxy (פרודקשן)
+    const reply=await callPixelProxy(PIXEL_SYSTEM,messages);
+    document.getElementById('pixel-typing')?.remove();
+    PIXEL_HISTORY.push({who:'ai',t:reply});
+    renderPixelThread();
+    return;
   }catch(err){
     document.getElementById('pixel-typing')?.remove();
-    // fallback to keyword matching
+    // אם ה-proxy עוד לא מוגדר/נכשל — ניסיון תשובה מקומית מהמאגר,
+    // אבל גם מציגים את סיבת השגיאה כדי שלא ניתקע בשקט.
     const a=pixelFallback(q);
     PIXEL_HISTORY.push({who:'ai',t:a});
     renderPixelThread();
+    console.error('[Pixel] proxy call failed:',err);
   }finally{
     PIXEL_BUSY=false;
   }
