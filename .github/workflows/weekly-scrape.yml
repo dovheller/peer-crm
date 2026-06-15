@@ -1,0 +1,65 @@
+name: Weekly Yad2 Scrape
+
+on:
+  schedule:
+    # כל יום ראשון ב-04:00 UTC = 07:00 שעון ישראל (חורף) / 06:00 (קיץ)
+    - cron: '0 4 * * 0'
+  workflow_dispatch:  # מאפשר הרצה ידנית מ-GitHub UI
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # הרשאה לעדכן את data.json
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install Python dependencies
+        run: |
+          cd scraper
+          pip install -r requirements.txt
+      
+      - name: Install Playwright Chromium
+        run: |
+          python -m playwright install chromium
+          python -m playwright install-deps chromium
+      
+      - name: Run scraper
+        id: scrape
+        continue-on-error: true
+        run: |
+          cd scraper
+          python scrape.py
+      
+      - name: Merge results into data.json
+        if: steps.scrape.outcome == 'success'
+        run: |
+          cd scraper
+          python merger.py
+      
+      - name: Commit changes
+        if: steps.scrape.outcome == 'success'
+        run: |
+          git config user.name "PEER CRM Bot"
+          git config user.email "bot@peer-crm.local"
+          git add data.json data-history/
+          git diff --staged --quiet || git commit -m "🤖 Auto-scrape weekly $(date +'%Y-%m-%d')"
+          git push
+      
+      - name: Upload scrape logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scrape-logs-${{ github.run_number }}
+          path: |
+            scraper/last-run.log
+            scraper/last-scrape.json
+          retention-days: 30
