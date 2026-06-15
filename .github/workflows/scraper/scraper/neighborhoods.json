@@ -1,0 +1,55 @@
+{
+  "_doc": "קונפיג שכונות ירושלים ליד2",
+  "neighborhoods": [
+    {
+      "key": "bhk",
+      "name": "בית הכרם",
+      "city_id": 5000,
+      "area_id": 4,
+      "top_area_id": 25,
+      "neighborhood_id": 544,
+      "target_data_key": "bhkSale",
+      "max_per_run": 15
+    },
+    {
+      "key": "denya",
+      "name": "רמת דניה",
+      "city_id": 5000,
+      "area_id": 4,
+      "top_area_id": 25,
+      "neighborhood_id": 556,
+      "target_data_key": "denyaSale",
+      "max_per_run": 10
+    },
+    {
+      "key": "talbiya",
+      "name": "טלביה",
+      "city_id": 5000,
+      "area_id": 4,
+      "top_area_id": 25,
+      "neighborhood_id": 561,
+      "target_data_key": "talbiyaSale",
+      "max_per_run": 10
+    },
+    {
+      "key": "rehavia",
+      "name": "רחביה",
+      "city_id": 5000,
+      "area_id": 4,
+      "top_area_id": 25,
+      "neighborhood_id": 543,
+      "target_data_key": "rehaviaSale",
+      "max_per_run": 10
+    },
+    {
+      "key": "city_center",
+      "name": "מרכז העיר",
+      "city_id": 5000,
+      "area_id": 4,
+      "top_area_id": 25,
+      "neighborhood_id": 552,
+      "target_data_key": "cityCenterSale",
+      "max_per_run": 10
+    }
+  ]
+}
