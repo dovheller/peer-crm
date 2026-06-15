@@ -562,6 +562,16 @@ button{cursor:pointer;border:0;background:transparent;font:inherit;color:inherit
     <section class="screen" id="screen-peer-commercial"></section>
     <section class="screen" id="screen-peer-land"></section>
     <!-- NEIGHBORHOOD -->
+    <section class="screen" id="screen-rehavia"></section>
+    <section class="screen" id="screen-talbiya"></section>
+    <section class="screen" id="screen-german"></section>
+    <section class="screen" id="screen-baka"></section>
+    <section class="screen" id="screen-arnona"></section>
+    <section class="screen" id="screen-city-center"></section>
+    <section class="screen" id="screen-katamon"></section>
+    <section class="screen" id="screen-niot"></section>
+    <section class="screen" id="screen-yemin-moshe"></section>
+    <section class="screen" id="screen-makor-haim"></section>
     <section class="screen" id="screen-neighborhood"></section>
     <!-- INTAKE -->
     <section class="screen" id="screen-intake"></section>
@@ -663,6 +673,18 @@ const NAV=[
     {id:'sold',label:'נמכרו לאחרונה',icon:'check-circle',count:PEER_DATA.sold.length},
     {id:'neighborhood',label:'מודיעין שכונה',icon:'map-pin'},
   ]},
+  {section:'שכונות יוקרה · ירושלים',items:[
+    {id:'rehavia',label:'רחביה',icon:'building',count:PEER_DATA.rehaviaSale?PEER_DATA.rehaviaSale.length:0},
+    {id:'talbiya',label:'טלביה',icon:'building',count:PEER_DATA.talbiyaSale?PEER_DATA.talbiyaSale.length:0},
+    {id:'german',label:'המושבה הגרמנית',icon:'building',count:PEER_DATA.germanSale?PEER_DATA.germanSale.length:0},
+    {id:'baka',label:'בקעה',icon:'building',count:PEER_DATA.bakaSale?PEER_DATA.bakaSale.length:0},
+    {id:'arnona',label:'ארנונה',icon:'building',count:PEER_DATA.arnonaSale?PEER_DATA.arnonaSale.length:0},
+    {id:'city-center',label:'מרכז העיר',icon:'building',count:PEER_DATA.cityCenterSale?PEER_DATA.cityCenterSale.length:0},
+    {id:'katamon',label:'קטמון הישנה',icon:'building',count:PEER_DATA.katamonSale?PEER_DATA.katamonSale.length:0},
+    {id:'niot',label:'ניות/ק.שמואל',icon:'building',count:PEER_DATA.niotSale?PEER_DATA.niotSale.length:0},
+    {id:'yemin-moshe',label:'ימין משה',icon:'building',count:PEER_DATA.yeminMosheSale?PEER_DATA.yeminMosheSale.length:0},
+    {id:'makor-haim',label:'מקור חיים',icon:'building',count:PEER_DATA.makorHaimSale?PEER_DATA.makorHaimSale.length:0},
+  ]},
   {section:'פאר תיווך · קטלוג',items:[
     {id:'peer-il-sale',label:'מכירה ישראל',icon:'building-2',count:PEER_DATA.peerSaleIL.length},
     {id:'peer-il-rent',label:'השכרה ישראל',icon:'key-round',count:PEER_DATA.peerRentIL.length},
@@ -718,6 +740,16 @@ function renderScreen(id){
     'peer-il-sale':()=>renderCatalog('peer-il-sale'),'peer-il-rent':()=>renderCatalog('peer-il-rent'),
     'peer-greece':()=>renderCatalog('peer-greece'),'peer-cyprus':()=>renderCatalog('peer-cyprus'),
     'peer-commercial':()=>renderCatalog('peer-commercial'),'peer-land':()=>renderCatalog('peer-land'),
+    'rehavia':()=>renderCatalog('rehavia'),
+    'talbiya':()=>renderCatalog('talbiya'),
+    'german':()=>renderCatalog('german'),
+    'baka':()=>renderCatalog('baka'),
+    'arnona':()=>renderCatalog('arnona'),
+    'city-center':()=>renderCatalog('city-center'),
+    'katamon':()=>renderCatalog('katamon'),
+    'niot':()=>renderCatalog('niot'),
+    'yemin-moshe':()=>renderCatalog('yemin-moshe'),
+    'makor-haim':()=>renderCatalog('makor-haim'),
     neighborhood:renderNeighborhood,intake:renderIntake,leads:renderLeads,
     whatsapp:renderWhatsApp,pixel:renderPixel,import:renderImport,database:renderDatabase,
   };
@@ -1085,6 +1117,16 @@ const CAT_CFG={
   'peer-cyprus':{data:'peerCyprus',title:'נכסים בקפריסין 🇨🇾',meta:'קטלוג פאר · פרוטארס, לרנקה, פמגוסטה',eyebrow:'קפריסין',type:'intl',cur:'€'},
   'peer-commercial':{data:'peerCommercial',title:'נכסים מסחריים',meta:'קטלוג פאר · משרדים, חנויות, ברנדים',eyebrow:'מסחרי',type:'commercial',cur:'₪'},
   'peer-land':{data:'peerLand',title:'מגרשים וקרקעות',meta:'קטלוג פאר · נווה צדק, ירקון, פרדס חנה',eyebrow:'מגרשים',type:'land',cur:'₪'},
+  'rehavia':{data:'rehaviaSale',title:'דירות למכירה · רחביה',meta:'מקור: יד2 + מדלן · עודכן 15 ביוני 2026',eyebrow:'רחביה · ירושלים',type:'sale',cur:'₪'},
+  'talbiya':{data:'talbiyaSale',title:'דירות למכירה · טלביה',meta:'מקור: יד2 + מדלן · עודכן 15 ביוני 2026',eyebrow:'טלביה · ירושלים',type:'sale',cur:'₪'},
+  'german':{data:'germanSale',title:'דירות למכירה · המושבה הגרמנית',meta:'מקור: יד2 + מדלן · עודכן 15 ביוני 2026',eyebrow:'המושבה הגרמנית · ירושלים',type:'sale',cur:'₪'},
+  'baka':{data:'bakaSale',title:'דירות למכירה · בקעה',meta:'מקור: יד2 + מדלן · עודכן 15 ביוני 2026',eyebrow:'בקעה · ירושלים',type:'sale',cur:'₪'},
+  'arnona':{data:'arnonaSale',title:'דירות למכירה · ארנונה',meta:'מקור: יד2 + מדלן · עודכן 15 ביוני 2026',eyebrow:'ארנונה · ירושלים',type:'sale',cur:'₪'},
+  'city-center':{data:'cityCenterSale',title:'דירות למכירה · מרכז העיר',meta:'מקור: יד2 + מדלן · עודכן 15 ביוני 2026',eyebrow:'מרכז העיר · ירושלים',type:'sale',cur:'₪'},
+  'katamon':{data:'katamonSale',title:'דירות למכירה · קטמון הישנה',meta:'מקור: יד2 + מדלן · עודכן 15 ביוני 2026',eyebrow:'קטמון הישנה · ירושלים',type:'sale',cur:'₪'},
+  'niot':{data:'niotSale',title:'דירות למכירה · ניות/ק.שמואל',meta:'מקור: יד2 + מדלן · עודכן 15 ביוני 2026',eyebrow:'ניות/ק.שמואל · ירושלים',type:'sale',cur:'₪'},
+  'yemin-moshe':{data:'yeminMosheSale',title:'דירות למכירה · ימין משה',meta:'מקור: יד2 + מדלן · עודכן 15 ביוני 2026',eyebrow:'ימין משה · ירושלים',type:'sale',cur:'₪'},
+  'makor-haim':{data:'makorHaimSale',title:'דירות למכירה · מקור חיים',meta:'מקור: יד2 + מדלן · עודכן 15 ביוני 2026',eyebrow:'מקור חיים · ירושלים',type:'sale',cur:'₪'},
 };
 
 function getCardHTML(p,cfg,i){
@@ -1692,7 +1734,7 @@ function handleFile(f){
 }
 function showMerge(rows,headers,sheetName){
   const mapped=rows.map(rowToProp).filter(p=>p.addr);
-  const targetKey=sheetName.includes('דניה')?'denyaSale':(sheetName.includes('השכרה')?'bhkRent':'bhkSale');
+  const targetKey=sheetName.includes('דניה')?'denyaSale':(sheetName.includes('השכרה')?'bhkRent':sheetName.includes('רחביה')?'rehaviaSale':sheetName.includes('טלביה')?'talbiyaSale':sheetName.includes('המושבה')?'germanSale':sheetName.includes('בקעה')?'bakaSale':sheetName.includes('ארנונה')?'arnonaSale':sheetName.includes('מרכז העיר')?'cityCenterSale':sheetName.includes('קטמון')?'katamonSale':sheetName.includes('ניות')?'niotSale':sheetName.includes('ימין משה')?'yeminMosheSale':sheetName.includes('מקור חיים')?'makorHaimSale':'bhkSale');
   const existing=new Map(PEER_DATA[targetKey].map(p=>[normAddr(p.addr),p]));
   const incoming=new Map();mapped.forEach(p=>incoming.set(normAddr(p.addr),p));
   const newRows=[],updated=[],unchanged=[];
