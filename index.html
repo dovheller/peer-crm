@@ -577,6 +577,7 @@ button{cursor:pointer;border:0;background:transparent;font:inherit;color:inherit
     <section class="screen" id="screen-intake"></section>
     <!-- LEADS -->
     <section class="screen" id="screen-leads"></section>
+    <section class="screen" id="screen-matches"></section>
     <!-- WHATSAPP -->
     <section class="screen" id="screen-whatsapp"></section>
     <!-- PIXEL -->
@@ -697,6 +698,7 @@ const NAV=[
     {id:'whatsapp',label:'וואטסאפ Business',icon:'message-circle',status:'wa'},
     {id:'pixel',label:'פיקסל · עוזר AI',icon:'sparkles',status:'ai'},
     {id:'leads',label:'לידים',icon:'users'},
+    {id:'matches',label:'התאמות ⚡',icon:'sparkles'},
     {id:'intake',label:'הוספת נכס',icon:'plus-square'},
     {id:'import',label:'מיזוג שבועי',icon:'upload-cloud'},
   ]},
@@ -750,7 +752,7 @@ function renderScreen(id){
     'niot':()=>renderCatalog('niot'),
     'yemin-moshe':()=>renderCatalog('yemin-moshe'),
     'makor-haim':()=>renderCatalog('makor-haim'),
-    neighborhood:renderNeighborhood,intake:renderIntake,leads:renderLeads,
+    neighborhood:renderNeighborhood,intake:renderIntake,leads:renderLeads,matches:renderMatches,
     whatsapp:renderWhatsApp,pixel:renderPixel,import:renderImport,database:renderDatabase,
   };
   if(fns[id])fns[id]();
@@ -1402,6 +1404,175 @@ function renderLeads(){
   `;
   if(window.lucide)lucide.createIcons();
 }
+
+
+/* ============== מנוע התאמות (Eligible Buyers) ============== */
+// פרסר תקציב: "₪3.5-4.2M" → {min:3500000, max:4200000}
+function parseBudget(s){
+  if(!s)return null;
+  s=String(s);
+  // טווח עם M
+  const m=s.match(/([\d.]+)\s*[-–]\s*([\d.]+)\s*M/i);
+  if(m)return{min:parseFloat(m[1])*1e6,max:parseFloat(m[2])*1e6};
+  // ערך יחיד M
+  const single=s.match(/([\d.]+)\s*M/i);
+  if(single){const v=parseFloat(single[1])*1e6;return{min:v*0.85,max:v*1.1}}
+  // אירו (השקעות חו"ל) - לא נתאים לנכסי ישראל
+  if(/€|K€|יוון|קפריסין/i.test(s))return{intl:true};
+  return null;
+}
+// פרסר רצון: "בית הכרם, 4 חדרים" → {nbhs:['בית הכרם'], rooms:4}
+function parseWant(s){
+  if(!s)return{nbhs:[],rooms:null,rent:false};
+  s=String(s);
+  const rent=/השכרה/.test(s);
+  // חדרים
+  let rooms=null;
+  const rm=s.match(/([\d.]+)\s*חדר/);
+  if(rm)rooms=parseFloat(rm[1]);
+  // שכונות - נחפש את כל שמות השכונות הידועות בטקסט
+  const allNbhs=['בית הכרם','רמת דניה','רמת בית הכרם','רחביה','טלביה','המושבה הגרמנית','מושבה','בקעה','ארנונה','מרכז העיר','קטמון','ניות','קרית שמואל','ימין משה','מקור חיים'];
+  const nbhs=allNbhs.filter(n=>s.includes(n));
+  return{nbhs,rooms,rent};
+}
+// המרת ליד גולמי לקריטריונים
+function leadCriteria(lead){
+  const budget=parseBudget(lead.budget);
+  const want=parseWant(lead.want);
+  return{
+    name:lead.n,phone:lead.phone,phoneClean:(lead.phoneClean||String(lead.phone||'').replace(/[^\d]/g,'')),
+    stage:lead.stage,score:lead.score,
+    budget,nbhs:want.nbhs,rooms:want.rooms,rent:want.rent,
+    intl:budget&&budget.intl
+  };
+}
+// ניקוד התאמה בין ליד לנכס (0-100)
+function matchScore(crit,prop){
+  if(crit.intl)return 0; // לידים בינלאומיים לא מתאימים לנכסי ירושלים
+  let score=0;
+  // תקציב (40)
+  if(crit.budget&&typeof prop.price==='number'&&prop.price>0){
+    if(prop.price>=crit.budget.min&&prop.price<=crit.budget.max)score+=40;
+    else if(prop.price<=crit.budget.max*1.1)score+=20;
+  }
+  // שכונה (35)
+  if(crit.nbhs.length&&prop.nbh){
+    const match=crit.nbhs.some(n=>String(prop.nbh).includes(n)||n.includes(String(prop.nbh)));
+    if(match)score+=35;
+  }else if(crit.nbhs.length===0){
+    score+=10; // ליד בלי העדפת שכונה - בונוס קטן לכל נכס
+  }
+  // חדרים (25)
+  if(crit.rooms&&typeof prop.rooms==='number'){
+    if(prop.rooms===crit.rooms)score+=25;
+    else if(Math.abs(prop.rooms-crit.rooms)<=0.5)score+=18;
+    else if(Math.abs(prop.rooms-crit.rooms)<=1)score+=10;
+  }
+  return score;
+}
+// איסוף כל הנכסים מכל הקטגוריות (למכירה בלבד)
+function allSaleProps(){
+  const out=[];
+  Object.entries(CAT_CFG).forEach(([id,cfg])=>{
+    if(cfg.type==='rent'||cfg.type==='rent-intl'||cfg.type==='sold')return;
+    const arr=PEER_DATA[cfg.data];
+    if(Array.isArray(arr)){
+      arr.forEach((p,idx)=>{
+        if(p.removed)return;
+        out.push({...p,_cat:id,_idx:idx,_cfg:cfg});
+      });
+    }
+  });
+  return out;
+}
+// חישוב כל ההתאמות
+function computeMatches(minScore){
+  minScore=minScore||50;
+  const leads=(PEER_DATA.leads||SAMPLE_LEADS).map(leadCriteria);
+  const props=allSaleProps();
+  const matches=[];
+  leads.forEach(crit=>{
+    if(crit.intl)return;
+    props.forEach(prop=>{
+      const sc=matchScore(crit,prop);
+      if(sc>=minScore)matches.push({crit,prop,score:sc});
+    });
+  });
+  matches.sort((a,b)=>b.score-a.score);
+  return matches;
+}
+function matchAction(score){
+  if(score>=85)return{t:'🔥 להציע מיד',c:'var(--success)'};
+  if(score>=65)return{t:'📞 להתקשר השבוע',c:'var(--gold)'};
+  return{t:'💬 לשלוח פרטים',c:'var(--ink-faint)'};
+}
+function renderMatches(){
+  const minScore=STATE.matchMin||50;
+  const matches=computeMatches(minScore);
+  const hot=matches.filter(m=>m.score>=85).length;
+  const warm=matches.filter(m=>m.score>=65&&m.score<85).length;
+  // קיבוץ לפי ליד
+  const byLead={};
+  matches.forEach(m=>{(byLead[m.crit.name]=byLead[m.crit.name]||[]).push(m)});
+  
+  $('#screen-matches').innerHTML=`
+    <div class="topbar">
+      <div>
+        <div class="page-meta">מנוע התאמות</div>
+        <h1 class="page-title">התאמות לקוח ← נכס</h1>
+        <div class="page-sub">${matches.length} התאמות פעילות · ${hot} חמות 🔥 · ${warm} מתעניינות 📞 · מחושב אוטומטית</div>
+      </div>
+      <div class="topbar-act">
+        <button class="btn ${minScore===85?'btn-pri':''}" onclick="STATE.matchMin=85;renderMatches()">חמות בלבד</button>
+        <button class="btn ${minScore===65?'btn-pri':''}" onclick="STATE.matchMin=65;renderMatches()">65+</button>
+        <button class="btn ${minScore===50?'btn-pri':''}" onclick="STATE.matchMin=50;renderMatches()">הכל (50+)</button>
+      </div>
+    </div>
+    ${Object.entries(byLead).map(([name,ms])=>{
+      const lead=ms[0].crit;
+      return `
+      <div class="sec">
+        <div class="sec-h">
+          <div>
+            <div class="sec-eyebrow">${lead.stage} · ציון ליד ${lead.score}</div>
+            <div class="sec-title">${name} <span style="font-size:13px;font-weight:400;color:var(--ink-faint)">· ${ms.length} התאמות</span></div>
+          </div>
+          <button class="btn btn-sm wa" onclick="openWhatsAppLeadByName('${name.replace(/'/g,"\\'")}')"><i data-lucide="message-circle"></i>WhatsApp</button>
+        </div>
+        <table class="tbl">
+          <thead><tr><th>נכס</th><th>שכונה</th><th>מחיר</th><th>חד'</th><th>מ"ר</th><th>ציון</th><th>פעולה</th></tr></thead>
+          <tbody>
+            ${ms.slice(0,8).map(m=>{
+              const a=matchAction(m.score);
+              return `<tr style="cursor:pointer" onclick="showDetail('${m.prop._cat}',${m.prop._idx})">
+                <td style="font-weight:600">${m.prop.addr||'—'}</td>
+                <td>${m.prop.nbh||'—'}</td>
+                <td>₪${m.prop.price?m.prop.price.toLocaleString('he-IL'):'—'}</td>
+                <td>${m.prop.rooms||'—'}</td>
+                <td>${m.prop.m2||'—'}</td>
+                <td><span style="display:inline-block;min-width:36px;text-align:center;font-weight:700;color:${m.score>=85?'var(--success)':m.score>=65?'var(--gold)':'var(--ink-faint)'}">${m.score}</span></td>
+                <td style="color:${a.c};font-weight:600;font-size:12px">${a.t}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+        ${ms.length>8?`<div style="text-align:center;font-size:12px;color:var(--ink-faint);margin-top:8px">+ ${ms.length-8} התאמות נוספות (סנני בטבלה)</div>`:''}
+      </div>`;
+    }).join('')||'<div class="sec"><div style="text-align:center;padding:30px;color:var(--ink-faint)">אין התאמות בטווח הציון הזה. נסי להוריד את הסף.</div></div>'}
+  `;
+  if(window.lucide)lucide.createIcons();
+}
+// פתיחת WhatsApp לפי שם ליד
+function openWhatsAppLeadByName(name){
+  const leads=PEER_DATA.leads||SAMPLE_LEADS;
+  const lead=leads.find(l=>l.n===name);
+  if(!lead){toast&&toast('הליד לא נמצא');return}
+  const phone=(lead.phoneClean||String(lead.phone||'').replace(/[^\d]/g,''));
+  const fullPhone=phone.startsWith('972')?phone:('972'+phone.replace(/^0/,''));
+  const greeting=`היי ${lead.n}, מדברת אסתי הלר מ-PEER נדל"ן יוקרה. `;
+  window.open(`https://wa.me/${fullPhone}?text=${encodeURIComponent(greeting)}`,'_blank');
+}
+
 
 /* ============== WHATSAPP ============== */
 const WA_CONVS=[
