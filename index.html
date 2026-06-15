@@ -1887,25 +1887,100 @@ function setupImport(){
   dz.addEventListener('drop',e=>handleFile(e.dataTransfer.files[0]));
   inp.addEventListener('change',e=>handleFile(e.target.files[0]));
 }
+let _loadedWB=null; // workbook שמור לבחירת גליון
 function handleFile(f){
   if(!f)return;
   const reader=new FileReader();
   reader.onload=e=>{
-    const wb=XLSX.read(e.target.result,{type:'array'});
-    const sheetName=wb.SheetNames.find(n=>n.includes('בית הכרם'))||wb.SheetNames[0];
-    const ws=wb.Sheets[sheetName];
-    let rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
-    // skip metadata row
-    if(rows.length>2&&typeof rows[0][0]==='string'&&rows[0][0].startsWith('מקור'))rows=rows.slice(1);
-    const headers=rows[0].map(h=>String(h));
-    const data=rows.slice(1).filter(r=>r.some(v=>v!==''&&v!=null)).map(r=>{const o={};headers.forEach((h,i)=>o[h]=r[i]);return o});
-    showMerge(data,headers,sheetName);
+    _loadedWB=XLSX.read(e.target.result,{type:'array'});
+    // סינון גליונות רלוונטיים (לא סיכום/ניתוח/התאמות)
+    const skipWords=['סיכום','ניתוח','התאמ','סקירה','לידים','overview'];
+    const sheets=_loadedWB.SheetNames.filter(n=>!skipWords.some(w=>n.includes(w)));
+    if(sheets.length===0){toast('לא נמצאו גליונות נכסים בקובץ');return}
+    if(sheets.length===1){
+      // גליון יחיד - ייבוא ישיר
+      processSheet(sheets[0]);
+    }else{
+      // מספר גליונות - הצגת בורר
+      showSheetPicker(sheets);
+    }
   };
   reader.readAsArrayBuffer(f);
 }
+// זיהוי יעד לפי שם גליון (להצגה בבורר)
+function sheetTarget(name){
+  const map=[['דניה','רמת דניה'],['השכרה','השכרה'],['רחביה','רחביה'],['טלביה','טלביה'],['המושבה','המושבה הגרמנית'],['בקעה','בקעה'],['ארנונה','ארנונה'],['מרכז העיר','מרכז העיר'],['קטמון','קטמון'],['ניות','ניות'],['ימין משה','ימין משה'],['מקור חיים','מקור חיים'],['בית הכרם','בית הכרם']];
+  for(const[m,label]of map){if(name.includes(m))return label}
+  return name;
+}
+function showSheetPicker(sheets){
+  $('#merge-result').innerHTML=`
+  <div class="sec gold">
+    <div class="sec-h"><div><div class="sec-eyebrow">נמצאו ${sheets.length} גליונות</div><div class="sec-title">בחרי איזו שכונה לייבא</div></div></div>
+    <div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">
+      ${sheets.map(s=>{
+        // ספירת שורות נתונים בגליון
+        const ws=_loadedWB.Sheets[s];
+        let rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+        if(rows.length>2&&typeof rows[0][0]==='string'&&rows[0][0].startsWith('מקור'))rows=rows.slice(1);
+        const count=rows.slice(1).filter(r=>r.some(v=>v!==''&&v!=null)).length;
+        return `<div class="card" style="cursor:pointer" onclick="processSheet('${s.replace(/'/g,"\\'")}')">
+          <div class="hd"><div style="flex:1"><div class="addr">${sheetTarget(s)}</div><div class="nbh">${s}</div></div></div>
+          <div class="stats"><span class="s">${count} נכסים</span></div>
+          <div class="footer"><span class="agent">לחצי לייבוא</span><span class="acts"><i data-lucide="arrow-left" style="color:var(--gold)"></i></span></div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-start">
+      <button class="btn" onclick="importAllSheets([${sheets.map(s=>`'${s.replace(/'/g,"\\'")}'`).join(',')}])"><i data-lucide="layers"></i>ייבא את כל ${sheets.length} השכונות</button>
+    </div>
+  </div>`;
+  if(window.lucide)lucide.createIcons();
+}
+function processSheet(sheetName){
+  const ws=_loadedWB.Sheets[sheetName];
+  let rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+  if(rows.length>2&&typeof rows[0][0]==='string'&&rows[0][0].startsWith('מקור'))rows=rows.slice(1);
+  const headers=rows[0].map(h=>String(h));
+  const data=rows.slice(1).filter(r=>r.some(v=>v!==''&&v!=null)).map(r=>{const o={};headers.forEach((h,i)=>o[h]=r[i]);return o});
+  showMerge(data,headers,sheetName);
+}
+// ייבוא כל הגליונות בבת אחת
+async function importAllSheets(sheets){
+  let totalNew=0,totalUpd=0;
+  for(const sheetName of sheets){
+    const ws=_loadedWB.Sheets[sheetName];
+    let rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+    if(rows.length>2&&typeof rows[0][0]==='string'&&rows[0][0].startsWith('מקור'))rows=rows.slice(1);
+    const headers=rows[0].map(h=>String(h));
+    const data=rows.slice(1).filter(r=>r.some(v=>v!==''&&v!=null)).map(r=>{const o={};headers.forEach((h,i)=>o[h]=r[i]);return o});
+    const mapped=data.map(rowToProp).filter(p=>p.addr);
+    const targetKey=mergeTargetKey(sheetName);
+    if(!PEER_DATA[targetKey])PEER_DATA[targetKey]=[];
+    const existing=new Map(PEER_DATA[targetKey].map((p,i)=>[normAddr(p.addr),i]));
+    mapped.forEach(p=>{
+      const idx=existing.get(normAddr(p.addr));
+      if(idx!==undefined){Object.assign(PEER_DATA[targetKey][idx],p);totalUpd++}
+      else{PEER_DATA[targetKey].unshift(p);totalNew++}
+    });
+  }
+  await dbSet('custom','data',PEER_DATA);
+  await dbSet('meta','lastMerge',{when:new Date().toISOString(),added:totalNew,updated:totalUpd});
+  $('#merge-result').innerHTML='';
+  toast(`✓ מוזגו ${totalNew} חדשים, ${totalUpd} עודכנו מ-${sheets.length} שכונות`);
+  if(typeof renderImport==='function')renderImport();
+  if(typeof renderNav==='function')renderNav();
+  if(typeof updateSidebarStats==='function')updateSidebarStats();
+  if(typeof markChanged==='function')markChanged('ייבוא מרובה שכונות');
+}
+// פונקציית עזר לזיהוי יעד (משותפת)
+function mergeTargetKey(sheetName){
+  return sheetName.includes('דניה')?'denyaSale':(sheetName.includes('השכרה')?'bhkRent':sheetName.includes('רחביה')?'rehaviaSale':sheetName.includes('טלביה')?'talbiyaSale':sheetName.includes('המושבה')?'germanSale':sheetName.includes('בקעה')?'bakaSale':sheetName.includes('ארנונה')?'arnonaSale':sheetName.includes('מרכז העיר')?'cityCenterSale':sheetName.includes('קטמון')?'katamonSale':sheetName.includes('ניות')?'niotSale':sheetName.includes('ימין משה')?'yeminMosheSale':sheetName.includes('מקור חיים')?'makorHaimSale':'bhkSale');
+}
 function showMerge(rows,headers,sheetName){
   const mapped=rows.map(rowToProp).filter(p=>p.addr);
-  const targetKey=sheetName.includes('דניה')?'denyaSale':(sheetName.includes('השכרה')?'bhkRent':sheetName.includes('רחביה')?'rehaviaSale':sheetName.includes('טלביה')?'talbiyaSale':sheetName.includes('המושבה')?'germanSale':sheetName.includes('בקעה')?'bakaSale':sheetName.includes('ארנונה')?'arnonaSale':sheetName.includes('מרכז העיר')?'cityCenterSale':sheetName.includes('קטמון')?'katamonSale':sheetName.includes('ניות')?'niotSale':sheetName.includes('ימין משה')?'yeminMosheSale':sheetName.includes('מקור חיים')?'makorHaimSale':'bhkSale');
+  const targetKey=mergeTargetKey(sheetName);
+  if(!PEER_DATA[targetKey])PEER_DATA[targetKey]=[];
   const existing=new Map(PEER_DATA[targetKey].map(p=>[normAddr(p.addr),p]));
   const incoming=new Map();mapped.forEach(p=>incoming.set(normAddr(p.addr),p));
   const newRows=[],updated=[],unchanged=[];
