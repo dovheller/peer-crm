@@ -1839,7 +1839,7 @@ function pixelFallback(q){
 
 /* ============== IMPORT (weekly merge) ============== */
 const SCHEMA={
-  'סטטוס':'status','כתובת':'addr','חדרים':'rooms','מ"ר':'m2','קומה':'floor','מחיר (₪)':'price','מחיר':'price','מטבע':'currency','שכ"ד חודשי (₪)':'rent','מתווך':'agent','מקור':'src','הערות':'notes','שכונה':'nbh','סוג נכס':'type','מחיר למ"ר (₪)':'permm','עיר/אזור':'city','תיאור הנכס':'desc'
+  'סטטוס':'status','כתובת':'addr','רחוב/כתובת':'addr','רחוב':'addr','חדרים':'rooms','מ"ר':'m2','קומה':'floor','מחיר (₪)':'price','מחיר':'price','מטבע':'currency','שכ"ד חודשי (₪)':'rent','מתווך':'agent','מקור':'src','הערות':'notes','שכונה':'nbh','סוג נכס':'type','מחיר למ"ר (₪)':'permm','עיר/אזור':'city','תיאור הנכס':'desc'
 };
 function normAddr(a){return String(a||'').trim().replace(/\s+/g,' ').toLowerCase()}
 function rowToProp(r){const p={};Object.keys(r).forEach(k=>{const f=SCHEMA[String(k).trim()];if(f)p[f]=r[k]});return p}
